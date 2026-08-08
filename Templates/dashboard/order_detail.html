@@ -1,0 +1,932 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid mt-4 mb-5">
+
+    <!-- ================= PAGE HEADER ================= -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h3 class="mb-1">
+                Order #{{ order.order_code }}
+            </h3>
+
+            <small class="text-muted">
+                {{ order.created_at|date:"d M Y, h:i A" }}
+            </small>
+
+        </div>
+
+        <div>
+
+            <a href="{% url 'admin_panel' %}?tab=orders"
+               class="btn btn-outline-secondary">
+
+                ← Back to Orders
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= STATUS ================= -->
+
+    <div class="mb-4">
+
+        {% if order.status == "pending" %}
+
+            <span class="badge badge-warning p-2">
+                Pending
+            </span>
+
+        {% elif order.status == "accepted" %}
+
+            <span class="badge badge-success p-2">
+                Accepted
+            </span>
+
+        {% elif order.status == "rejected" %}
+
+            <span class="badge badge-danger p-2">
+                Rejected
+            </span>
+
+        {% elif order.status == "supplier_done" %}
+
+            <span class="badge badge-info p-2">
+                Supplier Reviewed
+            </span>
+
+        {% else %}
+
+            <span class="badge badge-primary p-2">
+                {{ order.get_status_display }}
+            </span>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ================= BASIC INFO ================= -->
+
+    <div class="row">
+
+        <div class="col-md-6 mb-4">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <strong>Order Information</strong>
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-sm table-borderless mb-0">
+
+                        <tr>
+                            <th width="160">Order ID</th>
+                            <td>{{ order.order_code }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Status</th>
+                            <td>{{ order.get_status_display }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Created</th>
+                            <td>{{ order.created_at|date:"d M Y h:i A" }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Total Products</th>
+                            <td>{{ order.items.count }}</td>
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6 mb-4">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <strong>Customer Information</strong>
+                </div>
+
+                <div class="card-body">
+
+                    <table class="table table-sm table-borderless mb-0">
+
+                        <tr>
+                            <th width="160">Customer ID</th>
+                            <td>{{ order.user.user_code }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Name</th>
+                            <td>{{ order.user.username }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Email</th>
+                            <td>{{ order.user.email }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Phone</th>
+                            <td>{{ order.user.phone_number }}</td>
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= QUICK LINKS ================= -->
+
+    <div class="mb-4">
+
+        {% if order.journal %}
+
+        <a href="{% url 'journal_detail' order.journal.journal_id %}"
+           class="btn btn-success mr-2">
+
+            View Journal
+
+        </a>
+
+        {% endif %}
+
+        {% if order.customer_account_id %}
+
+        <a href="{% url 'ledger_detail' order.customer_account_id %}"
+           class="btn btn-primary">
+
+            Customer Ledger
+
+        </a>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ================= ORDER TOTAL ================= -->
+
+    <div class="card mb-4">
+
+        <div class="card-header">
+            <strong>Order Summary</strong>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row text-center">
+
+                <div class="col-md-3 mb-3">
+
+                    <h6 class="text-muted">
+                        Original Total
+                    </h6>
+
+                    <h5>
+                        ৳ {{ order.total_price }}
+                    </h5>
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+
+                    <h6 class="text-muted">
+                        Updated Total
+                    </h6>
+
+                    <h5>
+                        ৳ {{ order.updated_total_price }}
+                    </h5>
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+
+                    <h6 class="text-muted">
+                        Discount
+                    </h6>
+
+                    <h5>
+                        ৳ {{ order.discount }}
+                    </h5>
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+
+                    <h6 class="text-muted">
+                        Final Payment
+                    </h6>
+
+                    <h4 class="text-success">
+                        ৳ {{ order.final_payment }}
+                    </h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= FORM START ================= -->
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <input
+            type="hidden"
+            name="order_id"
+            value="{{ order.id }}">
+                <!-- ================= ORDER PRODUCTS ================= -->
+
+        <div class="card mb-4">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <strong>Ordered Products</strong>
+
+                <span class="badge badge-secondary">
+                    {{ order.items.count }} Item{{ order.items.count|pluralize }}
+                </span>
+
+            </div>
+
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover mb-0">
+
+                        <thead class="thead-light">
+
+                            <tr>
+
+                                <th width="60">#</th>
+
+                                <th>Product</th>
+
+                                <th class="text-center">Ordered Qty</th>
+
+                                <th class="text-center">Updated Qty</th>
+
+                                <th class="text-center">Unit Price</th>
+
+                                <th class="text-center">Total</th>
+
+                                <th class="text-center">Updated Total</th>
+
+                                <th width="220">Remarks</th>
+
+                                <th width="170">Status</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for item in order.items.all %}
+
+                            <tr>
+
+                                <!-- Serial -->
+
+                                <td>
+
+                                    {{ forloop.counter }}
+
+                                </td>
+
+                                <!-- Product -->
+
+                                <td>
+
+                                    <strong>
+
+                                        {{ item.product.name }}
+
+                                    </strong>
+
+                                    <br>
+
+                                    <small class="text-muted">
+
+                                        {{ item.product.get_unit_display }}
+
+                                    </small>
+
+                                </td>
+
+                                <!-- Ordered Qty -->
+
+                                <td class="text-center">
+
+                                    {{ item.quantity }}
+
+                                </td>
+
+                                <!-- Updated Qty -->
+
+                                <td>
+
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        class="form-control form-control-sm text-center"
+                                        name="qty_{{ item.id }}"
+                                        value="{{ item.updated_quantity|default_if_none:item.quantity }}">
+
+                                </td>
+
+                                <!-- Unit Price -->
+
+                                <td class="text-center">
+
+                                    ৳ {{ item.price_at_order_time }}
+
+                                </td>
+
+                                <!-- Total -->
+
+                                <td class="text-center">
+
+                                    ৳ {{ item.total_price }}
+
+                                </td>
+
+                                <!-- Updated Total -->
+
+                                <td class="text-center">
+
+                                    <strong>
+
+                                        ৳ {{ item.updated_total }}
+
+                                    </strong>
+
+                                </td>
+
+                                <!-- Remarks -->
+
+                                <td>
+
+                                    <input
+                                        type="text"
+                                        class="form-control form-control-sm"
+                                        name="remark_{{ item.id }}"
+                                        value="{{ item.remarks|default:'' }}"
+                                        placeholder="Remarks">
+
+                                </td>
+
+                                <!-- Status -->
+
+                                <td>
+
+                                    <select
+                                        name="status_{{ item.id }}"
+                                        class="form-control form-control-sm">
+
+                                        <option value="pending"
+                                            {% if item.status == "pending" %}selected{% endif %}>
+                                            Pending
+                                        </option>
+
+                                        <option value="accepted"
+                                            {% if item.status == "accepted" %}selected{% endif %}>
+                                            Accepted
+                                        </option>
+
+                                        <option value="rejected"
+                                            {% if item.status == "rejected" %}selected{% endif %}>
+                                            Rejected
+                                        </option>
+
+                                        <option value="complimentary"
+                                            {% if item.status == "complimentary" %}selected{% endif %}>
+                                            Complimentary
+                                        </option>
+
+                                    </select>
+
+                                </td>
+
+                            </tr>
+
+                            {% empty %}
+
+                            <tr>
+
+                                <td colspan="9" class="text-center py-4">
+
+                                    No products found.
+
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+                <!-- ================= ORDER SETTINGS ================= -->
+
+        <div class="row">
+
+            <!-- ================= ASSIGN STAFF ================= -->
+
+            <div class="col-lg-6 mb-4">
+
+                <div class="card h-100">
+
+                    <div class="card-header">
+
+                        <strong>Assign Staff</strong>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <label>
+
+                            Select Staff
+
+                        </label>
+
+                        <select
+                            name="assigned_user"
+                            class="form-control">
+
+                            <option value="">
+
+                                Select Staff
+
+                            </option>
+
+                            {% for u in users %}
+
+                            <option
+                                value="{{ u.id }}"
+                                {% if order.assigned_to and order.assigned_to.id == u.id %}selected{% endif %}>
+
+                                {{ u.username }}
+                                |
+                                {{ u.email }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <small class="text-muted d-block mt-2">
+
+                            Assign this order to a staff member.
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= ORDER STATUS ================= -->
+
+            <div class="col-lg-6 mb-4">
+
+                <div class="card h-100">
+
+                    <div class="card-header">
+
+                        <strong>Order Status</strong>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <label>
+
+                            Current Status
+
+                        </label>
+
+                        <select
+                            name="status"
+                            class="form-control">
+
+                            {% for value,label in order.STATUS_CHOICES %}
+
+                            <option
+                                value="{{ value }}"
+                                {% if order.status == value %}selected{% endif %}>
+
+                                {{ label }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <small class="text-muted d-block mt-2">
+
+                            Change the order workflow status.
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= ADD PRODUCT ================= -->
+
+        <div class="card mb-4">
+
+            <div class="card-header">
+
+                <strong>Add Product</strong>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <!-- Product -->
+
+                    <div class="col-lg-6 mb-3">
+
+                        <label>
+
+                            Product
+
+                        </label>
+
+                        <select
+                            name="new_product_id"
+                            class="form-control">
+
+                            <option value="">
+
+                                Select Product
+
+                            </option>
+
+                            {% for p in products %}
+
+                            <option value="{{ p.id }}">
+
+                                {{ p.name }}
+                                (৳ {{ p.price }})
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <!-- Quantity -->
+
+                    <div class="col-lg-3 mb-3">
+
+                        <label>
+
+                            Quantity
+
+                        </label>
+
+                        <input
+                            type="number"
+                            step="0.01"
+                            name="new_qty"
+                            class="form-control"
+                            placeholder="0.00">
+
+                    </div>
+
+                    <!-- Button -->
+
+                    <div class="col-lg-3 mb-3 d-flex align-items-end">
+
+                        <button
+                            type="submit"
+                            class="btn btn-success btn-block">
+
+                            Add Product
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+                <!-- ================= FINANCIAL SETTINGS ================= -->
+
+        <div class="card mb-4">
+
+            <div class="card-header">
+
+                <strong>Financial Settings</strong>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <!-- Discount -->
+
+                    <div class="col-lg-4 mb-3">
+
+                        <label>
+
+                            Discount
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <div class="input-group-prepend">
+
+                                <span class="input-group-text">
+                                    ৳
+                                </span>
+
+                            </div>
+
+                            <input
+                                type="number"
+                                step="0.01"
+                                name="discount"
+                                value="{{ order.discount|default:0 }}"
+                                class="form-control">
+
+                        </div>
+
+                    </div>
+
+                    <!-- Packaging -->
+
+                    <div class="col-lg-4 mb-3">
+
+                        <label>
+
+                            Packaging Charge
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <div class="input-group-prepend">
+
+                                <span class="input-group-text">
+                                    ৳
+                                </span>
+
+                            </div>
+
+                            <input
+                                type="number"
+                                step="0.01"
+                                name="packaging_charge"
+                                value="{{ order.packaging_charge|default:0 }}"
+                                class="form-control">
+
+                        </div>
+
+                    </div>
+
+                    <!-- bKash -->
+
+                    <div class="col-lg-4 mb-3">
+
+                        <label>
+
+                            bKash Charge
+
+                        </label>
+
+                        <div class="border rounded p-3">
+
+                            <div class="custom-control custom-switch">
+
+                                <input
+                                    type="checkbox"
+                                    class="custom-control-input"
+                                    id="bkash{{ order.id }}"
+                                    name="apply_bkash_charge"
+                                    {% if order.apply_bkash_charge %}checked{% endif %}>
+
+                                <label
+                                    class="custom-control-label"
+                                    for="bkash{{ order.id }}">
+
+                                    Apply bKash Charge
+
+                                </label>
+
+                            </div>
+
+                            <small class="text-muted d-block mt-2">
+
+                                Auto adds bKash charge if enabled.
+
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= PAYMENT SUMMARY ================= -->
+
+        <div class="card mb-4">
+
+            <div class="card-header">
+
+                <strong>Payment Summary</strong>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row text-center">
+
+                    <div class="col-md-3 col-6 mb-3">
+
+                        <h6 class="text-muted">
+
+                            Items Total
+
+                        </h6>
+
+                        <h5>
+
+                            ৳ {{ order.updated_total_price }}
+
+                        </h5>
+
+                    </div>
+
+                    <div class="col-md-3 col-6 mb-3">
+
+                        <h6 class="text-muted">
+
+                            Discount
+
+                        </h6>
+
+                        <h5 class="text-danger">
+
+                            - ৳ {{ order.discount }}
+
+                        </h5>
+
+                    </div>
+
+                    <div class="col-md-3 col-6 mb-3">
+
+                        <h6 class="text-muted">
+
+                            Packaging
+
+                        </h6>
+
+                        <h5>
+
+                            + ৳ {{ order.packaging_charge }}
+
+                        </h5>
+
+                    </div>
+
+                    <div class="col-md-3 col-6 mb-3">
+
+                        <h6 class="text-muted">
+
+                            Final Payment
+
+                        </h6>
+
+                        <h4 class="text-success">
+
+                            ৳ {{ order.final_payment }}
+
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= SAVE ================= -->
+
+        <div class="sticky-bottom bg-white border-top py-3">
+
+            <div class="text-right">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary px-5">
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+<style>
+
+.card{
+    border-radius:10px;
+}
+
+.card-header{
+    background:#f8f9fa;
+    font-weight:600;
+}
+
+.table th,
+.table td{
+    vertical-align:middle;
+}
+
+.badge{
+    font-size:13px;
+}
+
+.sticky-bottom{
+    position:sticky;
+    bottom:0;
+    z-index:100;
+}
+
+</style>
+
+{% endblock %}

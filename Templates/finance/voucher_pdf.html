@@ -1,0 +1,564 @@
+{% load humanize %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        Voucher - {{ voucher.voucher_no }}
+    </title>
+
+
+    <style>
+
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            font-size: 13px;
+
+            color: #333;
+
+        }
+
+
+        .header {
+
+            text-align: center;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .header h2 {
+
+            margin: 0;
+
+            font-size: 24px;
+
+        }
+
+
+        .header p {
+
+            margin: 5px 0;
+
+        }
+
+
+
+        .info-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            margin-bottom: 20px;
+
+        }
+
+
+
+        .info-table td {
+
+            padding: 8px;
+
+            border: 1px solid #ddd;
+
+        }
+
+
+        .entry-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+
+
+        .entry-table th {
+
+            background: #f2f2f2;
+
+            padding: 8px;
+
+            border: 1px solid #999;
+
+        }
+
+
+        .entry-table td {
+
+            padding: 8px;
+
+            border: 1px solid #999;
+
+        }
+
+
+        .text-right {
+
+            text-align: right;
+
+        }
+
+
+
+        .total-row {
+
+            font-weight: bold;
+
+        }
+
+
+
+        .footer {
+
+            margin-top: 50px;
+
+            width:100%;
+
+        }
+
+
+
+        .signature {
+
+            width:30%;
+
+            float:right;
+
+            text-align:center;
+
+            border-top:1px solid #333;
+
+            padding-top:5px;
+
+        }
+
+
+
+    </style>
+
+
+</head>
+
+
+
+<body>
+
+
+
+<div class="header">
+
+
+    <h2>
+
+        AMADER UTHAAN KRSI
+
+    </h2>
+
+
+    <p>
+
+        Voucher Statement
+
+    </p>
+
+
+    <p>
+
+        Voucher No:
+
+        <strong>
+
+            {{ voucher.voucher_no }}
+
+        </strong>
+
+    </p>
+
+
+</div>
+
+
+
+
+
+
+
+<table class="info-table">
+
+
+<tr>
+
+
+<td>
+
+<strong>
+Voucher Type
+</strong>
+
+<br>
+
+{{ voucher.get_voucher_type_display }}
+
+
+</td>
+
+
+
+<td>
+
+
+<strong>
+Date
+</strong>
+
+
+<br>
+
+
+{{ voucher.created_at|date:"d M Y" }}
+
+
+</td>
+
+
+
+</tr>
+
+
+
+
+<tr>
+
+
+<td>
+
+
+<strong>
+Reference No
+</strong>
+
+
+<br>
+
+
+{{ voucher.reference_no|default:"-" }}
+
+
+
+</td>
+
+
+
+
+
+<td>
+
+
+<strong>
+Customer
+</strong>
+
+
+<br>
+
+
+{% if voucher.customer %}
+
+
+{{ voucher.customer.username }}
+
+
+{% else %}
+
+
+-
+
+
+{% endif %}
+
+
+
+</td>
+
+
+
+</tr>
+
+
+
+<tr>
+
+
+<td colspan="2">
+
+
+<strong>
+Notes
+</strong>
+
+
+<br>
+
+
+{{ voucher.notes|default:"-" }}
+
+
+
+</td>
+
+
+
+</tr>
+
+
+
+</table>
+
+
+
+
+
+
+
+
+
+
+<h4>
+
+Accounting Entries
+
+</h4>
+
+
+
+
+<table class="entry-table">
+
+
+<thead>
+
+
+<tr>
+
+
+<th>
+Account
+</th>
+
+
+<th>
+Against
+</th>
+
+
+<th>
+Debit
+</th>
+
+
+<th>
+Credit
+</th>
+
+
+<th>
+Narration
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+<tbody>
+
+
+
+{% for entry in entries %}
+
+
+
+<tr>
+
+
+<td>
+
+{{ entry.account.name }}
+
+</td>
+
+
+
+<td>
+
+
+{% if entry.against %}
+
+{{ entry.against.name }}
+
+
+{% else %}
+
+-
+
+{% endif %}
+
+
+</td>
+
+
+
+
+
+<td class="text-right">
+
+
+{{ entry.debit|intcomma }}
+
+
+</td>
+
+
+
+
+
+<td class="text-right">
+
+
+{{ entry.credit|intcomma }}
+
+
+</td>
+
+
+
+
+
+<td>
+
+
+{{ entry.narration }}
+
+
+</td>
+
+
+
+</tr>
+
+
+
+{% endfor %}
+
+
+
+<tr class="total-row">
+
+
+<td colspan="2"
+    class="text-right">
+
+
+Total
+
+
+</td>
+
+
+
+
+<td class="text-right">
+
+
+{{ total_debit|intcomma }}
+
+
+</td>
+
+
+
+
+<td class="text-right">
+
+
+{{ total_credit|intcomma }}
+
+
+</td>
+
+
+<td>
+
+
+</td>
+
+
+</tr>
+
+
+
+</tbody>
+
+
+
+</table>
+
+
+
+
+
+
+
+
+
+
+<div class="footer">
+
+
+<br><br><br>
+
+
+
+<div class="signature">
+
+
+Prepared By
+
+
+<br>
+
+
+{{ voucher.created_by.username|default:"Admin" }}
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+</body>
+
+
+</html>

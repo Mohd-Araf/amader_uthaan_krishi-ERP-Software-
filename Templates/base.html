@@ -1,0 +1,1130 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Amader Uthaan Krishi{% endblock %}</title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <link rel="stylesheet" href="{% static 'css/profiles.css' %}">
+  <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+  <link rel="stylesheet" href="{% static 'css/about.css' %}">
+  <link rel="stylesheet" href="{% static 'css/user_orders.css' %}">
+  <link rel="stylesheet" href="{% static 'css/admin_panal.css' %}">
+  <!-- Extra CSS from child templates -->
+  {% block extra_css %}{% endblock %}
+
+  <style>
+    :root {
+      --primary-green: #1a7a3c;
+      --green-light:   #22a052;
+      --green-accent:  #eafaf1;
+      --cream:         #f8f6f0;
+      --cream-dark:    #ede9df;
+      --text-dark:     #1a1f16;
+      --text-mid:      #4a5244;
+      --text-soft:     #8a9488;
+      --white:         #ffffff;
+      --shadow-soft:   0 8px 32px rgba(26,122,60,0.10);
+      --shadow-card:   0 4px 24px rgba(26,30,22,0.08);
+      --radius-pill:   50px;
+      --radius-md:     14px;
+    }
+
+    body {
+      font-family: 'Outfit', 'Nunito', sans-serif !important;
+      background-color: var(--cream);
+      color: var(--text-dark);
+    }
+
+    /* ─── SITE NAVBAR ─── */
+    .site-navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      background: #eef9ee;
+      box-shadow: 0 4px 20px rgba(26, 122, 60, 0.08);
+      border-bottom: 2px solid var(--cream-dark);
+      padding: 10px 0;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 16px;
+      gap: 10px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      text-decoration: none !important;
+      flex-shrink: 0;
+    }
+
+    .nav-logo {
+      height: 40px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* Desktop Nav Links */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 24px;
+    }
+
+    .nav-link-item {
+      text-decoration: none !important;
+      color: var(--text-dark);
+      font-weight: 600;
+      font-size: 15px;
+      position: relative;
+      padding: 6px 0;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link-item:hover,
+    .nav-link-item.active {
+      color: var(--primary-green);
+    }
+
+    .nav-link-item::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary-green);
+      transition: width 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .nav-link-item:hover::after,
+    .nav-link-item.active::after {
+      width: 100%;
+    }
+
+    /* Desktop Search & Right items */
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .nav-search-form {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--primary-green);
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .nav-search-input {
+      padding: 8px 48px 8px 36px;
+      border-radius: var(--radius-pill);
+      border: 1.5px solid var(--cream-dark);
+      background: var(--white);
+      font-size: 14px;
+      width: 210px;
+      transition: all 0.3s ease;
+      outline: none;
+      color: var(--text-dark) !important;
+      font-weight: 500;
+    }
+
+    .nav-search-input::placeholder {
+      color: #64748b !important;
+      opacity: 1;
+    }
+
+    .nav-search-input:focus {
+      background: var(--white);
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 3px rgba(26, 122, 60, 0.15);
+      width: 250px;
+    }
+
+    .nav-search-btn {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--primary-green);
+      color: var(--white) !important;
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 2;
+    }
+
+    .nav-search-btn:hover {
+      background: var(--green-light);
+    }
+
+    /* Auth Buttons & Dropdown */
+    .btn-nav-login {
+      color: var(--primary-green);
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: var(--radius-pill);
+      border: 2px solid var(--primary-green);
+      text-decoration: none !important;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+
+    .btn-nav-login:hover {
+      background: var(--primary-green);
+      color: var(--white) !important;
+    }
+
+    .btn-nav-signup {
+      background: var(--primary-green);
+      color: var(--white) !important;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: var(--radius-pill);
+      border: 2px solid var(--primary-green);
+      text-decoration: none !important;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(26, 122, 60, 0.2);
+    }
+
+    .btn-nav-signup:hover {
+      background: var(--green-light);
+      border-color: var(--green-light);
+    }
+
+    /* User Dropdown Desktop */
+    .user-dropdown {
+      position: relative;
+    }
+
+    .user-dropdown-toggle {
+      background: var(--cream);
+      border: 1.5px solid var(--cream-dark);
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .user-dropdown-toggle:hover {
+      border-color: var(--primary-green);
+      background: var(--green-accent);
+    }
+
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      background: var(--primary-green);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-dark);
+      max-width: 100px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chev {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .user-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 200px;
+      background: var(--white);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--cream-dark);
+      padding: 8px 0;
+      display: none;
+      z-index: 1040;
+    }
+
+    .user-dropdown-menu.show {
+      display: block;
+    }
+
+    .ddrop-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      color: var(--text-dark);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none !important;
+      transition: background 0.2s ease;
+    }
+
+    .ddrop-link i {
+      width: 16px;
+      color: var(--primary-green);
+    }
+
+    .ddrop-link:hover {
+      background: var(--green-accent);
+      color: var(--primary-green);
+    }
+
+    .ddrop-divider {
+      height: 1px;
+      background: var(--cream-dark);
+      margin: 6px 0;
+    }
+
+    .ddrop-logout {
+      width: 100%;
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      color: #dc2626;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.2s ease;
+    }
+
+    .ddrop-logout:hover {
+      background: #fef2f2;
+    }
+
+    /* ─── MOBILE MIDDLE INLINE NAV ─── */
+    .mobile-only {
+      display: none !important;
+    }
+
+    .mobile-nav-inline {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0 auto;
+    }
+
+    .mnav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--cream);
+      color: var(--text-dark) !important;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none !important;
+      border: 1px solid var(--cream-dark);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .mnav-pill i {
+      color: var(--primary-green);
+      font-size: 12px;
+    }
+
+    .mnav-pill:hover,
+    .mnav-pill.active {
+      background: var(--primary-green);
+      color: var(--white) !important;
+      border-color: var(--primary-green);
+    }
+
+    .mnav-pill:hover i,
+    .mnav-pill.active i {
+      color: var(--white);
+    }
+
+    /* Mobile User Profile Dropdown */
+    .mobile-user-dropdown {
+      position: relative;
+    }
+
+    .mobile-user-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: -20px;
+      width: 180px;
+      background: var(--white);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--cream-dark);
+      padding: 6px 0;
+      display: none;
+      z-index: 1045;
+    }
+
+    .mobile-user-menu.show {
+      display: block;
+    }
+
+    /* Hamburger Button (Mobile) */
+    .hamburger {
+      background: var(--cream);
+      border: 1px solid var(--cream-dark);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .hbar {
+      width: 18px;
+      height: 2px;
+      background-color: var(--primary-green);
+      border-radius: 2px;
+    }
+
+    /* ─── MOBILE DRAWER & OVERLAY ─── */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 1040;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .drawer-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mobile-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 300px;
+      max-width: 85vw;
+      height: 100vh;
+      background: var(--white);
+      z-index: 1050;
+      box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+    }
+
+    .mobile-drawer.active {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--cream-dark);
+      background: var(--cream);
+    }
+
+    .drawer-logo {
+      height: 36px;
+      width: auto;
+    }
+
+    .drawer-close {
+      background: var(--white);
+      border: 1px solid var(--cream-dark);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dark);
+      cursor: pointer;
+    }
+
+    /* Drawer Search Box */
+    .drawer-search {
+      padding: 16px 20px;
+      position: relative;
+      display: flex;
+      gap: 8px;
+      background: var(--cream);
+      border-bottom: 1px solid var(--cream-dark);
+    }
+
+    .drawer-search i {
+      position: absolute;
+      left: 32px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary-green);
+      font-size: 14px;
+    }
+
+    .drawer-search input {
+      width: 100%;
+      padding: 9px 14px 9px 36px;
+      border-radius: var(--radius-pill);
+      border: 1.5px solid var(--primary-green);
+      background: var(--white) !important;
+      color: var(--text-dark) !important;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .drawer-search input::placeholder {
+      color: var(--text-soft) !important;
+    }
+
+    .drawer-search button {
+      background: var(--primary-green) !important;
+      color: var(--white) !important;
+      border: none;
+      padding: 0 16px;
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* Drawer Nav Links (Hover Bug Fix) */
+    .drawer-nav {
+      padding: 14px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .drawer-link {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      color: var(--text-dark);
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none !important;
+      transition: all 0.25s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .drawer-link i {
+      width: 20px;
+      font-size: 16px;
+      color: var(--primary-green);
+      transition: color 0.25s ease, transform 0.25s ease;
+    }
+
+    .drawer-link:hover,
+    .drawer-link.active {
+      background: var(--green-accent);
+      color: var(--primary-green) !important;
+      border-left-color: var(--primary-green);
+      padding-left: 18px;
+    }
+
+    .drawer-link:hover i,
+    .drawer-link.active i {
+      color: var(--primary-green) !important;
+      transform: scale(1.15);
+    }
+
+    /* Drawer Auth Area */
+    .drawer-auth {
+      margin-top: auto;
+      padding: 20px;
+      border-top: 1px solid var(--cream-dark);
+      background: var(--cream);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .drawer-user-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 12px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+
+    .drawer-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--primary-green);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .drawer-username {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text-dark);
+    }
+
+    .drawer-user-sub {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .dauth-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px;
+      border-radius: var(--radius-pill);
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none !important;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .dauth-btn.outline {
+      border: 1.5px solid var(--cream-dark);
+      background: var(--white);
+      color: var(--text-dark);
+    }
+
+    .dauth-btn.outline:hover {
+      border-color: var(--primary-green);
+      color: var(--primary-green);
+      background: var(--green-accent);
+    }
+
+    .dauth-btn.solid {
+      background: var(--primary-green);
+      color: var(--white);
+    }
+
+    .dauth-btn.solid:hover {
+      background: var(--green-light);
+    }
+
+    .dauth-btn.danger {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    .dauth-btn.danger:hover {
+      background: #fee2e2;
+    }
+
+    /* ─── FOOTER ─── */
+    .site-footer {
+      background: #1b4332; /* Softened modern organic green */
+      color: #e2e8f0;
+      padding: 60px 0 30px 0;
+      margin-top: 60px;
+    }
+
+    .footer-brand {
+      color: var(--white);
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+    }
+
+    .footer-tagline {
+      color: #b7e4c7;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .footer-heading {
+      color: var(--white);
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 18px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .footer-heading::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 32px;
+      height: 2px;
+      background: #52d681;
+      border-radius: 2px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-links a {
+      color: #d8f3dc;
+      text-decoration: none !important;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      display: inline-block;
+    }
+
+    .footer-links a:hover {
+      color: #ffffff;
+      transform: translateX(4px);
+    }
+
+    .footer-contact {
+      color: #d8f3dc;
+      font-size: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-contact i {
+      color: #52d681;
+      background: rgba(255, 255, 255, 0.08);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .footer-hr {
+      border-color: rgba(255, 255, 255, 0.12);
+      margin: 40px 0 20px 0;
+    }
+
+    .footer-copy {
+      text-align: center;
+      color: #94d2bd;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    /* ─── RESPONSIVE BREAKPOINTS ─── */
+    @media (max-width: 991px) {
+      .desktop-only {
+        display: none !important;
+      }
+
+      .mobile-only {
+        display: flex !important;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .site-footer {
+        padding: 40px 0 25px 0;
+      }
+
+      .footer-col-mobile {
+        margin-bottom: 26px;
+        padding-bottom: 18px;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+      }
+
+      .footer-col-mobile:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+
+      .footer-links a:hover {
+        transform: translateX(6px);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── MAIN NAVBAR ─── -->
+<nav class="site-navbar" id="siteNavbar">
+  <div class="navbar-inner">
+
+    <!-- Brand -->
+    <a class="nav-brand" href="{% url 'home' %}">
+      <img src="{% static 'images/logo.png' %}" alt="Amader Uthaan Krishi" class="nav-logo">
+    </a>
+
+    <!-- Mobile Middle Quick Links (Home, Shop, User Profile) -->
+    <div class="mobile-nav-inline mobile-only">
+      <a href="{% url 'home' %}" class="mnav-pill {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+        <i class="fas fa-house"></i>
+        <span>Home</span>
+      </a>
+
+      <a href="{% url 'shop' %}" class="mnav-pill {% if request.resolver_match.url_name == 'shop' %}active{% endif %}">
+        <i class="fas fa-store"></i>
+        <span>Shop</span>
+      </a>
+
+      {% if user.is_authenticated %}
+        <!-- Mobile User Profile Dropdown -->
+        <div class="mobile-user-dropdown">
+          <button class="mnav-pill" id="mobileUserBtn" type="button">
+            <i class="fas fa-user-circle"></i>
+            <span>Profile</span>
+            <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+          </button>
+
+          <div class="mobile-user-menu" id="mobileUserMenu">
+            {% if user.is_superuser %}
+                <a href="{% url 'profile' %}" class="ddrop-link">
+                    <i class="fas fa-id-card"></i> Profile
+                </a>
+                <a href="{% url 'admin_panel' %}" class="ddrop-link">
+                    <i class="fa-solid fa-globe"></i> Admin Control
+                </a>
+            {% else %}
+                <a href="{% url 'profile' %}" class="ddrop-link">
+                    <i class="fas fa-id-card"></i> My Profile
+                </a>
+                <a href="{% url 'user_orders' %}" class="ddrop-link">
+                    <i class="fas fa-box-open"></i> My Orders
+                </a>
+            {% endif %}
+
+            <div class="ddrop-divider"></div>
+
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="ddrop-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+          </div>
+        </div>
+      {% else %}
+        <a href="{% url 'login' %}" class="mnav-pill">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>Login</span>
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Desktop Nav Links -->
+    <ul class="nav-links desktop-only">
+      <li><a href="{% url 'home' %}"    class="nav-link-item {% if request.resolver_match.url_name == 'home'    %}active{% endif %}">Home</a></li>
+      <li><a href="{% url 'shop' %}"    class="nav-link-item {% if request.resolver_match.url_name == 'shop'    %}active{% endif %}">Shop</a></li>
+      <li><a href="{% url 'contact' %}" class="nav-link-item {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a></li>
+      <li><a href="{% url 'about' %}"   class="nav-link-item {% if request.resolver_match.url_name == 'about'   %}active{% endif %}">About</a></li>
+    </ul>
+
+    <!-- Desktop Right -->
+    <div class="nav-right desktop-only">
+
+      <!-- Search Form (With Go Button & Adjusted Contrast) -->
+      <form class="nav-search-form" method="get" action="{% url 'shop' %}">
+        <i class="fas fa-search search-icon"></i>
+        <input type="search" name="q" placeholder="Search products…"
+               value="{{ request.GET.q }}" class="nav-search-input" autocomplete="off">
+        <button type="submit" class="nav-search-btn">View</button>
+      </form>
+
+      {% if user.is_authenticated %}
+        <!-- User Dropdown -->
+        <div class="user-dropdown" id="userDropdown">
+          <button class="user-dropdown-toggle" id="userDropdownBtn"
+                  type="button" aria-haspopup="true" aria-expanded="false">
+            <span class="user-avatar"><i class="fas fa-user"></i></span>
+            <span class="user-name">{{ user.username }}</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </button>
+          <div class="user-dropdown-menu" id="userDropdownMenu" role="menu">
+
+            {% if user.is_superuser %}
+                <a href="{% url 'profile' %}" class="ddrop-link">
+                    <i class="fas fa-id-card"></i>
+                    Profile
+                </a>
+
+                <a href="{% url 'admin_panel' %}" class="ddrop-link">
+                    <i class="fa-solid fa-globe"></i>
+                    Admin Control
+                </a>
+            {% else %}
+                <a href="{% url 'profile' %}" class="ddrop-link">
+                    <i class="fas fa-id-card"></i>
+                    My Profile
+                </a>
+
+                <a href="{% url 'user_orders' %}" class="ddrop-link">
+                    <i class="fas fa-box-open"></i>
+                    My Orders
+                </a>
+            {% endif %}
+
+            <div class="ddrop-divider"></div>
+
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="ddrop-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </form>
+
+          </div>
+        </div>
+
+      {% else %}
+        <a href="{% url 'login' %}"  class="btn-nav-login">Login</a>
+        <a href="{% url 'signup' %}" class="btn-nav-signup">Sign Up</a>
+      {% endif %}
+
+    </div><!-- /.nav-right -->
+
+    <!-- Hamburger (mobile) -->
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+      <span class="hbar"></span>
+      <span class="hbar"></span>
+      <span class="hbar"></span>
+    </button>
+
+  </div><!-- /.navbar-inner -->
+</nav>
+
+<!-- ─── MOBILE DRAWER ────────────────────── -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+
+<aside class="mobile-drawer" id="mobileDrawer" aria-label="Navigation" aria-modal="true">
+
+  <div class="drawer-header">
+    <img src="{% static 'images/logo.png' %}" alt="Logo" class="drawer-logo">
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">
+      <i class="fas fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- Search -->
+  <form class="drawer-search" method="get" action="{% url 'shop' %}">
+    <i class="fas fa-search"></i>
+    <input type="search" name="q" placeholder="Search products…" value="{{ request.GET.q }}">
+    <button type="submit">Go</button>
+  </form>
+
+  <!-- Nav Links -->
+  <nav class="drawer-nav">
+    <a href="{% url 'home' %}"    class="drawer-link {% if request.resolver_match.url_name == 'home'    %}active{% endif %}"><i class="fas fa-house"></i> Home</a>
+    <a href="{% url 'shop' %}"    class="drawer-link {% if request.resolver_match.url_name == 'shop'    %}active{% endif %}"><i class="fas fa-store"></i> Shop</a>
+    <a href="{% url 'contact' %}" class="drawer-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}"><i class="fas fa-envelope"></i> Contact</a>
+    <a href="{% url 'about' %}"   class="drawer-link {% if request.resolver_match.url_name == 'about'   %}active{% endif %}"><i class="fas fa-circle-info"></i> About</a>
+  </nav>
+
+  <!-- Auth -->
+  <div class="drawer-auth">
+    {% if user.is_authenticated %}
+      <div class="drawer-user-badge">
+        <span class="drawer-avatar"><i class="fas fa-user"></i></span>
+        <div>
+          <div class="drawer-username">{{ user.username }}</div>
+          <div class="drawer-user-sub">Logged in</div>
+        </div>
+      </div>
+      <a href="{% url 'profile' %}"     class="dauth-btn outline"><i class="fas fa-id-card"></i>  My Profile</a>
+      <a href="{% url 'user_orders' %}" class="dauth-btn outline"><i class="fas fa-box-open"></i> My Orders</a>
+      {% if user.is_superuser %}
+      <a href="{% url 'admin_panel' %}" class="dauth-btn outline"><i class="fa-solid fa-globe"></i> Admin Control</a>
+      {% endif %}
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="dauth-btn danger">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </form>
+    {% else %}
+      <a href="{% url 'login' %}"  class="dauth-btn outline"><i class="fas fa-sign-in-alt"></i> Login</a>
+      <a href="{% url 'signup' %}" class="dauth-btn solid"><i class="fas fa-user-plus"></i> Sign Up</a>
+    {% endif %}
+  </div>
+
+</aside>
+
+<!-- ─── PAGE CONTENT ─────────────────────── -->
+<main class="page-main">
+  <div class="container mt-4">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+<!-- ─── FOOTER ───────────────────────────── -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 footer-col-mobile">
+        <h5 class="footer-brand">Amader Uthaan Krishi</h5>
+        <p class="footer-tagline">Buy Fresh Food. Stay Healthy and enjoy a happy life.</p>
+      </div>
+      <div class="col-md-4 footer-col-mobile">
+        <h6 class="footer-heading">Quick Links</h6>
+        <div class="footer-links">
+          <a href="{% url 'home' %}">Home</a>
+          <a href="{% url 'shop' %}">Shop</a>
+          <a href="{% url 'contact' %}">Contact</a>
+          <a href="{% url 'about' %}">About</a>
+        </div>
+      </div>
+      <div class="col-md-4 footer-col-mobile">
+        <h6 class="footer-heading">Get in Touch</h6>
+        <p class="footer-contact"><i class="fas fa-envelope"></i> amaderuthaankrishibd@gmail.com</p>
+        <p class="footer-contact"><i class="fas fa-phone"></i> +8801403181484</p>
+        <p class="footer-contact"><i class="fas fa-map-marker-alt"></i> Farmgate, Dhaka, Bangladesh</p>
+      </div>
+    </div>
+    <hr class="footer-hr">
+    <p class="footer-copy">&copy; 2026 Amader Uthaan Krishi. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+<script src="{% static 'js/navbar.js' %}"></script>
+
+<!-- Interactive Scripts -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const drawerClose = document.getElementById('drawerClose');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+
+    const userDropdownBtn = document.getElementById('userDropdownBtn');
+    const userDropdownMenu = document.getElementById('userDropdownMenu');
+
+    const mobileUserBtn = document.getElementById('mobileUserBtn');
+    const mobileUserMenu = document.getElementById('mobileUserMenu');
+
+    // Drawer Open & Close
+    function openDrawer() {
+      mobileDrawer.classList.add('active');
+      drawerOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      mobileDrawer.classList.remove('active');
+      drawerOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    if (hamburgerBtn) hamburgerBtn.addEventListener('click', openDrawer);
+    if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+    if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && mobileDrawer.classList.contains('active')) {
+        closeDrawer();
+      }
+    });
+
+    // User Dropdown Toggle (Desktop)
+    if (userDropdownBtn && userDropdownMenu) {
+      userDropdownBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        userDropdownMenu.classList.toggle('show');
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!userDropdownBtn.contains(e.target) && !userDropdownMenu.contains(e.target)) {
+          userDropdownMenu.classList.remove('show');
+        }
+      });
+    }
+
+    // Mobile User Dropdown Toggle
+    if (mobileUserBtn && mobileUserMenu) {
+      mobileUserBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        mobileUserMenu.classList.toggle('show');
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!mobileUserBtn.contains(e.target) && !mobileUserMenu.contains(e.target)) {
+          mobileUserMenu.classList.remove('show');
+        }
+      });
+    }
+  });
+</script>
+
+</body>
+</html>
+```

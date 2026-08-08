@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3>Edit User</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+
+    <label>User Role</label>
+
+    <select name="role" class="form-control">
+
+        <!-- Normal User -->
+        <option value="user"
+            {% if not user.is_staff and not user.is_superuser %}selected{% endif %}>
+            Normal User
+        </option>
+
+        <!-- Staff -->
+        <option value="staff"
+            {% if user.is_staff and not user.is_superuser %}selected{% endif %}>
+            Staff (Supplier)
+        </option>
+
+        <!-- Admin -->
+        <option value="admin"
+            {% if user.is_superuser %}selected{% endif %}>
+            Admin
+        </option>
+
+    </select>
+
+</div>
+
+        User name: <input name="username" value="{{ user.username }}" class="form-control mb-2">
+        Gmail: <input name="email" value="{{ user.email }}" class="form-control mb-2">
+        Phone: <input name="phone_number" value="{{ user.phone_number }}" class="form-control mb-2">
+        Country: <input name="country" value="{{ user.country }}" class="form-control mb-2">
+        Location: <input name="location" value="{{ user.location }}" class="form-control mb-2">
+
+        <button class="btn btn-success">Save</button>
+
+    </form>
+
+</div>
+
+{% endblock %}

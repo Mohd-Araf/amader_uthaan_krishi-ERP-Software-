@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/finance.css' %}">
+
+{% endblock %}
+
+{% block title %}
+Cancel Voucher
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="container-fluid">
+
+
+    <div class="card shadow-sm border-0 mt-4">
+
+
+        <div class="card-header bg-danger text-white">
+
+
+            <h4 class="mb-0">
+
+                <i class="fas fa-times-circle"></i>
+
+                Cancel Voucher
+
+            </h4>
+
+
+        </div>
+
+
+
+
+
+        <div class="card-body">
+
+
+
+            <div class="alert alert-warning">
+
+
+                <strong>
+                    Warning!
+                </strong>
+
+                <br>
+
+                You are going to cancel this posted voucher.
+
+                This action will mark the voucher as cancelled.
+
+
+            </div>
+
+
+
+
+
+
+            <table class="table table-bordered">
+
+
+                <tr>
+
+
+                    <th width="30%">
+                        Voucher No
+                    </th>
+
+
+                    <td>
+                        {{ voucher.voucher_no }}
+                    </td>
+
+
+                </tr>
+
+
+
+                <tr>
+
+
+                    <th>
+                        Journal ID
+                    </th>
+
+
+                    <td>
+                        {{ voucher.journal_id }}
+                    </td>
+
+
+                </tr>
+
+
+
+
+                <tr>
+
+
+                    <th>
+                        Voucher Type
+                    </th>
+
+
+                    <td>
+
+                        {{ voucher.get_voucher_type_display }}
+
+                    </td>
+
+
+                </tr>
+
+
+
+
+                <tr>
+
+
+                    <th>
+                        Amount
+                    </th>
+
+
+                    <td>
+
+                        {{ voucher.grand_total }}
+
+                    </td>
+
+
+                </tr>
+
+
+
+
+                <tr>
+
+
+                    <th>
+                        Current Status
+                    </th>
+
+
+                    <td>
+
+
+                        <span class="badge bg-success">
+
+                            {{ voucher.get_status_display }}
+
+                        </span>
+
+
+                    </td>
+
+
+                </tr>
+
+
+
+            </table>
+
+
+
+
+
+
+
+            <form method="POST">
+
+
+                {% csrf_token %}
+
+
+
+
+
+                <div class="mb-3">
+
+
+                    <label class="form-label">
+
+                        Cancel Reason
+
+                    </label>
+
+
+
+                    <textarea
+                        name="reason"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Enter reason for cancellation..."
+                    ></textarea>
+
+
+                </div>
+
+
+
+
+
+
+
+
+                <div class="text-end">
+
+
+                    <a href="{% url 'voucher_detail' voucher.voucher_no %}"
+                       class="btn btn-secondary">
+
+
+                        Back
+
+
+                    </a>
+
+
+
+
+
+                    <button type="submit"
+                            class="btn btn-danger">
+
+
+                        <i class="fas fa-times"></i>
+
+                        Cancel Voucher
+
+
+                    </button>
+
+
+
+                </div>
+
+
+
+            </form>
+
+
+
+
+        </div>
+
+
+    </div>
+
+
+
+</div>
+
+
+
+{% endblock %}

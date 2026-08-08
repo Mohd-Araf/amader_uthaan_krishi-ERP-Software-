@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% block title %}Contact Us{% endblock title %}
+
+{% block content %}
+
+
+<div class="contact-section">
+  <div class="contact-container">
+    <!-- Header -->
+    <div class="contact-header">
+      <h2>Get in Touch</h2>
+      <p>We’re here to answer your questions and help you out.</p>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="contact-info">
+      <div class="info-card">
+        <i class="fas fa-map-marker-alt"></i>
+        <h4>Our Office</h4>
+        <p>Dhaka, Bangladesh</p>
+      </div>
+      <div class="info-card">
+        <i class="fas fa-phone-alt"></i>
+        <h4>Call Us</h4>
+        <p>+880 1403181484</p>
+      </div>
+      <div class="info-card">
+        <i class="fas fa-envelope"></i>
+        <h4>Email Us</h4>
+        <p>22201138@uap-bd.edu</p>
+      </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="contact-form">
+      <h3>Send Us a Message</h3>
+
+      {% if messages %}
+        <div style="text-align:center; margin-bottom:20px;">
+          {% for message in messages %}
+            <p style="color: {% if message.tags == 'success' %}green{% else %}red{% endif %};">
+              {{ message }}
+            </p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="post" class="form-grid">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" name="name" placeholder="Enter your name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Your Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        </div>
+
+        <div class="form-group" style="grid-column: span 2;">
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" name="subject" placeholder="Enter subject" required>
+        </div>
+
+        <div class="form-group" style="grid-column: span 2;">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" placeholder="Write your message..." required></textarea>
+        </div>
+
+        <button type="submit" class="contact-btn">Send Message</button>
+      </form>
+    </div>
+
+    <div class="map-section">
+<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3304.6337460686896!2d90.38468367479217!3d23.756679238536382!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b8a426199b0d%3A0x6a2c655d06c88ec9!2sFarmgate%2C%20Dhaka%201205!5e1!3m2!1sen!2sbd!4v1779132781501!5m2!1sen!2sbd" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</div>
+
+    </div>
+  </div>
+</div>
+<style>
+  .contact-section {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #f0f4f8, #e9eff5);
+    min-height: calc(100vh - 70px);
+    padding: 60px 20px;
+  }
+
+  .contact-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .contact-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .contact-header h2 {
+    font-size: 40px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+
+  .contact-header p {
+    font-size: 18px;
+    color: #7f8c8d;
+  }
+
+  /* Info cards */
+  .contact-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 60px;
+  }
+
+  .info-card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+  }
+
+  .info-card:hover {
+    transform: translateY(-6px);
+  }
+
+  .info-card i {
+    font-size: 32px;
+    color: #2575fc;
+    margin-bottom: 12px;
+  }
+
+  .info-card h4 {
+    font-size: 20px;
+    margin-bottom: 6px;
+    color: #2c3e50;
+  }
+
+  .info-card p {
+    font-size: 15px;
+    color: #555;
+    margin: 0;
+  }
+
+  /* Form */
+  .contact-form {
+    background: #fff;
+    padding: 40px 50px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .contact-form h3 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 25px;
+    text-align: center;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 6px;
+    color: #34495e;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: #2575fc;
+    box-shadow: 0 0 6px rgba(37,117,252,0.3);
+  }
+
+  .form-group textarea {
+    grid-column: span 2;
+    resize: none;
+    min-height: 130px;
+  }
+
+  .contact-btn {
+    grid-column: span 2;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #2575fc, #6a11cb);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.3s;
+  }
+
+  .contact-btn:hover {
+    transform: scale(1.04);
+    background: linear-gradient(90deg, #6a11cb, #2575fc);
+  }
+
+  /* Map section */
+  .map-section {
+    margin-top: 50px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  }
+
+  .map-section iframe {
+    width: 100%;
+    height: 350px;
+    border: none;
+  }
+
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+    .form-group textarea,
+    .contact-btn {
+      grid-column: span 1;
+    }
+  }
+</style>
+{% endblock content %}

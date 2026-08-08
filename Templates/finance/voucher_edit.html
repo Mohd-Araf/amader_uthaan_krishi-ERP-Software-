@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/finance.css' %}">
+
+{% endblock %}
+
+{% block title %}
+Edit Voucher
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid">
+
+
+    <!-- Header -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+
+        <div class="card-body">
+
+
+            <h3 class="font-weight-bold mb-1">
+
+                <i class="fas fa-edit"></i>
+
+                Edit Voucher
+
+            </h3>
+
+
+            <p class="text-muted mb-0">
+
+                {{ title }}
+
+                -
+
+                {{ form.instance.voucher_no }}
+
+            </p>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+<form method="POST">
+
+
+{% csrf_token %}
+
+
+
+
+
+<!-- Voucher Header -->
+
+<div class="card shadow-sm border-0 mb-4">
+
+
+    <div class="card-header bg-primary text-white">
+
+
+        <h5 class="mb-0">
+
+            Voucher Information
+
+        </h5>
+
+
+    </div>
+
+
+
+    <div class="card-body">
+
+
+        <div class="row">
+
+
+            <div class="col-md-4 mb-3">
+
+                <label>
+                    Voucher Type
+                </label>
+
+
+                {{ form.voucher_type }}
+
+
+            </div>
+
+
+
+
+            <div class="col-md-4 mb-3">
+
+                <label>
+                    Reference Type
+                </label>
+
+
+                {{ form.reference_type }}
+
+
+            </div>
+
+
+
+
+            <div class="col-md-4 mb-3">
+
+                <label>
+                    Reference No
+                </label>
+
+
+                {{ form.reference_no }}
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="row">
+
+
+            <div class="col-md-6 mb-3">
+
+
+                <label>
+                    Customer
+                </label>
+
+
+                {{ form.customer }}
+
+
+            </div>
+
+
+
+            <div class="col-md-6 mb-3">
+
+
+                <label>
+                    Order
+                </label>
+
+
+                {{ form.order }}
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="row">
+
+
+            <div class="col-md-6 mb-3">
+
+
+                <label>
+                    Status
+                </label>
+
+
+                {{ form.status }}
+
+
+            </div>
+
+
+
+            <div class="col-md-6 mb-3">
+
+
+                <label>
+                    Notes
+                </label>
+
+
+                {{ form.notes }}
+
+
+            </div>
+
+
+        </div>
+
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- Journal Entries -->
+
+
+<div class="card shadow-sm border-0 mb-4">
+
+
+<div class="card-header bg-dark text-white">
+
+
+<h5 class="mb-0">
+
+Debit / Credit Entries
+
+</h5>
+
+
+</div>
+
+
+
+
+
+<div class="card-body">
+
+
+
+{{ formset.management_form }}
+
+
+
+
+
+<table class="table table-bordered">
+
+
+<thead class="table-light">
+
+
+<tr>
+
+
+<th>
+Account
+</th>
+
+
+<th>
+Against
+</th>
+
+
+<th>
+Debit
+</th>
+
+
+<th>
+Credit
+</th>
+
+
+<th>
+Narration
+</th>
+
+
+<th>
+Delete
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+<tbody>
+
+
+
+{% for entry_form in formset %}
+
+
+
+<tr>
+
+
+<td>
+
+{{ entry_form.account }}
+
+
+</td>
+
+
+
+<td>
+
+{{ entry_form.against }}
+
+
+</td>
+
+
+
+
+<td>
+
+{{ entry_form.debit }}
+
+
+</td>
+
+
+
+
+<td>
+
+{{ entry_form.credit }}
+
+
+</td>
+
+
+
+
+<td>
+
+{{ entry_form.narration }}
+
+
+</td>
+
+
+
+
+<td class="text-center">
+
+
+{% if entry_form.DELETE %}
+
+
+{{ entry_form.DELETE }}
+
+
+{% endif %}
+
+
+
+</td>
+
+
+
+</tr>
+
+
+
+{% endfor %}
+
+
+
+</tbody>
+
+
+</table>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- Buttons -->
+
+
+<div class="text-end mb-5">
+
+
+
+<a href="{% url 'voucher_detail' form.instance.voucher_no %}"
+   class="btn btn-secondary">
+
+
+    Cancel
+
+
+</a>
+
+
+
+
+
+<button type="submit"
+        class="btn btn-success">
+
+
+<i class="fas fa-save"></i>
+
+
+Update Voucher
+
+
+</button>
+
+
+
+
+</div>
+
+
+
+
+</form>
+
+
+
+
+
+</div>
+
+
+{% endblock %}

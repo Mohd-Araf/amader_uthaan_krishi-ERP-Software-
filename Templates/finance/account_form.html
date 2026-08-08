@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="fas fa-book"></i>
+                {{ title }}
+            </h4>
+
+            <a href="{% url 'account_list' %}" class="btn btn-light btn-sm">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </a>
+        </div>
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div class="card-body">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="row">
+
+                    <!-- Account Name -->
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">
+                            Account Name
+                        </label>
+
+                        {{ form.name }}
+
+                        {% if form.name.errors %}
+                            <div class="text-danger">
+                                {{ form.name.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Type 1 -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            Account Type
+                        </label>
+
+                        {{ form.type1 }}
+
+                        {% if form.type1.errors %}
+                            <div class="text-danger">
+                                {{ form.type1.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Type 2 -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            Account Category
+                        </label>
+
+                        {{ form.type2 }}
+
+                        {% if form.type2.errors %}
+                            <div class="text-danger">
+                                {{ form.type2.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Opening Balance -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            Opening Balance
+                        </label>
+
+                        {{ form.opening_balance }}
+
+                        {% if form.opening_balance.errors %}
+                            <div class="text-danger">
+                                {{ form.opening_balance.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+
+
+                    <!-- Status -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            Status
+                        </label>
+
+                        {{ form.status }}
+
+                        {% if form.status.errors %}
+                            <div class="text-danger">
+                                {{ form.status.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card-footer text-end">
+
+                <a href="{% url 'account_list' %}" class="btn btn-secondary">
+                    Cancel
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Save Account
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

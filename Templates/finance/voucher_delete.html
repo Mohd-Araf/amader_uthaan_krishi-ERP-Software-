@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/finance.css' %}">
+
+{% endblock %}
+
+{% block title %}
+Delete Voucher
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="container-fluid">
+
+
+    <div class="card shadow-sm border-0 mt-4">
+
+
+        <div class="card-header bg-danger text-white">
+
+
+            <h4 class="mb-0">
+
+                <i class="fas fa-trash"></i>
+
+                Delete Voucher
+
+            </h4>
+
+
+        </div>
+
+
+
+
+
+        <div class="card-body">
+
+
+
+            <div class="alert alert-danger">
+
+
+                <strong>
+                    Warning!
+                </strong>
+
+
+                <br>
+
+
+                Are you sure you want to delete this voucher?
+
+
+                <br>
+
+
+                This action cannot be undone.
+
+
+            </div>
+
+
+
+
+
+
+
+
+            <table class="table table-bordered">
+
+
+                <tr>
+
+                    <th width="30%">
+                        Voucher No
+                    </th>
+
+
+                    <td>
+                        {{ voucher.voucher_no }}
+                    </td>
+
+                </tr>
+
+
+
+
+                <tr>
+
+                    <th>
+                        Journal ID
+                    </th>
+
+
+                    <td>
+                        {{ voucher.journal_id }}
+                    </td>
+
+
+                </tr>
+
+
+
+
+
+                <tr>
+
+                    <th>
+                        Voucher Type
+                    </th>
+
+
+                    <td>
+                        {{ voucher.get_voucher_type_display }}
+                    </td>
+
+
+                </tr>
+
+
+
+
+
+                <tr>
+
+                    <th>
+                        Customer
+                    </th>
+
+
+                    <td>
+
+                        {% if voucher.customer %}
+
+                            {{ voucher.customer.username }}
+
+                        {% else %}
+
+                            -
+
+                        {% endif %}
+
+                    </td>
+
+
+                </tr>
+
+
+
+
+
+                <tr>
+
+                    <th>
+                        Amount
+                    </th>
+
+
+                    <td>
+
+                        {{ voucher.grand_total }}
+
+                    </td>
+
+
+                </tr>
+
+
+
+
+
+
+                <tr>
+
+                    <th>
+                        Status
+                    </th>
+
+
+                    <td>
+
+
+                        {% if voucher.status == "draft" %}
+
+
+                            <span class="badge bg-warning text-dark">
+
+                                Draft
+
+                            </span>
+
+
+                        {% else %}
+
+
+                            <span class="badge bg-secondary">
+
+                                {{ voucher.get_status_display }}
+
+                            </span>
+
+
+                        {% endif %}
+
+
+
+                    </td>
+
+
+                </tr>
+
+
+
+            </table>
+
+
+
+
+
+
+
+
+            <form method="POST">
+
+
+                {% csrf_token %}
+
+
+
+
+
+                <div class="text-end">
+
+
+                    <a href="{% url 'voucher_detail' voucher.voucher_no %}"
+                       class="btn btn-secondary">
+
+
+                        Cancel
+
+
+                    </a>
+
+
+
+
+
+                    <button type="submit"
+                            class="btn btn-danger">
+
+
+                        <i class="fas fa-trash"></i>
+
+
+                        Delete Voucher
+
+
+                    </button>
+
+
+
+                </div>
+
+
+
+
+            </form>
+
+
+
+
+        </div>
+
+
+    </div>
+
+
+
+</div>
+
+
+
+{% endblock %}

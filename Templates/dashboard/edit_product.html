@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3>Edit Product</h3>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <input name="name" value="{{ product.name }}" class="form-control mb-2">
+        <input name="price" value="{{ product.price }}" class="form-control mb-2">
+
+        <select name="unit" class="form-control mb-2">
+
+         {% for value, label in unit_choices %}
+
+          <option value="{{ value }}"
+            {% if product.unit == value %}selected{% endif %}>
+
+            {{ label }}
+
+          </option>
+
+         {% endfor %}
+
+        </select>
+
+        <textarea name="description" class="form-control mb-2">{{ product.description }}</textarea>
+
+        <input type="file" name="image" class="form-control mb-2">
+
+        <button class="btn btn-success">Save</button>
+
+    </form>
+
+</div>
+
+{% endblock %}

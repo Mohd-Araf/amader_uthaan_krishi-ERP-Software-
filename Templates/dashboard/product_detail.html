@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3>Product Detail</h3>
+
+    <div class="card p-3">
+
+        {% if product.image %}
+            <img src="{{ product.image.url }}" width="200">
+        {% endif %}
+
+        <h4>{{ product.name }}</h4>
+        <p>{{ product.description }}</p>
+        <p>Price: {{ product.price }} ৳</p>
+        <p>Unit: {{ product.get_unit_display }}</p>
+
+        <a href="{% url 'edit_product' product.id %}" class="btn btn-warning">
+            Edit
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,687 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/finance.css' %}">
+
+{% endblock %}
+
+{% block title %}
+Chart of Accounts
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid">
+
+
+    <div class="card shadow-sm border-0">
+
+
+        <div class="card-header bg-white">
+
+
+            <div class="d-flex justify-content-between align-items-center">
+
+
+                <div>
+
+                    <h4 class="mb-0">
+
+                        <i class="fas fa-book mr-2"></i>
+
+                        Chart of Accounts
+
+                    </h4>
+
+
+                    <small class="text-muted">
+
+                        ERP Account Management
+
+                    </small>
+
+
+                </div>
+                 <a href="{% url 'financial_dashboard' %}"
+   class="btn btn-secondary mr-2">
+
+    <i class="fas fa-arrow-left"></i>
+
+    Back
+
+</a>
+
+
+                <a href="{% url 'account_create' %}"
+                   class="btn btn-primary">
+
+
+                    <i class="fas fa-plus"></i>
+
+                    Create Account
+
+
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+        <div class="card-body">
+
+
+
+            <!-- ========================= -->
+            <!-- FILTER -->
+            <!-- ========================= -->
+
+
+            <form method="get">
+
+
+                <div class="row mb-3">
+
+
+
+                    <!-- Search -->
+
+                    <div class="col-md-4">
+
+
+                        <input
+
+                            type="text"
+
+                            name="search"
+
+                            value="{{ request.GET.search }}"
+
+                            class="form-control"
+
+                            placeholder="Search Account Name / Code"
+
+                        >
+
+
+                    </div>
+
+
+
+
+
+                    <!-- Type 1 -->
+
+
+                    <div class="col-md-3">
+
+
+                        <select
+
+                            name="type1"
+
+                            class="form-control"
+
+                        >
+
+
+                            <option value="">
+
+                                All Type
+
+                            </option>
+
+
+
+                            <option value="asset"
+                            {% if request.GET.type1 == "asset" %}selected{% endif %}>
+
+                                Asset
+
+                            </option>
+
+
+
+                            <option value="liability"
+                            {% if request.GET.type1 == "liability" %}selected{% endif %}>
+
+                                Liability
+
+                            </option>
+
+
+
+                            <option value="equity"
+                            {% if request.GET.type1 == "equity" %}selected{% endif %}>
+
+                                Equity
+
+                            </option>
+
+
+
+                            <option value="revenue"
+                            {% if request.GET.type1 == "revenue" %}selected{% endif %}>
+
+                                Revenue
+
+                            </option>
+
+
+
+                            <option value="expense"
+                            {% if request.GET.type1 == "expense" %}selected{% endif %}>
+
+                                Expense
+
+                            </option>
+
+
+
+                        </select>
+
+
+                    </div>
+
+
+
+
+
+
+                    <!-- Type 2 -->
+
+
+                    <div class="col-md-3">
+
+
+                        <select
+
+                            name="type2"
+
+                            class="form-control"
+
+                        >
+
+
+                            <option value="">
+
+                                All Category
+
+                            </option>
+
+
+
+                            <option value="cash"
+                            {% if request.GET.type2 == "cash" %}selected{% endif %}>
+
+                                Cash
+
+                            </option>
+
+
+
+                            <option value="bank"
+                            {% if request.GET.type2 == "bank" %}selected{% endif %}>
+
+                                Bank
+
+                            </option>
+
+
+
+                            <option value="customer"
+                            {% if request.GET.type2 == "customer" %}selected{% endif %}>
+
+                                Customer
+
+                            </option>
+
+
+
+                            <option value="supplier"
+                            {% if request.GET.type2 == "supplier" %}selected{% endif %}>
+
+                                Supplier
+
+                            </option>
+
+
+
+                            <option value="product"
+                            {% if request.GET.type2 == "product" %}selected{% endif %}>
+
+                                Product
+
+                            </option>
+
+
+
+                            <option value="payable"
+                            {% if request.GET.type2 == "payable" %}selected{% endif %}>
+
+                                Payable
+
+                            </option>
+
+
+
+                            <option value="receivable"
+                            {% if request.GET.type2 == "receivable" %}selected{% endif %}>
+
+                                Receivable
+
+                            </option>
+
+
+
+                            <option value="other"
+                            {% if request.GET.type2 == "other" %}selected{% endif %}>
+
+                                Other
+
+                            </option>
+
+
+
+                        </select>
+
+
+                    </div>
+
+
+
+
+
+                    <!-- Status -->
+
+
+                    <div class="col-md-2">
+
+
+                        <select
+
+                            name="status"
+
+                            class="form-control"
+
+                        >
+
+
+                            <option value="">
+
+                                All Status
+
+                            </option>
+
+
+
+                            <option value="active"
+
+                            {% if request.GET.status == "active" %}selected{% endif %}
+
+                            >
+
+                                Active
+
+                            </option>
+
+
+
+
+                            <option value="inactive"
+
+                            {% if request.GET.status == "inactive" %}selected{% endif %}
+
+                            >
+
+                                Inactive
+
+                            </option>
+
+
+
+                        </select>
+
+
+                    </div>
+
+
+
+
+
+
+                    <div class="col-md-12 mt-3">
+
+
+                        <button
+
+                            class="btn btn-success"
+
+                        >
+
+
+                            <i class="fas fa-search"></i>
+
+                            Search
+
+
+                        </button>
+
+
+
+                        <a href="{% url 'account_list' %}"
+
+                           class="btn btn-secondary">
+
+
+                            Reset
+
+
+                        </a>
+
+
+                    </div>
+
+
+
+                </div>
+
+
+            </form>
+
+
+
+
+
+
+
+            <!-- ========================= -->
+            <!-- ACCOUNT TABLE -->
+            <!-- ========================= -->
+
+
+
+            <div class="table-responsive">
+
+
+
+                <table class="table table-bordered table-hover">
+
+
+
+                    <thead class="thead-dark">
+
+
+                    <tr>
+
+
+                        <th>
+
+                            Code
+
+                        </th>
+
+
+                        <th>
+
+                            Account Name
+
+                        </th>
+
+
+                        <th>
+
+                            Type 1
+
+                        </th>
+
+
+                        <th>
+
+                            Type 2
+
+                        </th>
+
+
+                        <th>
+
+                            Opening Balance
+
+                        </th>
+
+
+                        <th>
+
+                            Status
+
+                        </th>
+
+
+                        <th class="text-center">
+
+                            Action
+
+                        </th>
+
+
+                    </tr>
+
+
+                    </thead>
+
+
+
+
+
+
+                    <tbody>
+
+
+
+                    {% for account in accounts %}
+
+
+
+                    <tr>
+
+
+                        <td>
+
+                            {{ account.account_code }}
+
+                        </td>
+
+
+
+                        <td>
+
+
+                            <strong>
+
+                                {{ account.name }}
+
+                            </strong>
+
+
+                        </td>
+
+
+
+
+                        <td>
+
+
+                            <span class="badge badge-primary">
+
+
+                                {{ account.get_type1_display }}
+
+
+                            </span>
+
+
+                        </td>
+
+
+
+
+
+                        <td>
+
+
+                            <span class="badge badge-info">
+
+
+                                {{ account.get_type2_display }}
+
+
+                            </span>
+
+
+                        </td>
+
+
+
+
+
+                        <td>
+
+
+                            {{ account.opening_balance|floatformat:2 }}
+
+
+                        </td>
+
+
+
+
+
+                        <td>
+
+
+
+                            {% if account.status == "active" %}
+
+
+
+                                <span class="badge badge-success">
+
+                                    Active
+
+                                </span>
+
+
+
+                            {% else %}
+
+
+
+                                <span class="badge badge-danger">
+
+                                    Inactive
+
+                                </span>
+
+
+
+                            {% endif %}
+
+
+
+                        </td>
+
+
+
+
+
+
+                        <td class="text-center">
+
+    <div class="d-flex justify-content-center align-items-center">
+
+        <a href="{% url 'account_view' account.id %}"
+           class="btn btn-info btn-sm mr-1">
+
+            <i class="fas fa-eye"></i>
+
+        </a>
+
+        <a href="{% url 'account_update' account.id %}"
+           class="btn btn-warning btn-sm mr-1">
+
+            <i class="fas fa-edit"></i>
+
+        </a>
+
+        <a href="{% url 'account_delete' account.id %}"
+           class="btn btn-danger btn-sm">
+
+            <i class="fas fa-trash"></i>
+
+        </a>
+
+    </div>
+
+</td>
+
+
+                    </tr>
+
+
+
+                    {% empty %}
+
+
+
+                    <tr>
+
+
+                        <td colspan="7"
+
+                            class="text-center text-muted">
+
+
+                            No Accounts Found
+
+
+                        </td>
+
+
+                    </tr>
+
+
+
+                    {% endfor %}
+
+
+
+                    </tbody>
+
+
+
+                </table>
+
+
+
+            </div>
+
+
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}

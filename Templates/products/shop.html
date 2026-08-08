@@ -1,0 +1,631 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+
+
+<style>
+
+
+body{
+
+    background:#f8f9fa;
+
+}
+
+
+
+/* Back Button */
+
+
+.back-btn{
+
+    background:white;
+
+    border-radius:25px;
+
+    padding:8px 20px;
+
+    color:#198754;
+
+    border:1px solid #198754;
+
+    font-weight:600;
+
+}
+
+
+
+.back-btn:hover{
+
+    background:#198754;
+
+    color:white;
+
+}
+
+
+
+
+.shop-title{
+
+    font-size:30px;
+
+    font-weight:700;
+
+    color:#222;
+
+}
+
+
+
+
+
+/* Card */
+
+
+.product-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    height:430px;
+
+    border:1px solid #eeeeee;
+
+    transition:.3s;
+
+    box-shadow:
+    0 5px 18px rgba(0,0,0,.07);
+
+}
+
+
+
+.product-card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:
+    0 12px 30px rgba(0,0,0,.12);
+
+}
+
+
+
+
+
+
+/* Image */
+
+
+.image-box{
+
+    height:190px;
+
+    padding:12px;
+
+    background:#fff;
+
+}
+
+
+
+.product-image{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    border-radius:14px;
+
+    transition:.3s;
+
+}
+
+
+
+.product-image:hover{
+
+    transform:scale(1.06);
+
+}
+
+
+
+
+
+
+.product-name{
+
+    font-size:18px;
+
+    font-weight:700;
+
+    color:#333;
+
+    margin-bottom:8px;
+
+}
+
+
+
+
+
+
+.price{
+
+    color:#e53935;
+
+    font-size:21px;
+
+    font-weight:800;
+
+}
+
+
+
+.unit{
+
+    background:#198754;
+
+    color:white;
+
+    padding:4px 12px;
+
+    border-radius:20px;
+
+    font-size:12px;
+
+}
+
+
+
+
+
+
+.description{
+
+    color:#777;
+
+    font-size:13px;
+
+    height:35px;
+
+    overflow:hidden;
+
+}
+
+
+
+
+
+
+
+.quantity-box{
+
+    display:flex;
+
+    justify-content:center;
+
+    margin-bottom:12px;
+
+}
+
+
+
+.quantity-box button{
+
+    width:35px;
+
+    height:35px;
+
+    border:none;
+
+    background:#198754;
+
+    color:white;
+
+    font-size:20px;
+
+}
+
+
+
+.quantity-box input{
+
+    width:55px;
+
+    height:35px;
+
+    text-align:center;
+
+    border:1px solid #ddd;
+
+}
+
+
+
+
+
+
+
+.cart-btn{
+
+    background:#198754;
+
+    color:white;
+
+    border-radius:25px;
+
+    height:40px;
+
+    font-size:15px;
+
+}
+
+
+
+.cart-btn:hover{
+
+    background:#146c43;
+
+    color:white;
+
+}
+
+
+
+
+
+</style>
+
+
+
+
+
+
+<div class="container mt-4 mb-5">
+
+
+
+
+
+<!-- Back Home -->
+
+
+<div class="mb-4">
+
+<a href="{% url 'home' %}"
+   class="btn back-btn">
+
+    ← Back Home
+
+</a>
+
+</div>
+
+
+
+
+
+
+
+
+<h3 class="text-center shop-title mb-4">
+
+
+🥬 Fresh Products
+
+
+</h3>
+
+
+
+
+
+
+
+<div class="row">
+
+
+
+
+
+{% for p in products %}
+
+
+
+
+
+<div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+
+
+
+
+
+<div class="product-card">
+
+
+
+
+
+
+<a href="{% url 'product_details' p.id %}">
+
+
+<div class="image-box">
+
+
+{% if p.image %}
+
+
+<img src="{{ p.image.url }}"
+     class="product-image">
+
+
+{% else %}
+
+
+<img src="https://via.placeholder.com/300x200?text=No+Image"
+     class="product-image">
+
+
+{% endif %}
+
+
+</div>
+
+
+</a>
+
+
+
+
+
+
+
+<div class="card-body text-center p-3">
+
+
+
+
+
+<h5 class="product-name">
+
+{{ p.name }}
+
+</h5>
+
+
+
+
+
+
+
+<div class="mb-2">
+
+
+<span class="price">
+
+{{ p.price }} TK
+
+</span>
+
+
+<span class="unit">
+
+{{ p.get_unit_display }}
+
+</span>
+
+
+</div>
+
+
+
+
+
+
+
+<p class="description">
+
+{{ p.description|truncatewords:10 }}
+
+</p>
+
+
+
+
+
+
+
+<form method="POST"
+      action="{% url 'add_to_cart' p.id %}">
+
+
+{% csrf_token %}
+
+
+
+
+
+
+<div class="quantity-box">
+
+
+<button type="button"
+onclick="decrease(this)">
+-
+</button>
+
+
+
+<input type="number"
+name="quantity"
+value="1"
+min="1">
+
+
+
+<button type="button"
+onclick="increase(this)">
++
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+<button type="submit"
+class="btn cart-btn btn-block">
+
+
+🛒 Add To Cart
+
+
+</button>
+
+
+
+
+
+
+</form>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+{% empty %}
+
+
+
+<div class="col-12 text-center">
+
+
+<h5 class="text-muted">
+
+No Products Available
+
+</h5>
+
+
+</div>
+
+
+
+
+{% endfor %}
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+<div class="text-center mt-3">
+
+
+<a href="{% url 'cart' %}"
+class="btn btn-primary rounded-pill px-5">
+
+
+🛒 View Cart
+
+
+</a>
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+function increase(btn){
+
+let input =
+btn.parentElement.querySelector("input");
+
+input.value=parseInt(input.value)+1;
+
+}
+
+
+
+
+function decrease(btn){
+
+let input =
+btn.parentElement.querySelector("input");
+
+
+if(parseInt(input.value)>1){
+
+input.value=parseInt(input.value)-1;
+
+}
+
+}
+
+
+
+</script>
+
+
+
+
+
+{% endblock %}

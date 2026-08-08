@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/finance.css' %}">
+
+{% endblock %}
+
+
+{% block title %}
+Add Payment
+{% endblock %}
+
+
+{% block content %}
+
+
+<div class="container mt-4">
+
+
+    <div class="card shadow">
+
+
+        <div class="card-header bg-danger text-white">
+
+            <h4 class="mb-0">
+
+                <i class="fas fa-money-bill-wave"></i>
+
+                Add Payment
+
+            </h4>
+
+        </div>
+
+
+
+        <div class="card-body">
+
+
+            {% if journal %}
+
+            <div class="mb-3">
+
+                <label class="font-weight-bold">
+                    Voucher Reference
+                </label>
+
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ journal.journal_id }}"
+                    readonly
+                >
+
+            </div>
+
+
+            {% else %}
+
+
+            <div class="mb-3">
+
+                <label class="font-weight-bold">
+                    Select Journal
+                </label>
+
+
+                <select
+                    name="journal"
+                    form="paymentForm"
+                    class="form-control"
+                    required>
+
+                    <option value="">
+                        Select Journal
+                    </option>
+
+
+                    {% for item in journals %}
+
+                    <option value="{{ item.journal_id }}">
+
+                        {{ item.journal_id }} - {{ item.voucher_no }}
+
+                    </option>
+
+
+                    {% endfor %}
+
+
+                </select>
+
+
+            </div>
+
+
+            {% endif %}
+
+
+
+
+
+            <form method="POST" id="paymentForm">
+
+                {% csrf_token %}
+
+
+
+                <div class="form-group">
+
+                    <label>
+                        Payment Account
+                    </label>
+
+
+                    {{ form.account }}
+
+
+                    {% if form.account.errors %}
+
+                    <div class="text-danger">
+
+                        {{ form.account.errors }}
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <small class="text-muted">
+
+                        Select Supplier / Payable / Expense account
+
+                    </small>
+
+                </div>
+
+
+
+
+
+                <div class="form-group">
+
+                    <label>
+                        Amount
+                    </label>
+
+
+                    {{ form.amount }}
+
+
+                    {% if form.amount.errors %}
+
+                    <div class="text-danger">
+
+                        {{ form.amount.errors }}
+
+                    </div>
+
+                    {% endif %}
+
+
+                </div>
+
+
+
+
+
+                <div class="form-group">
+
+                    <label>
+                        Remarks
+                    </label>
+
+
+                    {{ form.remarks }}
+
+
+                    {% if form.remarks.errors %}
+
+                    <div class="text-danger">
+
+                        {{ form.remarks.errors }}
+
+                    </div>
+
+                    {% endif %}
+
+
+                </div>
+
+
+
+
+
+                <button
+                    type="submit"
+                    class="btn btn-danger">
+
+                    <i class="fas fa-save"></i>
+
+                    Save Payment
+
+                </button>
+
+
+
+                {% if journal %}
+
+                <a
+                    href="{% url 'journal_detail' journal.journal_id %}"
+                    class="btn btn-secondary">
+
+                    Cancel
+
+                </a>
+
+                {% else %}
+
+                <a
+                    href="{% url 'financial_dashboard' %}"
+                    class="btn btn-secondary">
+
+                    Cancel
+
+                </a>
+
+                {% endif %}
+
+
+
+            </form>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,623 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+
+<style>
+
+body{
+    background:#f6f6f6;
+}
+
+
+/* Main Container */
+
+.product-wrapper{
+
+    margin-top:40px;
+
+}
+
+
+
+/* Image Card */
+
+
+.product-image-card{
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    height:500px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    box-shadow:
+    0 4px 18px rgba(0,0,0,0.08);
+
+}
+
+
+
+.product-main-image{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    border-radius:15px;
+
+    transition:0.3s ease;
+
+}
+
+
+
+.product-main-image:hover{
+
+    transform:scale(1.03);
+
+}
+
+
+
+
+/* Details Card */
+
+
+.product-info-card{
+
+
+    background:white;
+
+    border-radius:18px;
+
+    padding:30px;
+
+    min-height:500px;
+
+    box-shadow:
+    0 4px 18px rgba(0,0,0,0.08);
+
+
+}
+
+
+
+
+.product-title{
+
+    font-size:32px;
+
+    font-weight:700;
+
+    color:#222;
+
+}
+
+
+
+.category-badge{
+
+    background:#198754;
+
+    color:white;
+
+    padding:6px 16px;
+
+    border-radius:20px;
+
+    font-size:14px;
+
+}
+
+
+
+
+.price-box{
+
+
+    background:#fff4e5;
+
+    padding:15px;
+
+    border-radius:12px;
+
+
+}
+
+
+
+.price{
+
+    color:#e53935;
+
+    font-size:35px;
+
+    font-weight:800;
+
+}
+
+
+
+.unit{
+
+    font-size:18px;
+
+    color:#555;
+
+}
+
+
+
+
+.description{
+
+    color:#666;
+
+    line-height:1.8;
+
+    font-size:16px;
+
+}
+
+
+
+
+
+/* Quantity */
+
+
+.quantity-area{
+
+    display:flex;
+
+    align-items:center;
+
+    margin-top:15px;
+
+}
+
+
+
+.quantity-area button{
+
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    background:#198754;
+
+    color:white;
+
+    font-size:22px;
+
+
+}
+
+
+
+
+.quantity-area input{
+
+
+    width:65px;
+
+    height:42px;
+
+    border:1px solid #ddd;
+
+    text-align:center;
+
+    font-size:18px;
+
+
+}
+
+
+
+
+/* Buttons */
+
+
+.action-buttons{
+
+
+    display:flex;
+
+    gap:15px;
+
+    margin-top:30px;
+
+
+}
+
+
+
+.cart-btn{
+
+
+    flex:1;
+
+    height:55px;
+
+    background:#198754;
+
+    color:white;
+
+    font-size:18px;
+
+    border-radius:12px;
+
+
+}
+
+
+
+.buy-btn{
+
+
+    flex:1;
+
+    height:55px;
+
+    background:#ff9800;
+
+    color:white;
+
+    font-size:18px;
+
+    border-radius:12px;
+
+
+}
+
+
+
+.cart-btn:hover{
+
+    background:#157347;
+
+    color:white;
+
+}
+
+
+
+.buy-btn:hover{
+
+    background:#f57c00;
+
+    color:white;
+
+}
+
+
+
+
+@media(max-width:768px){
+
+
+.product-image-card{
+
+    height:350px;
+
+}
+
+
+.product-title{
+
+    font-size:25px;
+
+}
+
+
+
+.action-buttons{
+
+    flex-direction:column;
+
+}
+
+
+
+}
+
+
+
+
+</style>
+
+
+
+
+
+<div class="container product-wrapper">
+
+
+
+<div class="row g-4">
+
+
+
+    <!-- IMAGE -->
+
+
+    <div class="col-md-5">
+
+
+        <div class="product-image-card">
+
+
+            {% if product.image %}
+
+
+            <img src="{{ product.image.url }}"
+                 class="product-main-image"
+                 alt="{{ product.name }}">
+
+
+
+            {% else %}
+
+
+            <img src="https://via.placeholder.com/600x600?text=No+Image"
+                 class="product-main-image">
+
+
+
+            {% endif %}
+
+
+
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- PRODUCT DETAILS -->
+
+
+    <div class="col-md-7">
+
+
+        <div class="product-info-card">
+
+
+
+            <h1 class="product-title">
+
+                {{ product.name }}
+
+            </h1>
+
+
+
+            <span class="category-badge">
+
+                Fresh Product
+
+            </span>
+
+
+
+
+            <hr>
+
+
+
+            <div class="price-box">
+
+
+                <span class="price">
+
+                    {{ product.price }} TK
+
+                </span>
+
+
+                <span class="unit">
+
+                    / {{ product.get_unit_display }}
+
+                </span>
+
+
+            </div>
+
+
+
+
+
+            <div class="mt-4">
+
+
+                <h5>
+
+                    Description
+
+                </h5>
+
+
+                <p class="description">
+
+
+                {% if product.description %}
+
+                    {{ product.description }}
+
+                {% else %}
+
+                    Fresh quality product collected from farmers.
+
+                {% endif %}
+
+
+                </p>
+
+
+            </div>
+
+
+
+
+
+
+            <form method="POST"
+                  action="{% url 'add_to_cart' product.id %}">
+
+
+                {% csrf_token %}
+
+
+
+                <h5 class="mt-4">
+
+                    Quantity
+
+                </h5>
+
+
+
+
+                <div class="quantity-area">
+
+
+                    <button type="button"
+                            onclick="decrease()">
+
+                        -
+
+                    </button>
+
+
+
+
+                    <input type="number"
+                           id="qty"
+                           name="quantity"
+                           value="1"
+                           min="1">
+
+
+
+
+                    <button type="button"
+                            onclick="increase()">
+
+                        +
+
+                    </button>
+
+
+
+                </div>
+
+
+
+
+
+
+
+                <div class="action-buttons">
+
+
+                    <button type="submit"
+                            class="btn cart-btn">
+
+                        🛒 Add To Cart
+
+                    </button>
+
+
+
+
+                    <button type="button"
+                            class="btn buy-btn">
+
+                        ⚡ Buy Now
+
+                    </button>
+
+
+
+                </div>
+
+
+
+
+            </form>
+
+
+
+
+        </div>
+
+
+
+    </div>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+<script>
+
+
+function increase(){
+
+    let qty=document.getElementById("qty");
+
+    qty.value=parseInt(qty.value)+1;
+
+}
+
+
+
+function decrease(){
+
+    let qty=document.getElementById("qty");
+
+    if(parseInt(qty.value)>1){
+
+        qty.value=parseInt(qty.value)-1;
+
+    }
+
+}
+
+
+</script>
+
+
+
+{% endblock %}

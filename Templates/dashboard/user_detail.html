@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3>User Detail</h3>
+
+    <div class="card p-3">
+
+        <p><b>Username:</b> {{ user_obj.username }}</p>
+        <p><b>Email:</b> {{ user_obj.email }}</p>
+        <p><b>Phone:</b> {{ user_obj.phone_number }}</p>
+        <p><b>Country:</b> {{ user_obj.country }}</p>
+        <p><b>Location:</b> {{ user_obj.location }}</p>
+
+        <a href="{% url 'edit_user' user_obj.id %}" class="btn btn-warning">
+            Edit User
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

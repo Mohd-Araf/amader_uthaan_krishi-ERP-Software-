@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/finance.css' %}">
+
+{% endblock %}
+
+{% block title %}
+Ledger Detail
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Header -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <div class="row align-items-center">
+
+                <div class="col-lg-8">
+
+                    <h3 class="font-weight-bold">
+
+                        <i class="fas fa-book text-success"></i>
+
+                        {{ account.get_type1_display }} Ledger
+
+                    </h3>
+
+                    <p class="text-muted mb-1">
+
+                        {{ account.name }}
+
+                    </p>
+
+                    <small class="text-muted">
+
+                        {{ account.account_code }}
+
+                    </small>
+
+                </div>
+
+                <div class="col-lg-4 text-lg-right mt-3 mt-lg-0">
+
+                    {% if journal %}
+
+                        {% if account.type2 == "customer" or account.type2 == "receivable" %}
+
+                            <a href="{% url 'receive_payment' journal.journal_id %}"
+                               class="btn btn-success">
+
+                                <i class="fas fa-hand-holding-usd"></i>
+
+                                Receive Payment
+
+                            </a>
+
+                        {% elif account.type2 == "supplier" or account.type2 == "payable" or account.type1 == "expense" %}
+
+                            <a href="{% url 'make_payment' journal.journal_id %}"
+                               class="btn btn-danger">
+
+                                <i class="fas fa-money-bill-wave"></i>
+
+                                Add Payment
+
+                            </a>
+
+                        {% endif %}
+
+                    {% endif %}
+
+                    <a href="{% url 'account_list' %}"
+                       class="btn btn-secondary">
+
+                        <i class="fas fa-arrow-left"></i>
+
+                        Back
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Summary -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-4 mb-3">
+
+            <div class="card border-left-primary shadow-sm">
+
+                <div class="card-body">
+
+                    <h6>Total Debit</h6>
+
+                    <h4 class="text-primary">
+
+                        ৳ {{ total_debit|floatformat:2|intcomma }}
+
+                    </h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4 mb-3">
+
+            <div class="card border-left-danger shadow-sm">
+
+                <div class="card-body">
+
+                    <h6>Total Credit</h6>
+
+                    <h4 class="text-danger">
+
+                        ৳ {{ total_credit|floatformat:2|intcomma }}
+
+                    </h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4 mb-3">
+
+            <div class="card border-left-success shadow-sm">
+
+                <div class="card-body">
+
+                    <h6>Closing Balance</h6>
+
+                    <h4 class="text-success">
+
+                        ৳ {{ balance|floatformat:2|intcomma }}
+
+                    </h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Ledger Table -->
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover mb-0">
+
+                    <thead class="thead-dark">
+
+                        <tr>
+
+                            <th width="120">Date</th>
+                            <th width="120">Journal</th>
+                            <th>Particulars</th>
+                            <th>Against</th>
+                            <th class="text-right">Debit</th>
+                            <th class="text-right">Credit</th>
+                            <th class="text-right">Balance</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for entry in entries %}
+                                            <tr>
+
+                            <td>
+
+                                {{ entry.entry_date|date:"d M Y" }}
+
+                            </td>
+
+                            <td>
+
+                                {% if entry.journal %}
+
+                                    <a href="{% url 'journal_detail' entry.journal.journal_id %}">
+
+                                        {{ entry.journal.journal_id }}
+
+                                    </a>
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {{ entry.narration|default:"-" }}
+
+                            </td>
+
+                            <td>
+
+                                {% if entry.against %}
+
+                                    {{ entry.against.name }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+                            <td class="text-right text-success">
+
+                                {% if entry.debit > 0 %}
+
+                                    {{ entry.debit|floatformat:2|intcomma }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+                            <td class="text-right text-danger">
+
+                                {% if entry.credit > 0 %}
+
+                                    {{ entry.credit|floatformat:2|intcomma }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+                            <td class="text-right font-weight-bold">
+
+                                {% if entry.closing_dr > 0 %}
+
+                                    <span class="text-success">
+
+                                        {{ entry.closing_dr|floatformat:2|intcomma }} Dr
+
+                                    </span>
+
+                                {% elif entry.closing_cr > 0 %}
+
+                                    <span class="text-danger">
+
+                                        {{ entry.closing_cr|floatformat:2|intcomma }} Cr
+
+                                    </span>
+
+                                {% else %}
+
+                                    0.00
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td colspan="7" class="text-center py-5">
+
+                                <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+
+                                <br>
+
+                                <strong>No Ledger Entries Found</strong>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                    <tfoot class="bg-light">
+
+                        <tr class="font-weight-bold">
+
+                            <td colspan="4" class="text-right">
+
+                                Total
+
+                            </td>
+
+                            <td class="text-right text-success">
+
+                                {{ total_debit|floatformat:2|intcomma }}
+
+                            </td>
+
+                            <td class="text-right text-danger">
+
+                                {{ total_credit|floatformat:2|intcomma }}
+
+                            </td>
+
+                            <td class="text-right">
+
+                                {% if balance >= 0 %}
+
+                                    <span class="text-success">
+
+                                        {{ balance|floatformat:2|intcomma }} Dr
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-danger">
+
+                                        {{ balance|floatformat:2|cut:"-"|intcomma }} Cr
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

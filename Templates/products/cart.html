@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3 class="text-center mb-4">Amader Uthaan Krishi Bill</h3>
+
+    <form method="POST">
+    {% csrf_token %}
+
+    <table class="table table-bordered text-center shadow">
+
+        <thead class="thead-dark">
+            <tr>
+                <th>SL</th>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+                <th>Remove</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in items %}
+            <tr>
+
+                <!-- SL -->
+                <td>{{ forloop.counter }}</td>
+
+                <!-- Product -->
+                <td class="font-weight-bold">
+                    {{ item.product.name }}
+                </td>
+
+                <td style="width:120px;">
+                    <input type="number"
+                           name="qty_{{ item.product.id }}"
+                           value="{{ item.quantity }}"
+                           min="0"
+                           class="form-control text-center">
+                </td>
+
+                <td>{{ item.product.price }} ৳</td>
+
+                <td class="font-weight-bold text-success">
+                    {{ item.total }} ৳
+                </td>
+
+                <td>
+                    <button type="submit"
+                            name="qty_{{ item.product.id }}"
+                            value="0"
+                            class="btn btn-danger btn-sm">
+                        ⛔
+                    </button>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+    <div class="text-right">
+        <h4 class="mt-3">
+            Total: <span class="text-primary">{{ total }} ৳</span>
+        </h4>
+    </div>
+
+    <div class="text-center mt-4">
+
+        <button type="submit" class="btn btn-warning mr-2">
+            🔄 Update Cart
+        </button>
+
+    </form>
+
+        <a href="{% url 'shop' %}" class="btn btn-secondary">
+            Continue Shopping
+        </a>
+
+        <form method="POST" action="{% url 'order_confirm' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">
+                 Confirm Order
+            </button>
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

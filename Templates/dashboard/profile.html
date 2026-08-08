@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-5 mb-5">
+
+    <div class="card shadow-lg border-0 profile-card">
+
+        <div class="card-body p-4 p-md-5">
+
+            <!-- Profile Header -->
+            <div class="text-center mb-4">
+
+                {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}"
+                         class="profile-img mb-3">
+                {% else %}
+                    <img src="{% static 'images/default-user.png' %}"
+                         class="profile-img mb-3">
+                {% endif %}
+
+                <h2 class="font-weight-bold">
+                    {{ user.username }}
+                </h2>
+
+                <p class="text-muted">
+                    {{ user.email }}
+                </p>
+
+            </div>
+
+            <hr>
+
+            <!-- Profile Information -->
+            <div class="row profile-info">
+
+                <div class="col-md-6 mb-4">
+                    <h6 class="font-weight-bold text-muted">
+                        Phone Number
+                    </h6>
+                    <p>{{ user.phone_number|default:"Not provided" }}</p>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <h6 class="font-weight-bold text-muted">
+                        Country
+                    </h6>
+                    <p>{{ user.country|default:"Not provided" }}</p>
+                </div>
+
+                <div class="col-md-12 mb-4">
+                    <h6 class="font-weight-bold text-muted">
+                        Address
+                    </h6>
+                    <p>{{ user.location|default:"Not provided" }}</p>
+                </div>
+
+            </div>
+
+            <hr>
+
+            <!-- Buttons -->
+            <div class="text-center mt-4">
+
+                <a href="{% url 'edit_profile' %}"
+                   class="btn btn-primary px-4 py-2 mr-2 mb-2">
+                    Edit Profile
+                </a>
+
+                <a href="{% url 'change_password' %}"
+                   class="btn btn-warning px-4 py-2 mr-2 mb-2">
+                    Change Password
+                </a>
+
+                {% if not user.is_superuser %}
+                <a href="{% url 'user_orders' %}"
+                   class="btn btn-success px-4 py-2 mb-2">
+                    Orders
+                </a>
+                {% endif %}
+
+                {% if user.is_superuser %}
+                <a href="{% url 'admin_panel' %}"
+                   class="btn btn-danger px-4 py-2 mb-2">
+                    Admin Control
+                </a>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

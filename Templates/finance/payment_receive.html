@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/finance.css' %}">
+{% endblock %}
+
+{% block title %}
+Receive Payment
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow border-0">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-money-check-alt"></i>
+                        Receive Customer Payment
+                    </h4>
+                </div>
+
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <!-- Customer Selection Section -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <label for="customer_account">
+                                    <i class="fas fa-user-tie text-success"></i> Customer Account
+                                </label>
+
+                                {% if selected_customer %}
+                                    <input type="text" class="form-control" value="{{ selected_customer.name }}" readonly>
+                                    <input type="hidden" name="customer_account" value="{{ selected_customer.id }}">
+                                {% else %}
+                                    <select name="customer_account" id="customer_account" class="form-control select2" required>
+                                        <option value="">-- Select Customer Account --</option>
+                                        {% for acc in customer_accounts %}
+                                            <option value="{{ acc.id }}">
+                                                {{ acc.name }} ({{ acc.account_code }}) - Current Due: ৳ {{ acc.current_balance|floatformat:2|intcomma }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Real-time Balance Display Card (If Customer Selected) -->
+                        {% if selected_customer %}
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="alert alert-info text-center mb-0">
+                                    <small class="text-muted">Account Code</small><br>
+                                    <strong>{{ selected_customer.account_code }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert {% if selected_customer.current_balance > 0 %}alert-danger{% else %}alert-success{% endif %} text-center mb-0">
+                                    <small class="text-muted">Current Ledger Due</small><br>
+                                    <strong>৳ {{ selected_customer.current_balance|floatformat:2|intcomma }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Deposit Account Selection (Cash or Bank) -->
+                        <div class="form-group mb-3">
+                            <label for="payment_account">
+                                <i class="fas fa-university text-primary"></i> Deposit To (Cash / Bank)
+                            </label>
+                            <select name="payment_account" id="payment_account" class="form-control" required>
+                                {% for acc in cash_bank_accounts %}
+                                    <option value="{{ acc.id }}" {% if acc.is_default %}selected{% endif %}>
+                                        {{ acc.name }} ({{ acc.get_type2_display }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Amount Input -->
+                        <div class="form-group mb-3">
+                            <label for="amount">
+                                <i class="fas fa-coins text-warning"></i> Received Amount (৳)
+                            </label>
+                            <input
+                                type="number"
+                                id="amount"
+                                name="amount"
+                                class="form-control"
+                                step="0.01"
+                                min="0.01"
+                                placeholder="Enter received amount (e.g. 5000)"
+                                required>
+                        </div>
+
+                        <!-- Remarks Input -->
+                        <div class="form-group mb-4">
+                            <label for="remarks">
+                                <i class="fas fa-sticky-note text-secondary"></i> Remarks / Note
+                            </label>
+                            <textarea
+                                id="remarks"
+                                name="remarks"
+                                rows="3"
+                                class="form-control"
+                                placeholder="Optional details (e.g. Received via bKash TrxID #12345)"></textarea>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <button type="submit" class="btn btn-success px-4">
+                                <i class="fas fa-check-circle me-1"></i> Receive Payment
+                            </button>
+
+                            {% if selected_customer %}
+                            <a href="{% url 'ledger_detail' selected_customer.id %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Back to Ledger
+                            </a>
+                            {% else %}
+                            <a href="{% url 'customer_ledger' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Back to Customer Ledger
+                            </a>
+                            {% endif %}
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border-radius: 15px;
+}
+
+.card-header {
+    font-size: 20px;
+    font-weight: 700;
+    border-top-left-radius: 15px !important;
+    border-top-right-radius: 15px !important;
+}
+
+.alert {
+    border-radius: 12px;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 10px 15px;
+}
+
+.btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+}
+
+@media(max-width:768px){
+    .card-header h4 {
+        font-size: 18px;
+    }
+    .alert {
+        margin-bottom: 15px;
+    }
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+</style>
+
+{% endblock %}

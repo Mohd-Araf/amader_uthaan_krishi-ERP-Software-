@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3 class="mb-4 text-center">Order Confirmation</h3>
+
+<table class="table table-bordered text-center">
+    <thead class="thead-dark">
+        <tr>
+            <th>SL</th>
+            <th>Item Name</th>
+            <th>Remarks</th>
+            <th>Qty</th>
+            <th>Unit</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.remarks }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.product.get_unit_display }}</td>
+            <td>{{ item.price_at_order_time }}৳</td>
+            <td>{{ item.total }} ৳</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h4 class="text-right">Total: {{ total }} ৳</h4>
+
+<div class="text-center mt-4">
+    <form method="POST" action="{% url 'order-confirm' %}">
+        {% csrf_token %}
+        <button class="btn btn-primary btn-lg">Place Order</button>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,183 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/finance.css' %}">
+
+{% endblock %}
+
+
+{% block title %}
+Delete Account
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-6">
+
+            <div class="card shadow border-0">
+
+                <div class="card-header bg-danger text-white">
+
+                    <h4 class="mb-0">
+
+                        <i class="fas fa-trash-alt mr-2"></i>
+
+                        Delete Account
+
+                    </h4>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="alert alert-warning">
+
+                        <h5>
+
+                            Are you sure?
+
+                        </h5>
+
+                        <p class="mb-0">
+
+                            This account will be permanently deleted.
+
+                        </p>
+
+                    </div>
+
+                    <table class="table table-bordered">
+
+                        <tr>
+
+                            <th width="35%">
+
+                                Account ID
+
+                            </th>
+
+                            <td>
+
+                                {{ account.id }}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>
+
+                                Account Name
+
+                            </th>
+
+                            <td>
+
+                                <strong>
+
+                                    {{ account.name }}
+
+                                </strong>
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>
+
+                                Account Type
+
+                            </th>
+
+                            <td>
+
+                                {{ account.get_account_type_display }}
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <th>
+
+                                Status
+
+                            </th>
+
+                            <td>
+
+                                {% if account.is_active %}
+
+                                    <span class="badge badge-success">
+
+                                        Active
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge badge-danger">
+
+                                        Inactive
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    </table>
+
+                    <form method="post">
+
+                        {% csrf_token %}
+
+                        <div class="text-right">
+
+                            <a href="{% url 'account_list' %}"
+                               class="btn btn-secondary">
+
+                                <i class="fas fa-arrow-left"></i>
+
+                                Cancel
+
+                            </a>
+
+                            <button
+                                    type="submit"
+                                    class="btn btn-danger">
+
+                                <i class="fas fa-trash"></i>
+
+                                Delete Account
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

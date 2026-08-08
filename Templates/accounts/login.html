@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+<div class="login-wrapper">
+
+    <div class="login-box">
+
+        <h2>User Login</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="input-group">
+                <span>✉</span>
+                {{ form.username }}
+            </div>
+
+            <div class="input-group">
+                <span>🔒</span>
+                {{ form.password }}
+            </div>
+
+
+            <div class="remember-row">
+                <label>
+                    <input type="checkbox">
+                    Remember me
+                </label>
+
+                <a href="{% url 'forgot_password' %}">
+                    Forgot Password?
+                </a>
+            </div>
+
+
+            <button type="submit">
+                LOGIN
+            </button>
+
+        </form>
+
+
+        <p class="signup">
+            Don't have an account?
+            <a href="{% url 'signup' %}">
+                Sign Up
+            </a>
+        </p>
+
+    </div>
+
+</div>
+<style>
+.login-wrapper {
+    min-height: 85vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: linear-gradient(
+        180deg,
+        #dff7e8,
+        #f5fff8
+    );
+}
+
+
+.login-box {
+
+    width: 360px;
+    padding: 45px 40px;
+
+    background: rgba(255,255,255,0.65);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.08);
+
+    text-align: center;
+}
+
+
+.login-box h2 {
+
+    font-size: 28px;
+    font-weight: 400;
+
+    color:#2d6a4f;
+
+    margin-bottom:35px;
+
+    letter-spacing:2px;
+}
+
+
+
+.input-group {
+
+    display:flex;
+
+    align-items:center;
+
+    border-bottom:1px solid #8bcf9c;
+
+    margin-bottom:25px;
+
+}
+
+
+.input-group span {
+
+    width:30px;
+
+    color:#2d6a4f;
+
+}
+
+
+.input-group input {
+
+    width:100%;
+
+    border:none;
+
+    outline:none;
+
+    background:transparent;
+
+    padding:10px;
+
+    font-size:13px;
+
+    color:#355834;
+
+}
+
+
+
+.input-group input::placeholder{
+
+    color:#9aaa9d;
+
+}
+
+
+
+.remember-row {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    font-size:11px;
+
+    margin-bottom:25px;
+
+    color:#55705c;
+
+}
+
+
+.remember-row a {
+
+    color:#2d6a4f;
+
+    text-decoration:none;
+
+}
+
+
+
+.login-box button {
+
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+
+    background:#2d6a4f;
+
+    color:white;
+
+    font-size:13px;
+
+    letter-spacing:2px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+
+.login-box button:hover {
+
+    background:#1b4332;
+
+}
+
+
+
+.signup {
+
+    margin-top:25px;
+
+    font-size:13px;
+
+    color:#777;
+
+}
+
+
+.signup a {
+
+    color:#2d6a4f;
+
+    text-decoration:none;
+
+}
+</style>
+{% endblock %}

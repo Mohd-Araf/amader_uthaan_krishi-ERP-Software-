@@ -1,0 +1,512 @@
+/* =====================================================
+   PREMIUM ADMIN DASHBOARD - ORDERS TAB
+   ===================================================== */
+
+:root{
+
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --success:#16a34a;
+    --danger:#dc2626;
+    --warning:#f59e0b;
+
+    --text:#1f2937;
+    --muted:#6b7280;
+
+    --card:#ffffff;
+    --bg:#f4f7fb;
+
+    --border:#e5e7eb;
+
+    --radius:18px;
+
+}
+
+#orders{
+
+    background:var(--bg);
+    padding:25px;
+    border-radius:20px;
+
+}
+
+/* ===========================
+   SEARCH
+=========================== */
+
+#orders form:first-child{
+
+    display:flex;
+    gap:12px;
+    margin-bottom:25px;
+    flex-wrap:wrap;
+
+}
+
+#orders form:first-child input{
+
+    flex:1;
+    min-height:48px;
+
+    border-radius:12px;
+
+    border:1px solid var(--border);
+
+    box-shadow:none;
+
+    transition:.25s;
+
+}
+
+#orders form:first-child input:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 .15rem rgba(37,99,235,.15);
+
+}
+
+#orders form:first-child .btn{
+
+    min-width:130px;
+
+    border-radius:12px;
+
+    font-weight:600;
+
+}
+
+/* ===========================
+   ORDER CARD
+=========================== */
+
+#orders .card{
+
+    border:none;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    margin-bottom:35px;
+
+    background:#fff;
+
+    box-shadow:
+
+    0 15px 35px rgba(0,0,0,.06);
+
+    transition:.25s;
+
+}
+
+#orders .card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+
+    0 20px 40px rgba(0,0,0,.10);
+
+}
+
+/* ===========================
+   ORDER HEADER
+=========================== */
+
+#orders h5{
+
+    font-size:22px;
+
+    font-weight:700;
+
+    color:var(--text);
+
+}
+
+#orders h6{
+
+    font-weight:700;
+
+}
+
+.badge{
+
+    padding:8px 14px;
+
+    border-radius:30px;
+
+    font-size:12px;
+
+    letter-spacing:.4px;
+
+}
+
+/* ===========================
+   ORDER INFO
+=========================== */
+
+#orders p{
+
+    line-height:2;
+
+    color:#374151;
+
+    font-size:15px;
+
+}
+
+#orders strong{
+
+    color:#111827;
+
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+
+.btn{
+
+    border-radius:10px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.btn:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.btn-success{
+
+    box-shadow:
+
+    0 8px 18px rgba(22,163,74,.20);
+
+}
+
+.btn-primary{
+
+    box-shadow:
+
+    0 8px 18px rgba(37,99,235,.20);
+
+}
+
+/* ===========================
+   TABLE
+=========================== */
+
+.table{
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+    margin-top:15px;
+
+}
+
+.table thead{
+
+    background:
+
+    linear-gradient(135deg,#2563eb,#3b82f6);
+
+    color:#fff;
+
+}
+
+.table thead th{
+
+    border:none;
+
+    padding:14px;
+
+    font-size:14px;
+
+}
+
+.table td{
+
+    vertical-align:middle;
+
+    padding:14px;
+
+}
+
+/* ===========================
+   INPUT
+=========================== */
+
+.form-control{
+
+    border-radius:10px;
+
+    border:1px solid var(--border);
+
+    min-height:42px;
+
+    box-shadow:none;
+
+}
+
+.form-control:focus{
+
+    border-color:var(--primary);
+
+    box-shadow:0 0 0 .15rem rgba(37,99,235,.15);
+
+}
+
+/* ===========================
+   SELECT
+=========================== */
+
+select.form-control{
+
+    cursor:pointer;
+
+}
+
+/* ===========================
+   INPUT GROUP
+=========================== */
+
+.input-group-text{
+
+    background:var(--primary);
+
+    color:#fff;
+
+    border:none;
+
+}
+
+/* ===========================
+   CHARGE CARD
+=========================== */
+
+.charge-card{
+
+    margin-top:20px;
+
+    border:none;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:
+
+    0 12px 30px rgba(0,0,0,.05);
+
+}
+
+.charge-card .card-header{
+
+    background:
+
+    linear-gradient(135deg,#2563eb,#3b82f6);
+
+    color:#fff;
+
+    border:none;
+
+    padding:16px 20px;
+
+}
+
+.charge-card .card-body{
+
+    padding:25px;
+
+}
+
+/* ===========================
+   TOGGLE
+=========================== */
+
+.bkash-box{
+
+    background:#f8fafc;
+
+    border:1px solid var(--border);
+
+    border-radius:14px;
+
+    padding:18px;
+
+}
+
+.custom-switch{
+
+    padding-left:3rem;
+
+}
+
+.custom-control-label{
+
+    font-weight:600;
+
+}
+
+.custom-control-label::before{
+
+    width:48px;
+
+    height:24px;
+
+    border-radius:30px;
+
+}
+
+.custom-control-label::after{
+
+    width:20px;
+
+    height:20px;
+
+    border-radius:50%;
+
+}
+
+.custom-control-input:checked
+~.custom-control-label::before{
+
+    background:#16a34a;
+
+    border-color:#16a34a;
+
+}
+
+/* ===========================
+   SAVE BUTTON
+=========================== */
+
+.save-btn{
+
+    width:100%;
+
+    margin-top:25px;
+
+    padding:13px;
+
+    font-size:16px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:
+
+    linear-gradient(135deg,#2563eb,#1d4ed8);
+
+    color:#fff;
+
+    font-weight:700;
+
+    transition:.25s;
+
+}
+
+.save-btn:hover{
+
+    color:#fff;
+
+    transform:translateY(-2px);
+
+    box-shadow:
+
+    0 12px 30px rgba(37,99,235,.25);
+
+}
+
+/* ===========================
+   MOBILE
+=========================== */
+
+@media(max-width:992px){
+
+    #orders{
+
+        padding:15px;
+
+    }
+
+    .table{
+
+        display:block;
+
+        overflow-x:auto;
+
+        white-space:nowrap;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    #orders h5{
+
+        font-size:18px;
+
+    }
+
+    #orders form:first-child{
+
+        flex-direction:column;
+
+    }
+
+    #orders form:first-child .btn{
+
+        width:100%;
+
+    }
+
+    .btn{
+
+        width:100%;
+
+        margin-bottom:8px;
+
+    }
+
+    .table td,
+    .table th{
+
+        font-size:13px;
+
+    }
+
+}
+
+@media(max-width:576px){
+
+    .card{
+
+        border-radius:15px;
+
+    }
+
+    .form-control{
+
+        font-size:14px;
+
+    }
+
+    .save-btn{
+
+        font-size:15px;
+
+    }
+
+}
+

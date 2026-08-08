@@ -1,0 +1,615 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/finance.css' %}">
+
+{% endblock %}
+
+
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<style>
+
+
+body{
+
+    background:#f5f7fb;
+
+}
+
+
+.page-title{
+
+    font-size:32px;
+    font-weight:800;
+    color:#2c3e50;
+
+}
+
+
+
+.card-box{
+
+    border:none;
+    border-radius:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+
+
+.card-header-custom{
+
+    background:#212529;
+    color:white;
+    padding:18px;
+    font-size:18px;
+    font-weight:700;
+
+}
+
+
+
+.form-control{
+
+    border-radius:10px;
+
+}
+
+
+
+.btn-action{
+
+    border-radius:12px;
+    padding:12px 25px;
+    font-weight:600;
+
+}
+
+
+
+.entry-table th{
+
+    background:#343a40;
+    color:white;
+    font-size:14px;
+
+}
+
+
+.entry-table td{
+
+    vertical-align:middle;
+
+}
+
+
+
+.delete-row{
+
+    width:35px;
+    height:35px;
+    border-radius:50%;
+
+}
+
+
+
+@media(max-width:768px){
+
+
+.page-title{
+
+    font-size:24px;
+
+}
+
+
+.entry-table{
+
+    font-size:13px;
+
+}
+
+
+}
+
+
+
+</style>
+
+
+
+
+
+<div class="container-fluid">
+
+
+
+
+
+<!-- HEADER -->
+
+
+<div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+
+
+<div>
+
+
+<h2 class="page-title">
+
+
+<i class="fas fa-file-invoice text-success mr-2"></i>
+
+
+{{ title }}
+
+
+</h2>
+
+
+<p class="text-muted">
+
+Create double entry accounting voucher
+
+</p>
+
+
+</div>
+
+
+
+
+<div>
+
+
+<a href="{% url 'voucher_list' %}"
+class="btn btn-dark btn-action">
+
+
+<i class="fas fa-arrow-left mr-2"></i>
+
+
+Voucher List
+
+
+</a>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<form method="POST">
+
+
+{% csrf_token %}
+
+
+
+
+
+<!-- VOUCHER INFORMATION -->
+
+
+<div class="card card-box mb-4">
+
+
+<div class="card-header-custom">
+
+
+<i class="fas fa-info-circle mr-2"></i>
+
+
+Voucher Information
+
+
+</div>
+
+
+
+<div class="card-body">
+
+
+<div class="row">
+
+
+
+{% for field in form %}
+
+
+
+<div class="col-lg-4 col-md-6 mb-3">
+
+
+<label class="font-weight-bold">
+
+{{ field.label }}
+
+</label>
+
+
+{{ field }}
+
+
+
+{% if field.errors %}
+
+<div class="text-danger">
+
+{{ field.errors }}
+
+</div>
+
+{% endif %}
+
+
+</div>
+
+
+
+{% endfor %}
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- JOURNAL ENTRIES -->
+
+
+<div class="card card-box mb-4">
+
+
+<div class="card-header-custom">
+
+
+<i class="fas fa-book mr-2"></i>
+
+
+Journal Entries
+
+
+</div>
+
+
+
+
+
+<div class="card-body">
+
+
+
+{{ formset.management_form }}
+
+
+
+
+<div class="table-responsive">
+
+
+<table class="table table-bordered entry-table">
+
+
+<thead>
+
+
+<tr class="form-row">
+
+<td>
+    <select name="account">
+        ...
+    </select>
+</td>
+
+
+<td>
+    <input
+        type="number"
+        class="form-control debit-input"
+        name="debit"
+        step="0.01"
+    >
+</td>
+
+
+<td>
+    <input
+        type="number"
+        class="form-control credit-input"
+        name="credit"
+        step="0.01"
+    >
+</td>
+
+
+<td>
+    <input
+        type="text"
+        name="against"
+    >
+</td>
+
+
+<td>
+    <input
+        type="text"
+        name="remarks"
+    >
+</td>
+
+
+<td>
+    <button type="button">
+        Delete
+    </button>
+</td>
+
+
+</tr>
+
+</thead>
+
+
+
+<tbody>
+
+
+
+{% for form in formset %}
+
+
+<tr>
+
+
+{% for hidden in form.hidden_fields %}
+
+{{ hidden }}
+
+{% endfor %}
+
+
+
+
+<td>
+
+{{ form.account }}
+
+</td>
+
+
+
+<td>
+
+{{ form.debit }}
+
+</td>
+
+
+
+<td>
+
+{{ form.credit }}
+
+</td>
+
+
+
+<td>
+
+{{ form.against }}
+
+</td>
+
+
+
+<td>
+
+{{ form.remarks }}
+
+</td>
+
+
+
+<td class="text-center">
+
+
+{% if form.instance.pk %}
+
+
+{{ form.DELETE }}
+
+
+{% else %}
+
+
+<input type="checkbox"
+name="{{ form.prefix }}-DELETE"
+class="form-check-input">
+
+
+{% endif %}
+
+
+</td>
+
+
+
+</tr>
+
+
+
+{% endfor %}
+
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<!-- BUTTON -->
+
+
+<div class="text-right mb-5">
+
+
+<a href="{% url 'voucher_list' %}"
+class="btn btn-secondary btn-action mr-2">
+
+
+<i class="fas fa-times"></i>
+
+
+Cancel
+
+
+</a>
+
+
+
+
+<button type="submit"
+class="btn btn-success btn-action">
+
+
+<i class="fas fa-save mr-2"></i>
+
+
+Save Voucher
+
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+</form>
+
+
+
+
+
+
+</div>
+<script>
+
+document.addEventListener("input", function(e){
+
+    // Debit Input
+    if(e.target.classList.contains("debit-input")){
+
+        let row = e.target.closest(".form-row");
+
+        if(!row) return;
+
+
+        let credit = row.querySelector(".credit-input");
+
+
+        if(e.target.value && parseFloat(e.target.value) > 0){
+
+            credit.value = "0.00";
+            credit.readOnly = true;
+
+        }
+        else{
+
+            credit.readOnly = false;
+            credit.value = "";
+
+        }
+
+    }
+
+
+
+    // Credit Input
+    if(e.target.classList.contains("credit-input")){
+
+        let row = e.target.closest(".form-row");
+
+        if(!row) return;
+
+
+        let debit = row.querySelector(".debit-input");
+
+
+        if(e.target.value && parseFloat(e.target.value) > 0){
+
+            debit.value = "0.00";
+            debit.readOnly = true;
+
+        }
+        else{
+
+            debit.readOnly = false;
+            debit.value = "";
+
+        }
+
+    }
+
+
+});
+
+</script>
+
+{% endblock %}

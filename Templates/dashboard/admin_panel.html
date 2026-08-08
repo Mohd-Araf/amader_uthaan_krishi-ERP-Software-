@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3 class="text-center mb-4">Admin Dashboard</h3>
+
+    <!-- ================= NAV TABS ================= -->
+    <ul class="nav nav-tabs" id="adminTab" role="tablist">
+
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'users' %}active{% endif %}"
+               data-toggle="tab" href="#users">Users</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'products' %}active{% endif %}"
+               data-toggle="tab" href="#products">Products</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'orders' %}active{% endif %}"
+               data-toggle="tab" href="#orders">Orders</a>
+        </li>
+        <li class="nav-item">
+    <a class="nav-link text-success font-weight-bold"
+       href="{% url 'financial_dashboard' %}">
+        Financial Statement
+    </a>
+</li>
+
+    </ul>
+
+    <div class="tab-content mt-3">
+
+        <!-- ================= USERS TAB ================= -->
+        <div class="tab-pane fade {% if active_tab == 'users' %}show active{% endif %}" id="users">
+
+            <!-- SEARCH -->
+            <form method="GET" class="mb-3">
+                <input type="hidden" name="tab" value="users">
+
+                <input type="text"
+                       name="uq"
+                       value="{{ user_query }}"
+                       class="form-control"
+                       placeholder="Search by username, email, phone">
+
+                <button type="submit" class="btn btn-primary mt-2">Search</button>
+            </form>
+
+            <!-- TABLE -->
+            <div class="card shadow-sm p-3">
+                <h5>User List</h5>
+
+                <table class="table table-bordered text-center mt-3">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>#ID</th>
+                            <th>Email</th>
+                            <th>Username</th>
+                            <th>Phone</th>
+                            <th>Location</th>
+                            <th>Country</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <a href="{% url 'user_detail' user.id %}">
+                                    {{ user.username }}
+                                </a>
+                            </td>
+                            <td>{{ user.phone_number }}</td>
+                            <td>{{ user.location }}</td>
+                            <td>{{ user.get_country_display }}</td>
+                            <td>
+                                <a href="{% url 'delete_user' user.id %}" class="btn btn-danger btn-sm">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <!-- ================= PRODUCTS TAB ================= -->
+        <div class="tab-pane fade {% if active_tab == 'products' %}show active{% endif %}" id="products">
+
+            <!-- SEARCH -->
+            <form method="GET" class="mb-3">
+                <input type="hidden" name="tab" value="products">
+
+                <input type="text"
+                       name="pq"
+                       value="{{ product_query }}"
+                       class="form-control"
+                       placeholder="Search product">
+
+                <button type="submit" class="btn btn-primary mt-2">Search</button>
+            </form>
+
+            <div class="card shadow-sm p-3">
+
+                <h5>Product List</h5>
+
+                <a href="{% url 'add_product' %}" class="btn btn-success mb-3">
+                    + Add Product
+                </a>
+
+                <table class="table table-bordered text-center">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>#ID</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Unit</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <a href="{% url 'edit_product' product.id %}">
+                                    {{ product.name }}
+                                </a>
+                            </td>
+
+
+
+                            <td>{{ product.price }} ৳</td>
+                            <td>{{ product.get_unit_display }}</td>
+                            <td>
+                                <a href="{% url 'delete_product' product.id %}" class="btn btn-danger btn-sm">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+<!-- ================= ORDERS TAB ================= -->
+<div class="tab-pane fade {% if active_tab == 'orders' %}show active{% endif %}" id="orders">
+
+    <!-- SEARCH -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+
+            <form method="GET">
+                <input type="hidden" name="tab" value="orders">
+
+                <div class="row align-items-center">
+
+                    <div class="col-lg-10 col-md-9 mb-2 mb-md-0">
+                        <div class="input-group">
+
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                            </div>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="oq"
+                                value="{{ order_query }}"
+                                placeholder="Search by Order ID">
+
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-search mr-1"></i>
+                            Search
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- ORDER TABLE -->
+    <div class="card shadow-sm p-3">
+
+        <h5 class="mb-3">Order List</h5>
+
+        <table class="table table-bordered table-hover text-center">
+
+            <thead class="thead-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for order in orders %}
+
+                <tr>
+
+                    <td>{{ forloop.counter }}</td>
+
+                    <td>
+                        <a href="{% url 'admin_order_detail' order.id %}">
+                            {{ order.order_code }}
+                        </a>
+                    </td>
+
+                    <td>
+                        {{ order.user.username }}
+                    </td>
+
+                    <td>
+                        <span class="badge badge-info">
+                            {{ order.get_status_display }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ order.created_at|date:"d M Y, h:i A" }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="5" class="text-center">
+                        No orders found.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+</div>
+
+</div>
+
+{% endblock %}

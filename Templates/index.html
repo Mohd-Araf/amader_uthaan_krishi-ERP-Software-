@@ -1,0 +1,741 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- ================= HERO SECTION ================= -->
+<section class="hero-section">
+
+    <div class="container-fluid px-lg-5 px-3">
+
+        <div class="row g-3 align-items-stretch">
+
+            <div class="col-lg-8">
+
+
+    <div class="hero-video-box">
+
+
+        <video
+            autoplay
+            muted
+            loop
+            playsinline
+            class="hero-video">
+
+
+            <source src="/static/videos/WhatsApp Video 2026-08-02 at 00.39.39.mp4" type="video/mp4">
+
+
+        </video>
+
+
+
+        <div class="hero-video-overlay"></div>
+
+
+
+        <div class="hero-video-content">
+
+
+            <h1>
+                Fresh Organic<br>
+                <em>Vegetables</em>
+            </h1>
+
+
+            <p>
+                Fresh from farm directly to your home.
+            </p>
+
+
+            <div>
+
+                <a href="{% url 'shop' %}" class="hero-btn">
+                    Shop Now →
+                </a>
+
+
+                <a href="{% url 'about' %}" class="learn-btn">
+                    Learn More
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+            <!-- ================= RIGHT BANNER ================= -->
+            <div class="col-lg-4">
+
+                <div class="side-banner">
+                    <img src="/static/images/mainbanner.jpeg"
+                         class="side-banner-img"
+                         alt="Uthaan Krishi">
+                    <div class="side-banner-overlay">
+                        <div class="side-badge">🌿 Certified Organic</div>
+                        <h3>100%<br>Organic</h3>
+                        <p>Fresh From Farm</p>
+                        <a href="{% url 'shop' %}" class="side-btn">
+                            Shop Collection <span class="btn-arrow">→</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================= FEATURE SECTION ================= -->
+<section class="feature-section">
+
+    <div class="container">
+
+        <div class="row g-3 text-center">
+
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrap">
+                        <span class="feature-icon">🚚</span>
+                    </div>
+                    <h5>Fast Delivery</h5>
+                    <p>Quick delivery across your area.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrap">
+                        <span class="feature-icon">🌿</span>
+                    </div>
+                    <h5>Organic Products</h5>
+                    <p>Fresh and healthy farm products.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrap">
+                        <span class="feature-icon">💳</span>
+                    </div>
+                    <h5>Secure Payment</h5>
+                    <p>Trusted and secure checkout system.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================= PRODUCTS SECTION ================= -->
+<section class="product-section">
+
+    <div class="container">
+
+        <!-- Title -->
+        <div class="section-title text-center">
+            <span class="section-label">Our Selection</span>
+            <h2>Popular Products</h2>
+            <p>Fresh products selected for you</p>
+        </div>
+
+        <!-- Products (3 columns in Mobile: col-4, 4 rows: slice 12) -->
+        <div class="row g-2 g-md-4">
+
+            {% for p in products|slice:":12" %}
+
+            <div class="col-lg-3 col-md-4 col-4">
+
+                <div class="product-card">
+
+                    <!-- Badge -->
+                    <div class="product-badge">Fresh</div>
+
+                    <!-- Image -->
+                    <div class="product-image-box">
+                        {% if p.image %}
+                        <img src="{{ p.image.url }}"
+                             class="product-image"
+                             alt="{{ p.name }}">
+                        {% else %}
+                        <img src="https://via.placeholder.com/300x220"
+                             class="product-image">
+                        {% endif %}
+                        <div class="product-image-overlay"></div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="product-body">
+                        <h5 class="product-name">{{ p.name }}</h5>
+                        <div class="product-price">
+                            ৳ {{ p.price }}
+                            <span>/ {{ p.get_unit_display }}</span>
+                        </div>
+                        <a href="{% url 'shop' %}" class="shop-btn">
+                            Shop Now <span class="btn-arrow">→</span>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================= CSS ================= -->
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* ================= CSS VARIABLES ================= */
+:root {
+    --green-primary: #1a7a3c;
+    --green-light:   #22a052;
+    --green-accent:  #4cca7a;
+    --cream:         #f8f6f0;
+    --cream-dark:    #ede9df;
+    --text-dark:     #1a1f16;
+    --text-mid:      #4a5244;
+    --text-soft:     #8a9488;
+    --white:         #ffffff;
+    --shadow-soft:   0 8px 32px rgba(26,122,60,0.10);
+    --shadow-card:   0 4px 24px rgba(26,30,22,0.08);
+    --radius-lg:     22px;
+    --radius-md:     14px;
+    --radius-pill:   50px;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-dark);
+    background-color: #faf9f6;
+}
+
+/* ================= HERO SECTION ================= */
+.hero-section {
+    padding: 20px 0;
+}
+
+.hero-video-box {
+    height: 100%;
+    min-height: 480px;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+.hero-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.hero-video-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.08) 0%,
+    rgba(0, 0, 0, 0.20) 100%
+);
+}
+
+.hero-video-content {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--white);
+    padding: 30px 20px;
+}
+
+.hero-video-content h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 5vw, 54px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.hero-video-content h1 em {
+    font-style: italic;
+    color: #8ce6a6;
+}
+
+.hero-video-content p {
+    font-size: clamp(15px, 2.5vw, 19px);
+    margin-bottom: 26px;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 500px;
+}
+
+.hero-video-content > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.hero-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 30px;
+    border-radius: var(--radius-pill);
+    background: var(--green-primary);
+    color: var(--white) !important;
+    text-decoration: none !important;
+    font-weight: 600;
+    border: 2px solid var(--green-primary);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(26, 122, 60, 0.4);
+}
+
+.hero-btn:hover {
+    background: var(--green-light);
+    border-color: var(--green-light);
+    transform: translateY(-2px);
+    color: var(--white) !important;
+}
+
+.learn-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 30px;
+    border-radius: var(--radius-pill);
+    background: var(--white);
+    color: var(--green-primary) !important;
+    text-decoration: none !important;
+    border: 2px solid var(--white);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.learn-btn:hover {
+    background: var(--green-primary);
+    color: var(--white) !important;
+    border-color: var(--green-primary);
+    transform: translateY(-2px);
+}
+
+/* ================= RIGHT BANNER ================= */
+.side-banner {
+    position: relative;
+    height: 100%;
+    min-height: 480px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+}
+
+.side-banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.side-banner:hover .side-banner-img {
+    transform: scale(1.04);
+}
+
+.side-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.20) 0%, rgba(26, 122, 60, 0.85) 100%);
+    padding: 35px 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    color: var(--white);
+}
+
+.side-badge {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.side-banner h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(30px, 4vw, 40px);
+    line-height: 1.1;
+    margin-bottom: 8px;
+}
+
+.side-banner p {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 20px;
+}
+
+.side-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    border-radius: var(--radius-pill);
+    background: var(--white);
+    color: var(--green-primary) !important;
+    text-decoration: none !important;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.side-btn:hover {
+    background: var(--cream);
+    transform: translateX(4px);
+}
+
+.btn-arrow {
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+.side-btn:hover .btn-arrow,
+.shop-btn:hover .btn-arrow {
+    transform: translateX(4px);
+}
+
+/* ================= FEATURE SECTION ================= */
+.feature-section {
+    padding: 50px 0;
+}
+
+.feature-box {
+    background: var(--white);
+    padding: 30px 24px;
+    border-radius: var(--radius-md);
+    border: 1px solid #f0efe9;
+    box-shadow: var(--shadow-card);
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.feature-box:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-soft);
+    border-color: var(--green-accent);
+}
+
+.feature-icon-wrap {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px auto;
+}
+
+.feature-icon {
+    font-size: 30px;
+}
+
+.feature-box h5 {
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: var(--text-dark);
+}
+
+.feature-box p {
+    color: var(--text-mid);
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+/* ================= PRODUCTS SECTION ================= */
+.product-section {
+    padding: 40px 0 70px 0;
+}
+
+.section-title {
+    margin-bottom: 40px;
+}
+
+.section-label {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--green-primary);
+    margin-bottom: 6px;
+}
+
+.section-title h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    color: var(--text-dark);
+    margin-bottom: 8px;
+}
+
+.section-title p {
+    color: var(--text-mid);
+    font-size: 15px;
+}
+
+/* Product Card */
+.product-card {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid #eee;
+    box-shadow: var(--shadow-card);
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-soft);
+}
+
+.product-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 3;
+    background: var(--green-primary);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.product-image-box {
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+    background: #fdfdfd;
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.08);
+}
+
+.product-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,0.05) 100%);
+}
+
+.product-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.product-name {
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.product-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--green-primary);
+    margin-bottom: 16px;
+}
+
+.product-price span {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-soft);
+}
+
+.shop-btn {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    background: var(--cream);
+    color: var(--green-primary) !important;
+    text-decoration: none !important;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--cream-dark);
+}
+
+.shop-btn:hover {
+    background: var(--green-primary);
+    color: var(--white) !important;
+    border-color: var(--green-primary);
+}
+
+/* ================= RESPONSIVE MEDIA QUERIES ================= */
+
+/* Tablet (under 992px) */
+@media (max-width: 991px) {
+    .hero-video-box {
+        min-height: 380px;
+    }
+
+    .side-banner {
+        min-height: 320px;
+    }
+}
+
+/* Mobile Devices (under 768px) */
+@media (max-width: 767px) {
+    .hero-section {
+        padding: 10px 0;
+    }
+
+    .hero-video-box {
+        min-height: 340px;
+        border-radius: 16px;
+    }
+
+    .hero-video-content {
+        padding: 20px 15px;
+    }
+
+    .hero-video-content > div {
+        flex-direction: column;
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .hero-btn, .learn-btn {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+
+    .side-banner {
+        min-height: 280px;
+        border-radius: 16px;
+    }
+
+    .side-banner-overlay {
+        padding: 24px 20px;
+    }
+
+    .feature-section {
+        padding: 30px 0;
+    }
+
+    .product-section {
+        padding: 30px 0 50px 0;
+    }
+}
+
+/* Mobile 3-Column Specific Optimizations (under 576px) */
+@media (max-width: 575px) {
+    .hero-video-box {
+        min-height: 310px;
+    }
+
+    .feature-box {
+        padding: 20px 12px;
+    }
+
+    /* 3 Column Product Card Styles for Mobile */
+    .product-card {
+        border-radius: 10px;
+    }
+
+    .product-badge {
+        font-size: 9px;
+        padding: 2px 6px;
+        top: 6px;
+        left: 6px;
+    }
+
+    .product-image-box {
+        height: 110px;
+    }
+
+    .product-body {
+        padding: 8px 6px;
+        text-align: center;
+    }
+
+    .product-name {
+        font-size: 12px;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .product-price {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .product-price span {
+        display: block;
+        font-size: 10px;
+        margin-top: -2px;
+    }
+
+    .shop-btn {
+        padding: 5px 6px;
+        font-size: 10px;
+        gap: 3px;
+        border-radius: 20px;
+        width: 100%;
+    }
+}
+
+</style>
+
+{% endblock %}

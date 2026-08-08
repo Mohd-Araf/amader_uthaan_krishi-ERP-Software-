@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- ================= HERO SECTION ================= -->
+<section class="hero-section">
+
+    <div class="container-fluid px-lg-5 px-3">
+
+        <div class="row g-3 align-items-stretch">
+
+            <div class="col-lg-8">
+
+                <div class="hero-slider-box">
+
+                    <div id="homeSlider"
+                         class="carousel slide carousel-fade h-100"
+                         data-ride="carousel"
+                         data-interval="4000">
+
+                        <!-- Indicators -->
+                        <ol class="carousel-indicators custom-indicators">
+                            <li data-target="#homeSlider" data-slide-to="0" class="active"></li>
+                            <li data-target="#homeSlider" data-slide-to="1"></li>
+                            <li data-target="#homeSlider" data-slide-to="2"></li>
+                        </ol>
+
+                        <!-- Slides -->
+                        <div class="carousel-inner h-100">
+
+                            <!-- Slide 1 -->
+                            <div class="carousel-item active h-100">
+                                <div class="hero-overlay"></div>
+                                <img src="/static/images/b2.png"
+                                     class="hero-slide-img"
+                                     alt="Fresh Vegetables">
+                                <div class="hero-content">
+                                    <span class="hero-tag">New Arrivals</span>
+                                    <h1>Fresh Organic<br><em>Products</em></h1>
+                                    <p>Farm fresh vegetables directly from trusted farmers.</p>
+                                    <a href="{% url 'shop' %}" class="hero-btn">
+                                        Shop Now <span class="btn-arrow">→</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Slide 2 -->
+                            <div class="carousel-item h-100">
+                                <div class="hero-overlay"></div>
+                                <img src="/static/images/b1.png"
+                                     class="hero-slide-img"
+                                     alt="Healthy Fruits">
+                                <div class="hero-content">
+                                    <span class="hero-tag">Best Sellers</span>
+                                    <h1>Healthy &<br><em>Natural Foods</em></h1>
+                                    <p>Pure, safe and healthy food for your family.</p>
+                                    <a href="{% url 'shop' %}" class="hero-btn">
+                                        Explore Products <span class="btn-arrow">→</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Slide 3 -->
+                            <div class="carousel-item h-100">
+                                <div class="hero-overlay"></div>
+                                <img src="/static/images/b3.png"
+                                     class="hero-slide-img"
+                                     alt="Daily Essentials">
+                                <div class="hero-content">
+                                    <span class="hero-tag">Daily Deals</span>
+                                    <h1>Daily Grocery<br><em>Essentials</em></h1>
+                                    <p>Fast delivery with affordable prices.</p>
+                                    <a href="{% url 'shop' %}" class="hero-btn">
+                                        Buy Today <span class="btn-arrow">→</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Controls -->
+                        <a class="carousel-control-prev"
+                           href="#homeSlider"
+                           role="button"
+                           data-slide="prev">
+                            <span class="slider-arrow">&#10094;</span>
+                        </a>
+                        <a class="carousel-control-next"
+                           href="#homeSlider"
+                           role="button"
+                           data-slide="next">
+                            <span class="slider-arrow">&#10095;</span>
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ================= RIGHT BANNER ================= -->
+            <div class="col-lg-4">
+
+                <div class="side-banner">
+                    <img src="/static/images/mainbanner.jpeg"
+                         class="side-banner-img"
+                         alt="Uthaan Krishi">
+                    <div class="side-banner-overlay">
+                        <div class="side-badge">🌿 Certified Organic</div>
+                        <h3>100%<br>Organic</h3>
+                        <p>Fresh From Farm</p>
+                        <a href="{% url 'shop' %}" class="side-btn">
+                            Shop Collection <span class="btn-arrow">→</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================= FEATURE SECTION ================= -->
+<section class="feature-section">
+
+    <div class="container">
+
+        <div class="row g-3 text-center">
+
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrap">
+                        <span class="feature-icon">🚚</span>
+                    </div>
+                    <h5>Fast Delivery</h5>
+                    <p>Quick delivery across your area.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrap">
+                        <span class="feature-icon">🌿</span>
+                    </div>
+                    <h5>Organic Products</h5>
+                    <p>Fresh and healthy farm products.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <div class="feature-icon-wrap">
+                        <span class="feature-icon">💳</span>
+                    </div>
+                    <h5>Secure Payment</h5>
+                    <p>Trusted and secure checkout system.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================= PRODUCTS SECTION ================= -->
+<section class="product-section">
+
+    <div class="container">
+
+        <!-- Title -->
+        <div class="section-title text-center">
+            <span class="section-label">Our Selection</span>
+            <h2>Popular Products</h2>
+            <p>Fresh products selected for you</p>
+        </div>
+
+        <!-- Products -->
+        <div class="row g-4">
+
+            {% for p in products|slice:":8" %}
+
+            <div class="col-lg-3 col-md-4 col-sm-6">
+
+                <div class="product-card">
+
+                    <!-- Badge -->
+                    <div class="product-badge">Fresh</div>
+
+                    <!-- Image -->
+                    <div class="product-image-box">
+                        {% if p.image %}
+                        <img src="{{ p.image.url }}"
+                             class="product-image"
+                             alt="{{ p.name }}">
+                        {% else %}
+                        <img src="https://via.placeholder.com/300x220"
+                             class="product-image">
+                        {% endif %}
+                        <div class="product-image-overlay"></div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="product-body">
+                        <h5 class="product-name">{{ p.name }}</h5>
+                        <div class="product-price">
+                            ৳ {{ p.price }}
+                            <span>/ {{ p.get_unit_display }}</span>
+                        </div>
+                        <a href="{% url 'shop' %}" class="shop-btn">
+                            Shop Now <span class="btn-arrow">→</span>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================= CSS ================= -->
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* ================= CSS VARIABLES ================= */
+:root {
+    --green-primary: #1a7a3c;
+    --green-light:   #22a052;
+    --green-accent:  #4cca7a;
+    --cream:         #f8f6f0;
+    --cream-dark:    #ede9df;
+    --text-dark:     #1a1f16;
+    --text-mid:      #4a5244;
+    --text-soft:     #8a9488;
+    --white:         #ffffff;
+    --shadow-soft:   0 8px 32px rgba(26,122,60,0.10);
+    --shadow-card:   0 4px 24px rgba(26,30,22,0.08);
+    --radius-lg:     22px;
+    --radius-md:     14px;
+    --radius-pill:   50px;
+}
+
+</style>
+
+{% endblock %}

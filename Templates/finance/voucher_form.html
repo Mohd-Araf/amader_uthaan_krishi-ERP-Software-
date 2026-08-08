@@ -1,0 +1,629 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title|default:"Accounting Voucher Form" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --bg-surface: #ffffff;
+    --bg-body: #f8fafc;
+    --border-color: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+  }
+
+  .voucher-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    color: var(--text-main);
+  }
+
+  .card {
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #ffffff;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .card-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .card-body {
+    padding: 2rem;
+  }
+
+  /* Form Header Grid */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+    background: #f1f5f9;
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+  }
+
+  .form-control, .form-select, input[type="text"], input[type="number"], input[type="date"], select, textarea {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    color: var(--text-main);
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-md);
+    transition: all 0.15s ease-in-out;
+    box-sizing: border-box;
+  }
+
+  .form-control:focus, .form-select:focus, select:focus, input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  }
+
+  /* Table Styles */
+  .table-responsive {
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+  }
+
+  .entry-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    text-align: left;
+  }
+
+  .entry-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.875rem 1rem;
+    border-bottom: 2px solid var(--border-color);
+  }
+
+  .entry-table td {
+    padding: 0.75rem 0.75rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .entry-table tbody tr:nth-child(even) {
+    background-color: #fdfdfd;
+  }
+
+  .entry-table tbody tr:hover {
+    background-color: #f1f5f9;
+  }
+
+  .row-index {
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: center;
+    width: 40px;
+  }
+
+  /* Footer Controls & Totals */
+  .table-footer-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+  }
+
+  .totals-summary {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .total-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .total-box label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .total-box .amount {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-success {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  .status-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background-color: var(--primary-color);
+    color: #ffffff;
+  }
+  .btn-primary:hover {
+    background-color: var(--primary-hover);
+  }
+
+  .btn-secondary {
+    background-color: #e2e8f0;
+    color: #334155;
+  }
+  .btn-secondary:hover {
+    background-color: #cbd5e1;
+  }
+
+  .btn-outline-success {
+    background-color: #ffffff;
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+  }
+  .btn-outline-success:hover {
+    background-color: var(--success-color);
+    color: #ffffff;
+  }
+
+  .btn-danger-icon {
+    background: transparent;
+    color: var(--danger-color);
+    border: 1px solid #fca5a5;
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--radius-md);
+  }
+  .btn-danger-icon:hover {
+    background-color: var(--danger-color);
+    color: #ffffff;
+  }
+
+  .alert {
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .alert-danger {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+  }
+
+  .errorlist {
+    color: var(--danger-color);
+    font-size: 0.8125rem;
+    margin: 0.25rem 0 0 0;
+    padding-left: 1.25rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="voucher-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if form.errors or formset.errors %}
+    <div class="alert alert-danger">
+      <strong>Please correct the errors below:</strong>
+      {{ form.non_field_errors }}
+      {{ formset.non_form_errors }}
+    </div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-header">
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        {{ title|default:"Voucher Form" }}
+      </h2>
+      <a href="{% url 'voucher_list' %}" class="btn btn-secondary">
+        &larr; Back to Vouchers
+      </a>
+    </div>
+
+    <div class="card-body">
+      <form method="post" id="voucher-form" novalidate>
+        {% csrf_token %}
+
+        <!-- Voucher Header Information -->
+        <div class="form-grid">
+          {% for field in form %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+              {{ field }}
+              {% if field.help_text %}
+                <small style="color: var(--text-muted);">{{ field.help_text }}</small>
+              {% endif %}
+              {% if field.errors %}
+                <div class="errorlist">{{ field.errors }}</div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Django Formset Management Form (TOTAL_FORMS, INITIAL_FORMS, etc.) -->
+        {{ formset.management_form }}
+
+        <h3 style="font-size: 1.125rem; font-weight: 700; margin: 1.5rem 0 1rem; color: #1e293b;">
+          Journal Entries (Double Entry Ledger)
+        </h3>
+
+        <!-- Dynamic Formset Table -->
+        <div class="table-responsive">
+          <table class="entry-table" id="journal-entries-table">
+            <thead>
+              <tr>
+                <th style="width: 40px; text-align: center;">#</th>
+                <th style="min-width: 250px;">Account *</th>
+                <th style="width: 160px;">Debit (৳)</th>
+                <th style="width: 160px;">Credit (৳)</th>
+                <th>Narration / Remarks</th>
+                <th style="width: 60px; text-align: center;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="journal-entries-body">
+              {% for entry_form in formset %}
+                <tr class="entry-row">
+                  <td class="row-index" style="text-align: center;">{{ forloop.counter }}</td>
+                  <td>
+                    {% for hidden in entry_form.hidden_fields %}
+                      {{ hidden }}
+                    {% endfor %}
+                    {% if entry_form.DELETE %}
+                      <div style="display:none;">{{ entry_form.DELETE }}</div>
+                    {% endif %}
+
+                    {{ entry_form.account }}
+                    {% if entry_form.account.errors %}
+                      <div class="errorlist">{{ entry_form.account.errors }}</div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {{ entry_form.debit }}
+                    {% if entry_form.debit.errors %}
+                      <div class="errorlist">{{ entry_form.debit.errors }}</div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {{ entry_form.credit }}
+                    {% if entry_form.credit.errors %}
+                      <div class="errorlist">{{ entry_form.credit.errors }}</div>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if entry_form.narration %}
+                      {{ entry_form.narration }}
+                    {% elif entry_form.remarks %}
+                      {{ entry_form.remarks }}
+                    {% else %}
+                      {{ entry_form.description }}
+                    {% endif %}
+                  </td>
+                  <td style="text-align: center;">
+                    <button type="button" class="btn-danger-icon delete-row-btn" title="Remove Entry Row">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer Controls & Balances -->
+        <div class="table-footer-controls">
+          <button type="button" class="btn btn-outline-success" id="add-row-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Add New Entry Row
+          </button>
+
+          <div class="totals-summary">
+            <div class="total-box">
+              <label>Total Debit</label>
+              <div class="amount" id="total-debit-display">৳0.00</div>
+            </div>
+
+            <div class="total-box">
+              <label>Total Credit</label>
+              <div class="amount" id="total-credit-display">৳0.00</div>
+            </div>
+
+            <div class="total-box">
+              <label>Difference</label>
+              <div class="amount" id="balance-diff-display">৳0.00</div>
+            </div>
+
+            <div id="balance-status-badge" class="status-badge status-danger">
+              Imbalanced
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
+          <a href="{% url 'voucher_list' %}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary" id="submit-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline></svg>
+            Save Voucher Draft
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden HTML Template for Dynamic Empty Row -->
+<template id="empty-form-template">
+  <tr class="entry-row">
+    <td class="row-index" style="text-align: center;">__number__</td>
+    <td>
+      {% for hidden in formset.empty_form.hidden_fields %}
+        {{ hidden }}
+      {% endfor %}
+      {{ formset.empty_form.account }}
+    </td>
+    <td>
+      {{ formset.empty_form.debit }}
+    </td>
+    <td>
+      {{ formset.empty_form.credit }}
+    </td>
+    <td>
+      {% if formset.empty_form.narration %}
+        {{ formset.empty_form.narration }}
+      {% elif formset.empty_form.remarks %}
+        {{ formset.empty_form.remarks }}
+      {% else %}
+        {{ formset.empty_form.description }}
+      {% endif %}
+    </td>
+    <td style="text-align: center;">
+      <button type="button" class="btn-danger-icon delete-row-btn" title="Remove Entry Row">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </button>
+    </td>
+  </tr>
+</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Detect Formset Prefix dynamically
+    const prefix = '{{ formset.prefix }}' || 'entries';
+    const totalFormsInput = document.getElementById(`id_${prefix}-TOTAL_FORMS`) ||
+                            document.querySelector('input[id$="-TOTAL_FORMS"]');
+
+    const tableBody = document.getElementById('journal-entries-body');
+    const emptyFormTemplate = document.getElementById('empty-form-template');
+    const addRowBtn = document.getElementById('add-row-btn');
+
+    // Apply class names to input fields automatically for clean styling & listener target
+    function applyInputStyling() {
+        tableBody.querySelectorAll('select').forEach(el => el.classList.add('form-select'));
+        tableBody.querySelectorAll('input[type="text"], input[type="number"]').forEach(el => {
+            el.classList.add('form-control');
+            if (el.name.includes('-debit')) {
+                el.classList.add('debit-input');
+            } else if (el.name.includes('-credit')) {
+                el.classList.add('credit-input');
+            }
+        });
+    }
+
+    // 2. Add New Row Functionality
+    if (addRowBtn && totalFormsInput && emptyFormTemplate) {
+        addRowBtn.addEventListener('click', function() {
+            let currentCount = parseInt(totalFormsInput.value, 10) || 0;
+
+            // Replace __prefix__ with current total form index
+            let rowHtml = emptyFormTemplate.innerHTML.replace(/__prefix__/g, currentCount);
+
+            // Temporary DOM parser
+            const tempTable = document.createElement('table');
+            tempTable.innerHTML = `<tbody>${rowHtml}</tbody>`;
+            const newRow = tempTable.querySelector('tr');
+
+            tableBody.appendChild(newRow);
+
+            // Increment Django formset TOTAL_FORMS count
+            totalFormsInput.value = currentCount + 1;
+
+            // Apply classes, re-index & re-calculate
+            applyInputStyling();
+            updateRowNumbers();
+            attachCalculationListeners();
+            calculateTotals();
+        });
+    }
+
+    // 3. Delete Row Functionality (Event Delegation)
+    tableBody.addEventListener('click', function(e) {
+        const deleteBtn = e.target.closest('.delete-row-btn');
+        if (!deleteBtn) return;
+
+        const row = deleteBtn.closest('tr');
+        const deleteCheckbox = row.querySelector('input[type="checkbox"][name$="-DELETE"]');
+
+        if (deleteCheckbox) {
+            // Django initial object: mark DELETE checkbox and hide row
+            deleteCheckbox.checked = true;
+            row.style.display = 'none';
+        } else {
+            // Newly added front-end row: remove directly
+            row.remove();
+        }
+
+        updateRowNumbers();
+        calculateTotals();
+    });
+
+    // 4. Calculate Live Totals & Balance Verification
+    function calculateTotals() {
+        let totalDebit = 0;
+        let totalCredit = 0;
+
+        const visibleRows = tableBody.querySelectorAll('tr.entry-row:not([style*="display: none"])');
+
+        visibleRows.forEach(row => {
+            const debitInput = row.querySelector('.debit-input') || row.querySelector('input[name$="-debit"]');
+            const creditInput = row.querySelector('.credit-input') || row.querySelector('input[name$="-credit"]');
+
+            if (debitInput) {
+                const dVal = parseFloat(debitInput.value);
+                if (!isNaN(dVal)) totalDebit += dVal;
+            }
+
+            if (creditInput) {
+                const cVal = parseFloat(creditInput.value);
+                if (!isNaN(cVal)) totalCredit += cVal;
+            }
+        });
+
+        const totalDebitElem = document.getElementById('total-debit-display');
+        const totalCreditElem = document.getElementById('total-credit-display');
+        const diffDisplay = document.getElementById('balance-diff-display');
+        const statusBadge = document.getElementById('balance-status-badge');
+
+        if (totalDebitElem) totalDebitElem.textContent = '৳' + totalDebit.toFixed(2);
+        if (totalCreditElem) totalCreditElem.textContent = '৳' + totalCredit.toFixed(2);
+
+        const diff = totalDebit - totalCredit;
+        const absDiff = Math.abs(diff);
+
+        if (diffDisplay) {
+            diffDisplay.textContent = '৳' + absDiff.toFixed(2);
+        }
+
+        if (statusBadge) {
+            if (totalDebit > 0 && absDiff < 0.001) {
+                statusBadge.className = 'status-badge status-success';
+                statusBadge.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Balanced';
+            } else {
+                statusBadge.className = 'status-badge status-danger';
+                statusBadge.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Imbalanced';
+            }
+        }
+    }
+
+    // 5. Update Row Sequence Numbers
+    function updateRowNumbers() {
+        const visibleRows = tableBody.querySelectorAll('tr.entry-row:not([style*="display: none"])');
+        visibleRows.forEach((row, idx) => {
+            const indexTd = row.querySelector('.row-index');
+            if (indexTd) {
+                indexTd.textContent = idx + 1;
+            }
+        });
+    }
+
+    // 6. Attach Event Listeners to Inputs
+    function attachCalculationListeners() {
+        const inputs = tableBody.querySelectorAll('input[name$="-debit"], input[name$="-credit"], .debit-input, .credit-input');
+        inputs.forEach(input => {
+            input.removeEventListener('input', calculateTotals);
+            input.addEventListener('input', calculateTotals);
+        });
+    }
+
+    // Initialize on Page Load
+    applyInputStyling();
+    attachCalculationListeners();
+    updateRowNumbers();
+    calculateTotals();
+});
+</script>
+{% endblock %}

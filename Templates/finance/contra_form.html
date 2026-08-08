@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/finance.css' %}">
+<style>
+    /* Premium Contra Voucher Form Styling */
+    .contra-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        background: #ffffff;
+        transition: all 0.3s ease;
+    }
+
+    .contra-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: #ffffff;
+        padding: 1.5rem 1.75rem;
+    }
+
+    .contra-icon-badge {
+        width: 48px;
+        height: 48px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(8px);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .form-section {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.25rem;
+        position: relative;
+    }
+
+    .form-section-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        margin-bottom: 0.75rem;
+    }
+
+    .swap-btn-container {
+        display: flex;
+        justify-content: center;
+        margin: -10px 0;
+        position: relative;
+        z-index: 5;
+    }
+
+    .btn-swap {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 2px solid #e2e8f0;
+        color: #2a5298;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.25s ease;
+        cursor: pointer;
+    }
+
+    .btn-swap:hover {
+        background: #2a5298;
+        color: #ffffff;
+        transform: rotate(180deg) scale(1.05);
+        border-color: #2a5298;
+    }
+
+    .amount-input-group .input-group-text {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        font-weight: 700;
+        color: #334155;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+
+    .amount-input-group .form-control {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0f172a;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        padding: 0.65rem 0.9rem;
+        font-size: 0.95rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #2a5298;
+        box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.12);
+    }
+
+    .same-account-error {
+        display: none;
+        border-radius: 10px;
+        font-size: 0.875rem;
+    }
+
+    /* Mobile Responsiveness Adjustments */
+    @media (max-width: 575.98px) {
+        .contra-header {
+            padding: 1.25rem;
+        }
+
+        .contra-header h4 {
+            font-size: 1.2rem;
+        }
+
+        .contra-icon-badge {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+
+        .action-buttons-wrapper {
+            flex-direction: column-reverse;
+            gap: 0.75rem;
+        }
+
+        .action-buttons-wrapper .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block title %}
+Create Contra Voucher
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-3 py-md-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+
+            <div class="card contra-card">
+
+                <!-- Card Header -->
+                <div class="contra-header d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="contra-icon-badge">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 fw-bold">Create Contra Voucher</h4>
+                            <small class="opacity-75 d-none d-sm-inline-block">
+                                Transfer funds internally between Cash & Bank accounts
+                            </small>
+                        </div>
+                    </div>
+                    <span class="badge bg-light text-dark px-3 py-2 rounded-pill fw-semibold">
+                        Internal Transfer
+                    </span>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body p-3 p-md-4">
+
+                    <!-- Same Account Alert Notification -->
+                    <div id="accountErrorAlert" class="alert alert-danger same-account-error align-items-center mb-3" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <div>Source (From Account) and Destination (To Account) cannot be the same!</div>
+                    </div>
+
+                    <form method="post" id="contraVoucherForm">
+                        {% csrf_token %}
+
+                        <!-- FROM ACCOUNT SECTION -->
+                        <div class="form-section mb-2">
+                            <div class="form-section-title d-flex align-items-center">
+                                <i class="fas fa-arrow-up text-danger me-1"></i> Sending Account (Outflow)
+                            </div>
+                            <label for="from_account" class="form-label fw-semibold text-dark">
+                                From Account <span class="text-danger">*</span>
+                            </label>
+                            <select
+                                name="from_account"
+                                id="from_account"
+                                class="form-select"
+                                required>
+                                <option value="">Select Source Account (Cash/Bank)</option>
+                                {% for account in accounts %}
+                                    <option value="{{ account.id }}">
+                                        {{ account.account_code }} - {{ account.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- SWAP BUTTON -->
+                        <div class="swap-btn-container">
+                            <button type="button" class="btn-swap" id="btnSwapAccounts" title="Swap Source & Destination Accounts">
+                                <i class="fas fa-arrow-down-up"></i>
+                            </button>
+                        </div>
+
+                        <!-- TO ACCOUNT SECTION -->
+                        <div class="form-section mt-2 mb-4">
+                            <div class="form-section-title d-flex align-items-center">
+                                <i class="fas fa-arrow-down text-success me-1"></i> Receiving Account (Inflow)
+                            </div>
+                            <label for="to_account" class="form-label fw-semibold text-dark">
+                                To Account <span class="text-danger">*</span>
+                            </label>
+                            <select
+                                name="to_account"
+                                id="to_account"
+                                class="form-select"
+                                required>
+                                <option value="">Select Destination Account (Cash/Bank)</option>
+                                {% for account in accounts %}
+                                    <option value="{{ account.id }}">
+                                        {{ account.account_code }} - {{ account.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- AMOUNT & REMARKS -->
+                        <div class="row g-3 mb-4">
+
+                            <!-- Amount -->
+                            <div class="col-12 col-md-6">
+                                <label for="amount" class="form-label fw-semibold text-dark">
+                                    Transfer Amount <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group amount-input-group">
+                                    <span class="input-group-text">৳</span>
+                                    <input
+                                        type="number"
+                                        name="amount"
+                                        id="amount"
+                                        step="0.01"
+                                        min="0.01"
+                                        class="form-control"
+                                        placeholder="0.00"
+                                        required>
+                                </div>
+                            </div>
+
+                            <!-- Remarks -->
+                            <div class="col-12 col-md-6">
+                                <label for="remarks" class="form-label fw-semibold text-dark">
+                                    Remarks / Narration
+                                </label>
+                                <input
+                                    type="text"
+                                    name="remarks"
+                                    id="remarks"
+                                    class="form-control"
+                                    placeholder="e.g. Cash Deposit to Bank">
+                            </div>
+
+                        </div>
+
+                        <!-- ACTION BUTTONS -->
+                        <div class="d-flex align-items-center justify-content-between action-buttons-wrapper pt-2 border-top">
+                            <a href="{% url 'voucher_list' %}" class="btn btn-outline-secondary px-4 py-2 rounded-3 fw-semibold">
+                                <i class="fas fa-arrow-left me-1"></i> Back to Vouchers
+                            </a>
+
+                            <button type="submit" id="btnSubmit" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold shadow-sm">
+                                <i class="fas fa-save me-1"></i> Create Contra Voucher
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const fromAccount = document.getElementById("from_account");
+        const toAccount = document.getElementById("to_account");
+        const btnSwap = document.getElementById("btnSwapAccounts");
+        const form = document.getElementById("contraVoucherForm");
+        const errorAlert = document.getElementById("accountErrorAlert");
+
+        // Swap Accounts functionality
+        btnSwap.addEventListener("click", function () {
+            const tempVal = fromAccount.value;
+            fromAccount.value = toAccount.value;
+            toAccount.value = tempVal;
+            validateAccounts();
+        });
+
+        // Real-time validation to prevent selecting identical accounts
+        function validateAccounts() {
+            if (fromAccount.value && toAccount.value && fromAccount.value === toAccount.value) {
+                errorAlert.style.display = "flex";
+                return false;
+            } else {
+                errorAlert.style.display = "none";
+                return true;
+            }
+        }
+
+        fromAccount.addEventListener("change", validateAccounts);
+        toAccount.addEventListener("change", validateAccounts);
+
+        // Form submit validation safeguard
+        form.addEventListener("submit", function (e) {
+            if (!validateAccounts()) {
+                e.preventDefault();
+                errorAlert.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        });
+    });
+</script>
+{% endblock %}
