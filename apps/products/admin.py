@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Product, Order, OrderItem
 
+
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
@@ -23,16 +24,19 @@ class OrderItemInline(admin.TabularInline):
     )
 
     def unit_price_display(self, obj):
-        return obj.product.price if obj.product else 0
+        if obj.product:
+            return f"{obj.product.price} ৳ / {obj.product.get_unit_display()}"
+        return "0 ৳"
     unit_price_display.short_description = "Unit Price"
 
     def total_price_display(self, obj):
-        return obj.total_price()
+        return f"{round(obj.total_price(), 2)} ৳"
     total_price_display.short_description = "Total"
 
     def updated_total_display(self, obj):
-        return obj.updated_total
+        return f"{round(obj.updated_total, 2)} ৳"
     updated_total_display.short_description = "Updated Total"
+
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
@@ -53,20 +57,24 @@ class OrderAdmin(admin.ModelAdmin):
         'created_at'
     )
 
+    # Added user__user_id so admins can search orders by User ID in Admin Panel
     search_fields = (
         'order_code',
-        'user__username'
+        'user__username',
+        'user__email',
+        'user__user_id',
     )
 
     inlines = [OrderItemInline]
 
     def total_price_display(self, obj):
-        return obj.total_price()
+        return f"{round(obj.total_price, 2)} ৳"
     total_price_display.short_description = "Total"
 
     def updated_total_display(self, obj):
-        return obj.updated_total_price
+        return f"{round(obj.updated_total_price, 2)} ৳"
     updated_total_display.short_description = "Updated Total"
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):

@@ -1,631 +1,494 @@
 {% extends 'base.html' %}
-
-
 {% block content %}
 
-
-
 <style>
-
-
-body{
-
-    background:#f8f9fa;
-
-}
-
-
-
-/* Back Button */
-
-
-.back-btn{
-
-    background:white;
-
-    border-radius:25px;
-
-    padding:8px 20px;
-
-    color:#198754;
-
-    border:1px solid #198754;
-
-    font-weight:600;
-
-}
-
-
-
-.back-btn:hover{
-
-    background:#198754;
-
-    color:white;
-
-}
-
-
-
-
-.shop-title{
-
-    font-size:30px;
-
-    font-weight:700;
-
-    color:#222;
-
-}
-
-
-
-
-
-/* Card */
-
-
-.product-card{
-
-    background:white;
-
-    border-radius:18px;
-
-    overflow:hidden;
-
-    height:430px;
-
-    border:1px solid #eeeeee;
-
-    transition:.3s;
-
-    box-shadow:
-    0 5px 18px rgba(0,0,0,.07);
-
-}
-
-
-
-.product-card:hover{
-
-    transform:translateY(-6px);
-
-    box-shadow:
-    0 12px 30px rgba(0,0,0,.12);
-
-}
-
-
-
-
-
-
-/* Image */
-
-
-.image-box{
-
-    height:190px;
-
-    padding:12px;
-
-    background:#fff;
-
-}
-
-
-
-.product-image{
-
-    width:100%;
-
-    height:100%;
-
-    object-fit:cover;
-
-    border-radius:14px;
-
-    transition:.3s;
-
-}
-
-
-
-.product-image:hover{
-
-    transform:scale(1.06);
-
-}
-
-
-
-
-
-
-.product-name{
-
-    font-size:18px;
-
-    font-weight:700;
-
-    color:#333;
-
-    margin-bottom:8px;
-
-}
-
-
-
-
-
-
-.price{
-
-    color:#e53935;
-
-    font-size:21px;
-
-    font-weight:800;
-
-}
-
-
-
-.unit{
-
-    background:#198754;
-
-    color:white;
-
-    padding:4px 12px;
-
-    border-radius:20px;
-
-    font-size:12px;
-
-}
-
-
-
-
-
-
-.description{
-
-    color:#777;
-
-    font-size:13px;
-
-    height:35px;
-
-    overflow:hidden;
-
-}
-
-
-
-
-
-
-
-.quantity-box{
-
-    display:flex;
-
-    justify-content:center;
-
-    margin-bottom:12px;
-
-}
-
-
-
-.quantity-box button{
-
-    width:35px;
-
-    height:35px;
-
-    border:none;
-
-    background:#198754;
-
-    color:white;
-
-    font-size:20px;
-
-}
-
-
-
-.quantity-box input{
-
-    width:55px;
-
-    height:35px;
-
-    text-align:center;
-
-    border:1px solid #ddd;
-
-}
-
-
-
-
-
-
-
-.cart-btn{
-
-    background:#198754;
-
-    color:white;
-
-    border-radius:25px;
-
-    height:40px;
-
-    font-size:15px;
-
-}
-
-
-
-.cart-btn:hover{
-
-    background:#146c43;
-
-    color:white;
-
-}
-
-
-
-
-
+    body {
+        background: #f8f9fa;
+    }
+
+    /* Back Button */
+    .back-btn {
+        background: white;
+        border-radius: 25px;
+        padding: 8px 20px;
+        color: #198754;
+        border: 1.5px solid #198754;
+        font-weight: 600;
+        transition: all 0.25s ease;
+    }
+
+    .back-btn:hover {
+        background: #198754;
+        color: white;
+        text-decoration: none;
+    }
+
+    .shop-title {
+        font-size: 30px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    /* Responsive Flex Card */
+    .product-card {
+        background: white;
+        border-radius: 18px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    }
+
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Image Box */
+    .image-box {
+        height: 190px;
+        padding: 12px;
+        background: #fff;
+        overflow: hidden;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 14px;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-image {
+        transform: scale(1.05);
+    }
+
+    .product-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 6px;
+    }
+
+    .price {
+        color: #e53935;
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .unit {
+        background: #198754;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .description {
+        color: #64748b;
+        font-size: 13px;
+        height: 38px;
+        overflow: hidden;
+        margin-bottom: 12px;
+    }
+
+    /* ================= UNIFIED QUANTITY BOX (FITS BUTTONS TIGHTLY) ================= */
+    .quantity-box {
+        display: inline-flex;
+        align-items: stretch;
+        justify-content: center;
+        margin: 0 auto 14px auto;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1.5px solid #198754;
+        background: #fff;
+        height: 36px;
+        width: fit-content; /* Removes side white gaps */
+    }
+
+    .quantity-box button {
+        width: 32px;
+        height: 100%;
+        border: none;
+        background: #198754;
+        color: white;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .quantity-box button:hover {
+        background: #146c43;
+    }
+
+    .quantity-box input {
+        width: 54px;
+        height: 100%;
+        text-align: center;
+        border: none;
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 0.88rem;
+        outline: none;
+        background: transparent;
+        padding: 0 2px;
+    }
+
+    .qty-unit-label {
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0 6px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-left: 1px solid #cbd5e1;
+        white-space: nowrap;
+    }
+
+    .cart-btn {
+        background: #198754;
+        color: white;
+        border-radius: 25px;
+        height: 42px;
+        font-size: 15px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.25s ease;
+    }
+
+    .cart-btn:hover {
+        background: #146c43;
+        color: white;
+    }
+
+    /* ================= MOBILE: 3-Column Product Grid ================= */
+    @media (max-width: 767px) {
+
+        .row > [class*="col-"] {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        .product-card {
+            border-radius: 12px;
+        }
+
+        .image-box {
+            height: 100px;
+            padding: 6px;
+        }
+
+        .product-image {
+            border-radius: 8px;
+        }
+
+        .product-card .card-body {
+            padding: 8px 5px !important;
+        }
+
+        .product-name {
+            font-size: 11.5px;
+            margin-bottom: 3px;
+            line-height: 1.25;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .price {
+            font-size: 11.5px;
+        }
+
+        .unit {
+            font-size: 7.5px;
+            padding: 1px 4px;
+        }
+
+        .product-card .mb-2 {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 3px;
+            row-gap: 2px;
+        }
+
+        .description {
+            display: none;
+        }
+
+        .quantity-box {
+            margin: 0 auto 8px auto;
+            border-radius: 8px;
+            height: 26px;
+            border-width: 1.2px;
+            width: fit-content;
+        }
+
+        .quantity-box button {
+            width: 20px;
+            height: 100%;
+            font-size: 12px;
+        }
+
+        .quantity-box input {
+            width: 30px;
+            height: 100%;
+            font-size: 9.5px;
+            padding: 0 1px;
+        }
+
+        .qty-unit-label {
+            height: 100%;
+            font-size: 7.5px;
+            padding: 0 3px;
+        }
+
+        .cart-btn {
+            height: auto;
+            min-height: 30px;
+            font-size: 10px;
+            padding: 5px 3px;
+            line-height: 1.2;
+            white-space: normal;
+        }
+    }
 </style>
-
-
-
-
-
 
 <div class="container mt-4 mb-5">
 
+    <!-- Back Home -->
+    <div class="mb-4">
+        <a href="{% url 'home' %}" class="btn back-btn">
+            ← Back Home
+        </a>
+    </div>
 
+    <h3 class="text-center shop-title mb-4">
+        🥬 Fresh Products
+    </h3>
 
+    <div class="row">
+        {% for p in products %}
+        <div class="col-4 col-md-4 col-lg-3 mb-4">
 
+            <div class="product-card">
 
-<!-- Back Home -->
+                <a href="{% url 'product_details' p.id %}">
+                    <div class="image-box">
+                        {% if p.image %}
+                            <img src="{{ p.image.url }}" class="product-image" alt="{{ p.name }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/300x200?text=No+Image" class="product-image" alt="No Image">
+                        {% endif %}
+                    </div>
+                </a>
 
+                <div class="card-body text-center p-3 d-flex flex-column justify-content-between">
 
-<div class="mb-4">
+                    <div>
+                        <h5 class="product-name">
+                            {{ p.name }}
+                        </h5>
 
-<a href="{% url 'home' %}"
-   class="btn back-btn">
+                        <div class="mb-2">
+                            <span class="price">
+                                {{ p.price }} TK
+                            </span>
+                            <span class="unit">
+                                {% if p.unit == 'gm' %}/ Kg{% else %}/ {{ p.get_unit_display }}{% endif %}
+                            </span>
+                        </div>
 
-    ← Back Home
+                        <p class="description">
+                            {{ p.description|truncatewords:10|default:"Fresh agricultural product" }}
+                        </p>
+                    </div>
 
-</a>
+                    <form method="POST" action="{% url 'add_to_cart' p.id %}">
+                        {% csrf_token %}
+
+                        <!-- Unified Smart Quantity Input Box -->
+                        {% if p.unit == 'gm' %}
+                            <div class="quantity-box qty-gram-wrapper">
+                                <button type="button" aria-label="Decrease quantity" onclick="decreaseGram(this)">-</button>
+
+                                <!-- Real integer gram input submitted to backend -->
+                                <input type="hidden" name="quantity" value="250" class="gram-real-input">
+
+                                <!-- Display input formatted for user (gm or Kg) -->
+                                <input type="number"
+                                       value="250"
+                                       step="50"
+                                       class="gram-display-input"
+                                       oninput="handleGramInput(this)"
+                                       onchange="handleGramInput(this)">
+
+                                <span class="qty-unit-label">gm</span>
+
+                                <button type="button" aria-label="Increase quantity" onclick="increaseGram(this)">+</button>
+                            </div>
+                        {% else %}
+                            <div class="quantity-box">
+                                <button type="button" aria-label="Decrease quantity" onclick="decrease(this)">-</button>
+
+                                {% if p.unit == 'pcs' or p.unit == 'ati' or p.unit == 'fana' %}
+                                    <input type="number" name="quantity" value="1" min="1" step="1" onchange="validateMin(this)">
+                                {% else %}
+                                    <input type="number" name="quantity" value="1" min="0.5" step="0.5" onchange="validateMin(this)">
+                                {% endif %}
+
+                                <span class="qty-unit-label">{{ p.get_unit_display }}</span>
+
+                                <button type="button" aria-label="Increase quantity" onclick="increase(this)">+</button>
+                            </div>
+                        {% endif %}
+
+                        <button type="submit" class="btn cart-btn btn-block w-100">
+                            🛒 Add To Cart
+                        </button>
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <h5 class="text-muted">No Products Available Right Now.</h5>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- View Cart Floating / Bottom Button -->
+    <div class="text-center mt-4">
+        <a href="{% url 'cart' %}" class="btn btn-primary rounded-pill px-5 py-2 font-weight-bold shadow-sm">
+            🛒 View Cart Page
+        </a>
+    </div>
 
 </div>
 
-
-
-
-
-
-
-
-<h3 class="text-center shop-title mb-4">
-
-
-🥬 Fresh Products
-
-
-</h3>
-
-
-
-
-
-
-
-<div class="row">
-
-
-
-
-
-{% for p in products %}
-
-
-
-
-
-<div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-
-
-
-
-
-<div class="product-card">
-
-
-
-
-
-
-<a href="{% url 'product_details' p.id %}">
-
-
-<div class="image-box">
-
-
-{% if p.image %}
-
-
-<img src="{{ p.image.url }}"
-     class="product-image">
-
-
-{% else %}
-
-
-<img src="https://via.placeholder.com/300x200?text=No+Image"
-     class="product-image">
-
-
-{% endif %}
-
-
-</div>
-
-
-</a>
-
-
-
-
-
-
-
-<div class="card-body text-center p-3">
-
-
-
-
-
-<h5 class="product-name">
-
-{{ p.name }}
-
-</h5>
-
-
-
-
-
-
-
-<div class="mb-2">
-
-
-<span class="price">
-
-{{ p.price }} TK
-
-</span>
-
-
-<span class="unit">
-
-{{ p.get_unit_display }}
-
-</span>
-
-
-</div>
-
-
-
-
-
-
-
-<p class="description">
-
-{{ p.description|truncatewords:10 }}
-
-</p>
-
-
-
-
-
-
-
-<form method="POST"
-      action="{% url 'add_to_cart' p.id %}">
-
-
-{% csrf_token %}
-
-
-
-
-
-
-<div class="quantity-box">
-
-
-<button type="button"
-onclick="decrease(this)">
--
-</button>
-
-
-
-<input type="number"
-name="quantity"
-value="1"
-min="1">
-
-
-
-<button type="button"
-onclick="increase(this)">
-+
-</button>
-
-
-</div>
-
-
-
-
-
-
-
-<button type="submit"
-class="btn cart-btn btn-block">
-
-
-🛒 Add To Cart
-
-
-</button>
-
-
-
-
-
-
-</form>
-
-
-
-
-
-
-</div>
-
-
-
-
-
-
-</div>
-
-
-
-
-
-
-</div>
-
-
-
-
-
-
-{% empty %}
-
-
-
-<div class="col-12 text-center">
-
-
-<h5 class="text-muted">
-
-No Products Available
-
-</h5>
-
-
-</div>
-
-
-
-
-{% endfor %}
-
-
-
-
-
-
-
-</div>
-
-
-
-
-
-<div class="text-center mt-3">
-
-
-<a href="{% url 'cart' %}"
-class="btn btn-primary rounded-pill px-5">
-
-
-🛒 View Cart
-
-
-</a>
-
-
-</div>
-
-
-
-
-
-
-</div>
-
-
-
-
-
-
-
+<!-- Universal Dynamic Converter System -->
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.qty-gram-wrapper').forEach(function(wrapper) {
+            let hiddenInput = wrapper.querySelector('.gram-real-input');
+            let initialGram = parseFloat(hiddenInput.value) || 250;
+            updateShopGramDisplay(wrapper, initialGram);
+        });
+    });
 
+    // Central Display Renderer
+    function updateShopGramDisplay(wrapper, gramVal) {
+        let visibleInput = wrapper.querySelector('.gram-display-input');
+        let hiddenInput = wrapper.querySelector('.gram-real-input');
+        let unitSpan = wrapper.querySelector('.qty-unit-label');
 
-function increase(btn){
+        if (!visibleInput || !hiddenInput || !unitSpan) return;
 
-let input =
-btn.parentElement.querySelector("input");
+        hiddenInput.value = gramVal;
 
-input.value=parseInt(input.value)+1;
+        if (gramVal >= 1000) {
+            let kg = Math.round((gramVal / 1000) * 100) / 100;
+            visibleInput.value = kg;
+            unitSpan.textContent = 'Kg';
+            visibleInput.step = '0.05';
+            visibleInput.min = '0.05';
+        } else {
+            visibleInput.value = gramVal;
+            unitSpan.textContent = 'gm';
+            visibleInput.step = '50';
+            visibleInput.min = '50';
+        }
+    }
 
-}
+    // Increase for Gram Items (+50g)
+    function increaseGram(btn) {
+        let wrapper = btn.parentElement;
+        let hiddenInput = wrapper.querySelector('.gram-real-input');
+        let currentGram = parseFloat(hiddenInput.value) || 250;
+        let nextGram = currentGram + 50;
+        updateShopGramDisplay(wrapper, nextGram);
+    }
 
+    // Decrease for Gram Items (-50g, minimum 50g)
+    function decreaseGram(btn) {
+        let wrapper = btn.parentElement;
+        let hiddenInput = wrapper.querySelector('.gram-real-input');
+        let currentGram = parseFloat(hiddenInput.value) || 250;
+        let nextGram = Math.max(50, currentGram - 50);
+        updateShopGramDisplay(wrapper, nextGram);
+    }
 
+    // Direct Input Handling
+    function handleGramInput(visibleInput) {
+        let wrapper = visibleInput.closest('.qty-gram-wrapper');
+        if (!wrapper) return;
+        let hiddenInput = wrapper.querySelector('.gram-real-input');
+        let unitSpan = wrapper.querySelector('.qty-unit-label');
 
+        let val = parseFloat(visibleInput.value) || 0;
 
-function decrease(btn){
+        if (val <= 0) return;
 
-let input =
-btn.parentElement.querySelector("input");
+        let gramVal;
+        if (val >= 50) {
+            gramVal = Math.round(val);
+        } else {
+            gramVal = Math.round(val * 1000);
+        }
 
+        gramVal = Math.max(50, gramVal);
+        updateShopGramDisplay(wrapper, gramVal);
+    }
 
-if(parseInt(input.value)>1){
+    // Standard Increase / Decrease for Non-Gram Items
+    function increase(btn) {
+        let input = btn.parentElement.querySelector("input");
+        let step = parseFloat(input.getAttribute("step")) || 1;
+        let val = parseFloat(input.value) || 0;
+        let max = parseFloat(input.getAttribute("max"));
+        let newVal = val + step;
+        if (isNaN(max) || newVal <= max) {
+            input.value = Math.round(newVal * 100) / 100;
+        }
+    }
 
-input.value=parseInt(input.value)-1;
+    function decrease(btn) {
+        let input = btn.parentElement.querySelector("input");
+        let step = parseFloat(input.getAttribute("step")) || 1;
+        let min = parseFloat(input.getAttribute("min")) || 1;
+        let val = parseFloat(input.value) || 0;
+        let newVal = val - step;
+        if (newVal >= min) {
+            input.value = Math.round(newVal * 100) / 100;
+        } else {
+            input.value = min;
+        }
+    }
 
-}
-
-}
-
-
-
+    function validateMin(input) {
+        let min = parseFloat(input.getAttribute("min")) || 1;
+        let val = parseFloat(input.value);
+        if (isNaN(val) || val < min) {
+            input.value = min;
+        }
+    }
 </script>
-
-
-
-
 
 {% endblock %}

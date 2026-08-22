@@ -3,36 +3,244 @@
 {% block title %}Verify Code{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <h2>Verify Code</h2>
-        <p>OTP will expire in <span id="timer">{{ remaining_seconds }}</span> seconds</p>
+<style>
+    /* Custom Styling for OTP Verification Page */
+    .verify-container {
+        max-width: 460px;
+        margin: 3rem auto;
+    }
 
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary btn-block">Verify</button>
-        </form>
+    .verify-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    .verify-header {
+        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+        color: #ffffff;
+        padding: 2.5rem 2rem 2rem 2rem;
+        text-align: center;
+    }
+
+    .verify-header .icon-box {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem auto;
+        font-size: 1.5rem;
+    }
+
+    .verify-header h3 {
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 0.4rem;
+    }
+
+    .verify-header p {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .verify-body {
+        padding: 2.25rem 2.5rem;
+    }
+
+    /* Live Timer Badge Styling */
+    .timer-badge {
+        background-color: #eef2ff;
+        color: #0d6efd;
+        border: 1px solid #c7d2fe;
+        border-radius: 30px;
+        padding: 0.5rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .timer-badge span {
+        font-family: monospace;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #344767;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    /* Custom Styling for 6-Digit OTP Field */
+    .otp-input-group input {
+        display: block;
+        width: 100%;
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        font-size: 1.4rem;
+        font-weight: 700;
+        letter-spacing: 12px;
+        text-align: center;
+        border: 1.5px solid #cbd5e1;
+        background-color: #f8fafc;
+        color: #0f172a;
+        transition: all 0.25s ease;
+    }
+
+    .otp-input-group input:focus {
+        background-color: #ffffff;
+        border-color: #0d6efd;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+    }
+
+    .error-msg {
+        color: #dc3545;
+        font-size: 0.825rem;
+        margin-top: 0.4rem;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        padding: 0.85rem 1.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 0.75rem;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(13, 110, 253, 0.35);
+        color: #ffffff;
+    }
+
+    .verify-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .verify-footer a {
+        color: #0d6efd;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .verify-footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="container">
+    <div class="verify-container">
+        <div class="card verify-card">
+            <!-- Header Section -->
+            <div class="verify-header">
+                <div class="icon-box">
+                    📲
+                </div>
+                <h3>Verify OTP Code</h3>
+                <p>We've sent a 6-digit verification code to your email.</p>
+            </div>
+
+            <!-- Body Section -->
+            <div class="verify-body">
+
+                <!-- Timer Indicator -->
+                <div class="text-center">
+                    <div class="timer-badge">
+                        ⏱️ Code expires in: <span id="timer">{{ remaining_seconds|default:0 }}s</span>
+                    </div>
+                </div>
+
+                <!-- Non-field validation errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger rounded-3 mb-4">
+                        {% for error in form.non_field_errors %}
+                            <p class="mb-0 small text-center">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <!-- OTP Code Input -->
+                    <div class="form-group text-center">
+                        <label for="{{ form.code.id_for_label }}">Enter 6-Digit Code</label>
+                        <div class="otp-input-group">
+                            {{ form.code }}
+                        </div>
+                        {% for error in form.code.errors %}
+                            <div class="error-msg">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-submit">
+                        Verify Code
+                    </button>
+                </form>
+
+                <!-- Footer Links -->
+                <div class="verify-footer">
+                    Didn't receive the code? <a href="{% url 'forgot_password' %}">Resend Code</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+<!-- Countdown Script -->
 <script>
-    // Countdown timer (start from remaining_seconds from backend)
-    let timeLeft = {{ remaining_seconds }};
+    let timeLeft = parseInt("{{ remaining_seconds|default:0 }}");
     const timerDisplay = document.getElementById('timer');
 
-    if(timeLeft <= 0){
-        timerDisplay.textContent = 0;
+    function updateTimerDisplay(seconds) {
+        if(seconds < 10) {
+            timerDisplay.textContent = '0' + seconds + 's';
+        } else {
+            timerDisplay.textContent = seconds + 's';
+        }
+    }
+
+    if (timeLeft <= 0) {
+        timerDisplay.textContent = "0s";
         alert('OTP expired! Please request a new code.');
         window.location.href = "{% url 'forgot_password' %}";
-    }else{
+    } else {
+        updateTimerDisplay(timeLeft);
         const countdown = setInterval(() => {
             timeLeft--;
-            timerDisplay.textContent = timeLeft;
+            updateTimerDisplay(timeLeft);
 
-            if(timeLeft <= 0){
+            if (timeLeft <= 0) {
                 clearInterval(countdown);
-                timerDisplay.textContent = 0;
+                timerDisplay.textContent = "0s";
                 alert('OTP expired! Please request a new code.');
                 window.location.href = "{% url 'forgot_password' %}";
             }

@@ -1,10 +1,19 @@
+from decimal import Decimal, ROUND_HALF_UP
 from django.db import models, transaction
 from django.utils import timezone
 from django.db.models import Sum
 from django.core.exceptions import ValidationError
 from apps.accounts.models import CustomUser
 from apps.products.models import Order, Product
-from decimal import Decimal
+
+TWO_DECIMAL = Decimal("0.01")
+ZERO = Decimal("0.00")
+
+def _q(value):
+    if value is None:
+        return ZERO
+    return Decimal(str(value)).quantize(TWO_DECIMAL, rounding=ROUND_HALF_UP)
+
 
 # ===========================================
 # 1. EXPENSE CATEGORY
@@ -27,7 +36,6 @@ class ExpenseCategory(models.Model):
 
     class Meta:
         verbose_name_plural = "Expense Categories"
-
 
 # ===========================================
 # 2. CHART OF ACCOUNTS (ACCOUNT)
@@ -156,29 +164,46 @@ class Account(models.Model):
     def current_balance(self):
         """
         Calculates current real-time ledger balance considering opening balance
-        and all posted journal entries.
+        and all posted journal entries, rounded to 2 decimal places.
+        Prevents double-counting if an Opening Balance Journal Voucher already exists.
         """
         posted_entries = self.entries.filter(journal__status="posted")
+
+        # Check if an Opening Balance Journal already exists for this account
+        has_op_journal = posted_entries.filter(
+            journal__notes__icontains="Opening Balance"
+        ).exists()
+
         totals = posted_entries.aggregate(
             total_debit=Sum("debit"),
             total_credit=Sum("credit")
         )
-        t_debit = totals["total_debit"] or Decimal("0.00")
-        t_credit = totals["total_credit"] or Decimal("0.00")
+        t_debit = _q(totals["total_debit"])
+        t_credit = _q(totals["total_credit"])
 
-        op_debit = self.opening_balance if self.opening_balance_type == "debit" else Decimal("0.00")
-        op_credit = self.opening_balance if self.opening_balance_type == "credit" else Decimal("0.00")
+        # If opening balance was already converted to a journal entry, don't double count account.opening_balance
+        if has_op_journal:
+            op_debit = ZERO
+            op_credit = ZERO
+        else:
+            op_debit = _q(self.opening_balance) if self.opening_balance_type == "debit" else ZERO
+            op_credit = _q(self.opening_balance) if self.opening_balance_type == "credit" else ZERO
 
         net_debit = op_debit + t_debit
         net_credit = op_credit + t_credit
 
         if self.type1 in ["asset", "expense"]:
-            return net_debit - net_credit
+            return _q(net_debit - net_credit)
         else:
-            return net_credit - net_debit
+            return _q(net_credit - net_debit)
+
+    def get_current_balance(self):
+        """
+        Returns current balance as a normal callable method for Django templates.
+        """
+        return self.current_balance
 
     def save(self, *args, **kwargs):
-
         # Auto Set Opening Balance Type
         if self.type1 in ["asset", "expense"]:
             self.opening_balance_type = "debit"
@@ -212,12 +237,15 @@ class Account(models.Model):
 
         # Default Opening Balance
         if self.opening_balance is None:
-            self.opening_balance = Decimal("0.00")
+            self.opening_balance = ZERO
+        else:
+            self.opening_balance = _q(self.opening_balance)
 
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.account_code} - {self.name}"
+
 
 
 # ===========================================
@@ -369,15 +397,20 @@ class Journal(models.Model):
 
     @property
     def total_debit(self):
-        return self.entries.aggregate(total=Sum("debit"))["total"] or Decimal("0.00")
+        return _q(self.entries.aggregate(total=Sum("debit"))["total"])
 
     @property
     def total_credit(self):
-        return self.entries.aggregate(total=Sum("credit"))["total"] or Decimal("0.00")
+        return _q(self.entries.aggregate(total=Sum("credit"))["total"])
+
+    @property
+    def total_settled_amount(self):
+        """Calculates total paid/settled amount against this voucher"""
+        return _q(self.payment_settlements.aggregate(total=Sum("amount"))["total"])
 
     @property
     def is_balanced(self):
-        return self.total_debit == self.total_credit and self.total_debit > Decimal("0.00")
+        return self.total_debit == self.total_credit and self.total_debit > ZERO
 
     @property
     def is_draft(self):
@@ -507,8 +540,8 @@ class JournalItem(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        if self.quantity and self.rate:
-            self.amount = self.quantity * self.rate
+        if self.quantity is not None and self.rate is not None:
+            self.amount = _q(self.quantity * self.rate)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -576,18 +609,18 @@ class JournalEntry(models.Model):
     )
 
     def clean(self):
-        debit_val = self.debit or Decimal("0.00")
-        credit_val = self.credit or Decimal("0.00")
+        debit_val = _q(self.debit)
+        credit_val = _q(self.credit)
 
-        if debit_val > 0 and credit_val > 0:
+        if debit_val > ZERO and credit_val > ZERO:
             raise ValidationError("Debit and Credit cannot both have a value on the same entry line.")
 
-        if debit_val == 0 and credit_val == 0:
+        if debit_val == ZERO and credit_val == ZERO:
             raise ValidationError("Either Debit or Credit amount is required.")
 
     def save(self, *args, **kwargs):
-        self.debit = Decimal(str(self.debit or 0))
-        self.credit = Decimal(str(self.credit or 0))
+        self.debit = _q(self.debit)
+        self.credit = _q(self.credit)
 
         if self.journal:
             self.voucher_no = self.journal.voucher_no
@@ -673,6 +706,7 @@ class PaymentReceipt(models.Model):
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+        self.amount = _q(self.amount)
         super().save(*args, **kwargs)
 
         if is_new and not self.journal and self.party_account and self.payment_account:
@@ -696,14 +730,14 @@ class PaymentReceipt(models.Model):
                         journal=journal_obj,
                         account=self.payment_account,
                         debit=self.amount,
-                        credit=Decimal("0.00"),
+                        credit=ZERO,
                         narration=f"Cash/Bank Received",
                         created_by=self.received_by
                     )
                     JournalEntry.objects.create(
                         journal=journal_obj,
                         account=self.party_account,
-                        debit=Decimal("0.00"),
+                        debit=ZERO,
                         credit=self.amount,
                         narration=f"Payment from {self.party_account.name}",
                         created_by=self.received_by
@@ -713,14 +747,14 @@ class PaymentReceipt(models.Model):
                         journal=journal_obj,
                         account=self.party_account,
                         debit=self.amount,
-                        credit=Decimal("0.00"),
+                        credit=ZERO,
                         narration=f"Payment to {self.party_account.name}",
                         created_by=self.received_by
                     )
                     JournalEntry.objects.create(
                         journal=journal_obj,
                         account=self.payment_account,
-                        debit=Decimal("0.00"),
+                        debit=ZERO,
                         credit=self.amount,
                         narration=f"Paid via {self.payment_account.name}",
                         created_by=self.received_by
@@ -796,6 +830,7 @@ class Expense(models.Model):
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+        self.amount = _q(self.amount)
         super().save(*args, **kwargs)
 
         if is_new and not self.journal and self.expense_account and self.payment_account:
@@ -815,14 +850,14 @@ class Expense(models.Model):
                     journal=journal_obj,
                     account=self.expense_account,
                     debit=self.amount,
-                    credit=Decimal("0.00"),
+                    credit=ZERO,
                     narration=f"Expense: {self.category.name}",
                     created_by=self.created_by
                 )
                 JournalEntry.objects.create(
                     journal=journal_obj,
                     account=self.payment_account,
-                    debit=Decimal("0.00"),
+                    debit=ZERO,
                     credit=self.amount,
                     narration=f"Paid via {self.payment_account.name}",
                     created_by=self.created_by
@@ -833,3 +868,58 @@ class Expense(models.Model):
 
     def __str__(self):
         return f"{self.category.name} - {self.amount}"
+
+
+# ===========================================
+# 8. VOUCHER PAYMENT LINE (SETTLEMENT TRACKING)
+# ===========================================
+
+class VoucherPaymentLine(models.Model):
+    """
+    Tracks settlements/payments made specifically against individual vouchers.
+    This serves as the foundation for calculation of outstanding voucher balances.
+    """
+    payment_journal = models.ForeignKey(
+        Journal,
+        on_delete=models.CASCADE,
+        related_name="settlement_lines",
+        help_text="The Payment/Receipt Journal (RV/PV)"
+    )
+
+    reference_voucher = models.ForeignKey(
+        Journal,
+        on_delete=models.CASCADE,
+        null=True,           # <-- Added null=True & blank=True so Opening Balance payments can be tracked
+        blank=True,
+        related_name="payment_settlements",
+        help_text="The original Sales/Purchase/Expense/Journal voucher being settled (null if Opening Balance)"
+    )
+
+    account = models.ForeignKey(
+        Account,
+        on_delete=models.CASCADE,
+        related_name="voucher_payment_lines",
+        help_text="Customer or Supplier account"
+    )
+
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def save(self, *args, **kwargs):
+        self.amount = _q(self.amount)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Voucher Payment Line"
+        verbose_name_plural = "Voucher Payment Lines"
+
+    def __str__(self):
+        ref = self.reference_voucher.voucher_no if self.reference_voucher else "OPENING-BALANCE"
+        return f"{self.payment_journal.voucher_no} -> {ref} ({self.amount})"

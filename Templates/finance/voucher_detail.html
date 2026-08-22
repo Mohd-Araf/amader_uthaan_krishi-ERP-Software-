@@ -1,612 +1,340 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block extra_css %}
-
 <link rel="stylesheet" href="{% static 'css/finance.css' %}">
+<style>
+    .card {
+        border-radius: 10px;
+    }
+    .info-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .info-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #212529;
+    }
 
+    /* Table Heading Color Adjustment */
+    .table-voucher th {
+        background-color: #2c3e50 !important;
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        border: none;
+    }
+    .debit-text {
+        color: #0d6efd;
+        font-weight: 700;
+    }
+    .credit-text {
+        color: #198754;
+        font-weight: 700;
+    }
+    .settlement-table th {
+        background-color: #f39c12 !important;
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        border: none;
+    }
+</style>
 {% endblock %}
-
 
 {% block title %}
-Voucher Details
+Voucher Details - {{ voucher.voucher_no }}
 {% endblock %}
 
-
 {% block content %}
-
-<div class="container-fluid">
-
+<div class="container-fluid mt-4">
 
     <!-- Header -->
-
     <div class="card shadow-sm border-0 mb-4">
-
         <div class="card-body">
-
-
             <div class="row align-items-center">
-
-
                 <div class="col-md-8">
-
-
                     <h3 class="font-weight-bold mb-1">
-
-                        <i class="fas fa-file-invoice"></i>
-
-                        Voucher Details
-
+                        <i class="fas fa-file-invoice text-primary me-2"></i> Voucher Details
                     </h3>
-
-
-                    <p class="text-muted mb-0">
-
-                        {{ voucher.voucher_no }}
-
+                    <p class="text-muted mb-0 fw-bold">
+                        Voucher No: <span class="text-dark">{{ voucher.voucher_no }}</span>
                     </p>
-
-
                 </div>
-
-
-
                 <div class="col-md-4 text-end">
-
-
-                    <a href="{% url 'voucher_pdf' voucher.voucher_no %}"
-                       class="btn btn-secondary">
-
-                        <i class="fas fa-print"></i>
-                        Print PDF
-
+                    <a href="{% url 'voucher_pdf' voucher.voucher_no %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-file-pdf me-1"></i> PDF
                     </a>
-
-
+                    <a href="{% url 'voucher_print' voucher.voucher_no %}" class="btn btn-secondary ms-1" target="_blank">
+                        <i class="fas fa-print me-1"></i> Print
+                    </a>
                 </div>
-
-
             </div>
-
-
         </div>
-
     </div>
-
-
-
-
 
     <!-- Voucher Information -->
-
-
     <div class="card shadow-sm border-0 mb-4">
-
-
-        <div class="card-header bg-success text-white">
-
-
-            <h5 class="mb-0">
-
-                Voucher Information
-
+        <div class="card-header bg-success text-white py-3">
+            <h5 class="mb-0 fw-bold">
+                <i class="fas fa-info-circle me-2"></i> Voucher Information
             </h5>
-
-
         </div>
-
-
-
-        <div class="card-body">
-
-
-            <div class="row">
-
-
+        <div class="card-body p-4">
+            <div class="row mb-3">
                 <div class="col-md-4 mb-3">
-
-
-                    <strong>
-                        Voucher No
-                    </strong>
-
-
-                    <br>
-
-
-                    {{ voucher.voucher_no }}
-
-
+                    <div class="info-label">Voucher No</div>
+                    <div class="info-value">{{ voucher.voucher_no }}</div>
                 </div>
-
-
-
                 <div class="col-md-4 mb-3">
-
-
-                    <strong>
-                        Journal ID
-                    </strong>
-
-
-                    <br>
-
-
-                    {{ voucher.journal_id }}
-
-
+                    <div class="info-label">Journal ID</div>
+                    <div class="info-value">{{ voucher.journal_id }}</div>
                 </div>
-
-
-
                 <div class="col-md-4 mb-3">
-
-
-                    <strong>
-                        Type
-                    </strong>
-
-
-                    <br>
-
-
-                    <span class="badge bg-info">
-
-
-                        {{ voucher.get_voucher_type_display }}
-
-
-                    </span>
-
-
+                    <div class="info-label">Type</div>
+                    <div class="info-value">
+                        <span class="badge bg-info text-dark px-3 py-2">
+                            {{ voucher.get_voucher_type_display }}
+                        </span>
+                    </div>
                 </div>
-
-
             </div>
 
-
-
-
-            <div class="row">
-
-
+            <div class="row mb-3">
                 <div class="col-md-4 mb-3">
-
-
-                    <strong>
-                        Customer
-                    </strong>
-
-
-                    <br>
-
-
-                    {% if voucher.customer %}
-
-                        {{ voucher.customer.username }}
-
-                    {% else %}
-
-                        -
-
-                    {% endif %}
-
-
+                    <div class="info-label">Customer / Party</div>
+                    <div class="info-value">
+                        {% if voucher.customer %}
+                            <a href="{% url 'ledger_detail' voucher.customer.id %}" class="text-decoration-none fw-bold">
+                                {{ voucher.customer.name }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </div>
                 </div>
-
-
-
-
                 <div class="col-md-4 mb-3">
-
-
-                    <strong>
-                        Reference No
-                    </strong>
-
-
-                    <br>
-
-
-                    {{ voucher.reference_no|default:"-" }}
-
-
+                    <div class="info-label">Reference No</div>
+                    <div class="info-value">{{ voucher.reference_no|default:"-" }}</div>
                 </div>
-
-
-
-
                 <div class="col-md-4 mb-3">
-
-
-                    <strong>
-                        Date
-                    </strong>
-
-
-                    <br>
-
-
-                    {{ voucher.created_at|date:"d M Y H:i" }}
-
-
+                    <div class="info-label">Date</div>
+                    <div class="info-value">{{ voucher.created_at|date:"d M Y H:i" }}</div>
                 </div>
-
-
             </div>
 
-
-
-
-
             <div class="row">
-
-
                 <div class="col-md-4">
-
-
-                    <strong>
-                        Status
-                    </strong>
-
-
-                    <br>
-
-
-                    {% if voucher.status == "posted" %}
-
-                    <span class="badge bg-success">
-                        Posted
-                    </span>
-
-
-                    {% elif voucher.status == "draft" %}
-
-
-                    <span class="badge bg-warning text-dark">
-                        Draft
-                    </span>
-
-
-                    {% else %}
-
-
-                    <span class="badge bg-danger">
-                        Cancelled
-                    </span>
-
-
-                    {% endif %}
-
-
+                    <div class="info-label">Status</div>
+                    <div class="info-value">
+                        {% if voucher.status == "posted" %}
+                            <span class="badge bg-success px-3 py-2">Posted</span>
+                        {% elif voucher.status == "draft" %}
+                            <span class="badge bg-warning text-dark px-3 py-2">Draft</span>
+                        {% else %}
+                            <span class="badge bg-danger px-3 py-2">Cancelled</span>
+                        {% endif %}
+                    </div>
                 </div>
 
-
+                {% if voucher.status == "cancelled" and voucher.cancel_reason %}
+                <div class="col-md-8">
+                    <div class="info-label">Cancel Reason</div>
+                    <div class="info-value text-danger">{{ voucher.cancel_reason }}</div>
+                </div>
+                {% endif %}
             </div>
-
-
         </div>
-
-
     </div>
 
-
-
-
-
-    <!-- Journal Entries -->
-
-
+    <!-- Product Items (If any exist) -->
+    {% if items %}
     <div class="card shadow-sm border-0 mb-4">
-
-
-        <div class="card-header bg-dark text-white">
-
-
-            <h5 class="mb-0">
-
-                Debit / Credit Entries
-
-            </h5>
-
-
+        <div class="card-header bg-secondary text-white fw-bold">
+            <i class="fas fa-boxes me-2"></i> Inventory Items
         </div>
-
-
-
-
         <div class="card-body p-0">
-
-
             <div class="table-responsive">
-
-
-                <table class="table table-bordered mb-0">
-
-
-                    <thead class="table-light">
-
-
+                <table class="table table-bordered mb-0 table-voucher">
+                    <thead>
                         <tr>
-
-
-                            <th>
-                                Account
-                            </th>
-
-
-
-
-
-                            <th class="text-end">
-                                Debit
-                            </th>
-
-
-                            <th class="text-end">
-                                Credit
-                            </th>
-
-
-                            <th>
-                                Narration
-                            </th>
-
-
+                            <th>Product</th>
+                            <th class="text-end">Quantity</th>
+                            <th class="text-end">Rate (৳)</th>
+                            <th class="text-end">Amount (৳)</th>
+                            <th>Remark</th>
                         </tr>
-
-
                     </thead>
-
-
-
                     <tbody>
-
-
-
-                    {% for entry in entries %}
-
-
-
-                    <tr>
-
-
-                        <td>
-
-                            {{ entry.account.name }}
-
-                        </td>
-
-
-
-
-
-
-
-                        <td class="text-end">
-
-
-                            {{ entry.debit }}
-
-
-                        </td>
-
-
-
-
-                        <td class="text-end">
-
-
-                            {{ entry.credit }}
-
-
-                        </td>
-
-
-
-
-                        <td>
-
-
-                            {{ entry.narration }}
-
-
-                        </td>
-
-
-
-                    </tr>
-
-
-
-                    {% endfor %}
-
-
-
-                    </tbody>
-
-
-
-
-                    <tfoot>
-
-
-                        <tr class="fw-bold">
-
-
-                            <td colspan="2"
-                                class="text-end">
-
-                                Total
-
-                            </td>
-
-
-                            <td class="text-end">
-
-                                {{ total_debit }}
-
-                            </td>
-
-
-                            <td class="text-end">
-
-                                {{ total_credit }}
-
-                            </td>
-
-
-                            <td></td>
-
-
+                        {% for item in items %}
+                        <tr>
+                            <td class="fw-bold">{{ item.product.name }}</td>
+                            <td class="text-end">{{ item.quantity }}</td>
+                            <td class="text-end">৳ {{ item.rate|floatformat:2|intcomma }}</td>
+                            <td class="text-end fw-bold">৳ {{ item.amount|floatformat:2|intcomma }}</td>
+                            <td>{{ item.remark|default:"-" }}</td>
                         </tr>
-
-
-                    </tfoot>
-
-
+                        {% endfor %}
+                    </tbody>
                 </table>
-
-
             </div>
-
-
         </div>
-
-
     </div>
-
-
-
-
-
-
-    <!-- Notes -->
-
-
-    {% if voucher.notes %}
-
-
-    <div class="card shadow-sm border-0 mb-4">
-
-
-        <div class="card-body">
-
-
-            <strong>
-                Notes:
-            </strong>
-
-
-            <p class="mb-0">
-
-                {{ voucher.notes }}
-
-            </p>
-
-
-        </div>
-
-
-    </div>
-
-
     {% endif %}
 
-
-
-
-
-    <!-- Actions -->
-
-
-    <div class="text-end mb-5">
-
-
-
-        <a href="{% url 'voucher_list' %}"
-           class="btn btn-secondary">
-
-            Back
-
-        </a>
-
-
-
-
-        {% if voucher.status == "draft" %}
-
-
-
-        <a href="{% url 'voucher_edit' voucher.voucher_no %}"
-           class="btn btn-warning">
-
-
-            <i class="fas fa-edit"></i>
-
-            Edit
-
-
-        </a>
-
-
-
-
-        <a href="{% url 'voucher_post' voucher.voucher_no %}"
-           class="btn btn-success">
-
-
-            <i class="fas fa-check"></i>
-
-            Post
-
-
-        </a>
-
-
-
-
-        <a href="{% url 'voucher_delete' voucher.voucher_no %}"
-           class="btn btn-danger">
-
-
-            Delete
-
-
-        </a>
-
-
-
-        {% endif %}
-
-
-
-
-        {% if voucher.status == "posted" %}
-
-
-
-        <a href="{% url 'voucher_cancel' voucher.voucher_no %}"
-           class="btn btn-danger">
-
-
-            Cancel Voucher
-
-
-        </a>
-
-
-
-        {% endif %}
-
-
-
-
+    <!-- Journal Entries -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-dark text-white py-3">
+            <h5 class="mb-0 fw-bold">
+                <i class="fas fa-balance-scale me-2"></i> Debit / Credit Entries
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered mb-0 table-voucher">
+                    <thead>
+                        <tr>
+                            <th>Account Name</th>
+                            <th>Account Code</th>
+                            <th class="text-end">Debit (৳)</th>
+                            <th class="text-end">Credit (৳)</th>
+                            <th>Narration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in entries %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'ledger_detail' entry.account.id %}" class="text-decoration-none fw-bold text-dark">
+                                    {{ entry.account.name }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{ entry.account.account_code }}</span>
+                            </td>
+                            <td class="text-end debit-text">
+                                {% if entry.debit > 0 %}৳ {{ entry.debit|floatformat:2|intcomma }}{% else %}-{% endif %}
+                            </td>
+                            <td class="text-end credit-text">
+                                {% if entry.credit > 0 %}৳ {{ entry.credit|floatformat:2|intcomma }}{% else %}-{% endif %}
+                            </td>
+                            <td class="text-muted">{{ entry.narration|default:"-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-bold bg-light" style="font-size: 1.05rem;">
+                            <td colspan="2" class="text-end">Total</td>
+                            <td class="text-end debit-text">৳ {{ total_debit|floatformat:2|intcomma }}</td>
+                            <td class="text-end credit-text">৳ {{ total_credit|floatformat:2|intcomma }}</td>
+                            <td>
+                                {% if voucher.is_balanced %}
+                                    <span class="badge bg-success"><i class="fas fa-check me-1"></i> Balanced</span>
+                                {% else %}
+                                    <span class="badge bg-danger"><i class="fas fa-times me-1"></i> Unbalanced</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
     </div>
 
+    <!-- Voucher Settlement Details (For Receipt / Payment Vouchers) -->
+    {% if voucher.settlement_lines.exists %}
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-warning text-dark py-3 fw-bold">
+            <i class="fas fa-link me-2"></i> Settled Outstanding Vouchers
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered mb-0 settlement-table">
+                    <thead>
+                        <tr>
+                            <th>Reference Voucher</th>
+                            <th>Voucher Type</th>
+                            <th>Date</th>
+                            <th>Account</th>
+                            <th class="text-end">Settled Amount (৳)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for line in voucher.settlement_lines.all %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'voucher_detail' line.reference_voucher.voucher_no %}" class="fw-bold text-decoration-none text-dark" target="_blank">
+                                    {{ line.reference_voucher.voucher_no|default:line.reference_voucher.journal_id }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge bg-info text-dark">{{ line.reference_voucher.get_voucher_type_display }}</span>
+                            </td>
+                            <td>{{ line.created_at|date:"d M Y" }}</td>
+                            <td>{{ line.account.name }}</td>
+                            <td class="text-end fw-bold text-success">৳ {{ line.amount|floatformat:2|intcomma }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
+    <!-- Notes -->
+    {% if voucher.notes %}
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <strong class="text-muted d-block mb-1">Notes / Description:</strong>
+            <p class="mb-0">{{ voucher.notes }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="text-end mb-5">
+        <a href="{% url 'voucher_list' %}" class="btn btn-secondary me-1">
+            <i class="fas fa-arrow-left me-1"></i> Back
+        </a>
+
+        {% if voucher.status == "draft" %}
+            <a href="{% url 'voucher_edit' voucher.voucher_no %}" class="btn btn-warning me-1">
+                <i class="fas fa-edit me-1"></i> Edit
+            </a>
+
+            <a href="{% url 'voucher_post' voucher.voucher_no %}" class="btn btn-success me-1">
+                <i class="fas fa-check me-1"></i> Post
+            </a>
+
+            <a href="{% url 'voucher_delete' voucher.voucher_no %}" class="btn btn-danger me-1">
+                <i class="fas fa-trash me-1"></i> Delete
+            </a>
+        {% endif %}
+
+        {% if voucher.status == "posted" %}
+            {% if voucher.voucher_type == "sales" %}
+                <a href="{% url 'receive_payment_journal' voucher.voucher_no %}" class="btn btn-success me-1">
+                    <i class="fas fa-hand-holding-usd me-1"></i> Receive Payment
+                </a>
+            {% elif voucher.voucher_type == "expense" or voucher.voucher_type == "purchase" %}
+                <a href="{% url 'make_payment_journal' voucher.voucher_no %}" class="btn btn-danger me-1">
+                    <i class="fas fa-money-check me-1"></i> Make Payment
+                </a>
+            {% endif %}
+
+            <a href="{% url 'voucher_cancel' voucher.voucher_no %}" class="btn btn-danger">
+                <i class="fas fa-ban me-1"></i> Cancel Voucher
+            </a>
+        {% endif %}
+    </div>
 
 </div>
-
-
 {% endblock %}

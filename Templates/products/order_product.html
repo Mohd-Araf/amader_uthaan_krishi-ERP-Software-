@@ -2,24 +2,172 @@
 
 {% block content %}
 
+<style>
+    .add-product-container {
+        max-width: 550px;
+        margin: 3rem auto;
+    }
+
+    .add-product-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+        background: #ffffff;
+        overflow: hidden;
+    }
+
+    .add-product-header {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: #ffffff;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .add-product-header h3 {
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin: 0;
+    }
+
+    .add-product-body {
+        padding: 2.25rem 2.5rem;
+    }
+
+    .form-group label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        border: 1.5px solid #cbd5e1;
+        background-color: #f8fafc;
+        color: #0f172a;
+        transition: all 0.25s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: #ffffff;
+        border-color: #0d6efd;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+    }
+
+    .unit-hint {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 0.35rem;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        padding: 0.85rem 1.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(13, 110, 253, 0.35);
+        color: #ffffff;
+    }
+</style>
+
 <div class="container">
+    <div class="add-product-container">
+        <div class="card add-product-card">
 
-    <h3>Add Product</h3>
+            <!-- Header -->
+            <div class="add-product-header">
+                <h3>🛒 Add Product to Order</h3>
+            </div>
 
-    <form method="post">
-        {% csrf_token %}
+            <!-- Body -->
+            <div class="add-product-body">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
 
-        <label>Quantity:</label>
-        <input type="number" step="0.1" name="quantity" class="form-control" required>
+                    <!-- Product Selection (If available in context) -->
+                    {% if products %}
+                    <div class="form-group mb-3">
+                        <label for="productSelect">Select Product</label>
+                        <select name="new_product_id" id="productSelect" class="form-select" onchange="updateQuantityStep()" required>
+                            <option value="" data-unit="default">-- Choose Product --</option>
+                            {% for p in products %}
+                                <option value="{{ p.id }}" data-unit="{{ p.unit }}">
+                                    {{ p.name }} ({{ p.price }} ৳ / {{ p.get_unit_display }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
 
-        <br>
+                    <!-- Quantity Input -->
+                    <div class="form-group mb-3">
+                        <label for="quantityInput">Quantity</label>
+                        <input type="number"
+                               id="quantityInput"
+                               name="quantity"
+                               step="0.1"
+                               min="0.1"
+                               class="form-control"
+                               placeholder="Enter quantity"
+                               required>
+                        <div class="unit-hint" id="unitHint">Enter quantity based on product unit</div>
+                    </div>
 
-        <button type="submit" class="btn btn-primary">
-            Add to Order
-        </button>
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-submit">
+                        ➕ Add to Order
+                    </button>
+                </form>
+            </div>
 
-    </form>
-
+        </div>
+    </div>
 </div>
+
+<!-- Smart JS to change step and min dynamically based on selected product unit -->
+<script>
+    function updateQuantityStep() {
+        const select = document.getElementById('productSelect');
+        const qtyInput = document.getElementById('quantityInput');
+        const unitHint = document.getElementById('unitHint');
+
+        if (!select || !qtyInput) return;
+
+        const selectedOption = select.options[select.selectedIndex];
+        const unit = selectedOption.getAttribute('data-unit');
+
+        if (unit === 'gm') {
+            qtyInput.step = "50";
+            qtyInput.min = "50";
+            qtyInput.value = "250";
+            unitHint.textContent = "Unit: Grams (Enter quantity in grams like 250, 500)";
+        } else if (unit === 'pcs' || unit === 'ati' || unit === 'fana') {
+            qtyInput.step = "1";
+            qtyInput.min = "1";
+            qtyInput.value = "1";
+            unitHint.textContent = "Unit: Whole Number (Only integers like 1, 2, 3 allowed)";
+        } else {
+            qtyInput.step = "0.1";
+            qtyInput.min = "0.1";
+            qtyInput.value = "1";
+            unitHint.textContent = "Unit: Fractional allowed (e.g. 0.5, 1.5)";
+        }
+    }
+</script>
 
 {% endblock %}

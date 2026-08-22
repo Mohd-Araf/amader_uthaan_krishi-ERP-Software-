@@ -133,7 +133,7 @@
 
                         <tr>
                             <th width="160">Customer ID</th>
-                            <td>{{ order.user.user_code }}</td>
+                            <td>#{{ order.user.user_id|default:"N/A" }}</td>
                         </tr>
 
                         <tr>
@@ -148,7 +148,7 @@
 
                         <tr>
                             <th>Phone</th>
-                            <td>{{ order.user.phone_number }}</td>
+                            <td>{{ order.user.phone_number|default:"-" }}</td>
                         </tr>
 
                     </table>
@@ -210,7 +210,7 @@
                     </h6>
 
                     <h5>
-                        ৳ {{ order.total_price }}
+                        ৳ {{ order.total_price|floatformat:2 }}
                     </h5>
 
                 </div>
@@ -221,8 +221,8 @@
                         Updated Total
                     </h6>
 
-                    <h5>
-                        ৳ {{ order.updated_total_price }}
+                    <h5 id="summaryUpdatedTotal">
+                        ৳ {{ order.updated_total_price|floatformat:2 }}
                     </h5>
 
                 </div>
@@ -233,8 +233,8 @@
                         Discount
                     </h6>
 
-                    <h5>
-                        ৳ {{ order.discount }}
+                    <h5 id="summaryDiscount">
+                        ৳ {{ order.discount|floatformat:2 }}
                     </h5>
 
                 </div>
@@ -245,8 +245,8 @@
                         Final Payment
                     </h6>
 
-                    <h4 class="text-success">
-                        ৳ {{ order.final_payment }}
+                    <h4 class="text-success" id="summaryFinalPayment">
+                        ৳ {{ order.final_payment|floatformat:2 }}
                     </h4>
 
                 </div>
@@ -260,7 +260,7 @@
 
     <!-- ================= FORM START ================= -->
 
-    <form method="POST">
+    <form method="POST" id="orderDetailForm">
 
         {% csrf_token %}
 
@@ -268,7 +268,8 @@
             type="hidden"
             name="order_id"
             value="{{ order.id }}">
-                <!-- ================= ORDER PRODUCTS ================= -->
+
+        <!-- ================= ORDER PRODUCTS ================= -->
 
         <div class="card mb-4">
 
@@ -318,7 +319,10 @@
 
                             {% for item in order.items.all %}
 
-                            <tr>
+                            <!-- data-price and data-unit used by JS for live calculation -->
+                            <tr data-item-id="{{ item.id }}"
+                                data-price="{{ item.price_at_order_time|default:item.product.price }}"
+                                data-unit="{{ item.product.unit }}">
 
                                 <!-- Serial -->
 
@@ -352,7 +356,11 @@
 
                                 <td class="text-center">
 
-                                    {{ item.quantity }}
+                                    {% if item.product.unit == 'gm' or item.product.unit == 'pcs' or item.product.unit == 'ati' or item.product.unit == 'fana' %}
+                                        {{ item.quantity|floatformat:0 }}
+                                    {% else %}
+                                        {{ item.quantity }}
+                                    {% endif %}
 
                                 </td>
 
@@ -362,8 +370,8 @@
 
                                     <input
                                         type="number"
-                                        step="0.01"
-                                        class="form-control form-control-sm text-center"
+                                        step="{% if item.product.unit == 'gm' %}50{% elif item.product.unit == 'pcs' or item.product.unit == 'ati' or item.product.unit == 'fana' %}1{% else %}0.01{% endif %}"
+                                        class="form-control form-control-sm text-center item-qty-input"
                                         name="qty_{{ item.id }}"
                                         value="{{ item.updated_quantity|default_if_none:item.quantity }}">
 
@@ -373,7 +381,8 @@
 
                                 <td class="text-center">
 
-                                    ৳ {{ item.price_at_order_time }}
+                                    ৳ {{ item.price_at_order_time|default:item.product.price }}
+                                    {% if item.product.unit == 'gm' %}<small class="text-muted">/ Kg</small>{% endif %}
 
                                 </td>
 
@@ -381,17 +390,17 @@
 
                                 <td class="text-center">
 
-                                    ৳ {{ item.total_price }}
+                                    ৳ {{ item.total_price|floatformat:2 }}
 
                                 </td>
 
-                                <!-- Updated Total -->
+                                <!-- Updated Total (live updated by JS) -->
 
                                 <td class="text-center">
 
-                                    <strong>
+                                    <strong id="item-updated-total-{{ item.id }}">
 
-                                        ৳ {{ item.updated_total }}
+                                        ৳ {{ item.updated_total|floatformat:2 }}
 
                                     </strong>
 
@@ -416,7 +425,7 @@
 
                                     <select
                                         name="status_{{ item.id }}"
-                                        class="form-control form-control-sm">
+                                        class="form-control form-control-sm item-status-select">
 
                                         <option value="pending"
                                             {% if item.status == "pending" %}selected{% endif %}>
@@ -467,7 +476,8 @@
             </div>
 
         </div>
-                <!-- ================= ORDER SETTINGS ================= -->
+
+        <!-- ================= ORDER SETTINGS ================= -->
 
         <div class="row">
 
@@ -622,7 +632,7 @@
                             <option value="{{ p.id }}">
 
                                 {{ p.name }}
-                                (৳ {{ p.price }})
+                                (৳ {{ p.price }} / {{ p.get_unit_display }})
 
                             </option>
 
@@ -670,7 +680,8 @@
             </div>
 
         </div>
-                <!-- ================= FINANCIAL SETTINGS ================= -->
+
+        <!-- ================= FINANCIAL SETTINGS ================= -->
 
         <div class="card mb-4">
 
@@ -708,6 +719,7 @@
                                 type="number"
                                 step="0.01"
                                 name="discount"
+                                id="discountInput"
                                 value="{{ order.discount|default:0 }}"
                                 class="form-control">
 
@@ -739,6 +751,7 @@
                                 type="number"
                                 step="0.01"
                                 name="packaging_charge"
+                                id="packagingInput"
                                 value="{{ order.packaging_charge|default:0 }}"
                                 class="form-control">
 
@@ -816,9 +829,9 @@
 
                         </h6>
 
-                        <h5>
+                        <h5 id="liveItemsTotal">
 
-                            ৳ {{ order.updated_total_price }}
+                            ৳ {{ order.updated_total_price|floatformat:2 }}
 
                         </h5>
 
@@ -832,9 +845,9 @@
 
                         </h6>
 
-                        <h5 class="text-danger">
+                        <h5 class="text-danger" id="liveDiscount">
 
-                            - ৳ {{ order.discount }}
+                            - ৳ {{ order.discount|floatformat:2 }}
 
                         </h5>
 
@@ -848,9 +861,9 @@
 
                         </h6>
 
-                        <h5>
+                        <h5 id="livePackaging">
 
-                            + ৳ {{ order.packaging_charge }}
+                            + ৳ {{ order.packaging_charge|floatformat:2 }}
 
                         </h5>
 
@@ -864,9 +877,9 @@
 
                         </h6>
 
-                        <h4 class="text-success">
+                        <h4 class="text-success" id="liveFinalPayment">
 
-                            ৳ {{ order.final_payment }}
+                            ৳ {{ order.final_payment|floatformat:2 }}
 
                         </h4>
 
@@ -928,5 +941,120 @@
 }
 
 </style>
+
+
+<!-- ================= LIVE CALCULATION JS ================= -->
+<script>
+(function () {
+
+    var discountInput   = document.getElementById("discountInput");
+    var packagingInput  = document.getElementById("packagingInput");
+    var bkashCheckbox   = document.getElementById("bkash{{ order.id }}");
+
+    var qtyInputs       = document.querySelectorAll(".item-qty-input");
+    var statusSelects   = document.querySelectorAll(".item-status-select");
+
+
+    function recalculate() {
+
+        var subtotal = 0;
+
+        // প্রতিটি item row-এর জন্য amount বের করা
+        var rows = document.querySelectorAll("tr[data-item-id]");
+
+        rows.forEach(function (row) {
+
+            var itemId      = row.getAttribute("data-item-id");
+            var price       = parseFloat(row.getAttribute("data-price")) || 0;
+            var unit        = row.getAttribute("data-unit");
+            var qtyInput    = row.querySelector(".item-qty-input");
+            var statusSel   = row.querySelector(".item-status-select");
+            var totalCell   = document.getElementById("item-updated-total-" + itemId);
+
+            if (!qtyInput || !statusSel) return;
+
+            var qty    = parseFloat(qtyInput.value) || 0;
+            var status = statusSel.value;
+            var amount = 0;
+
+            if (status === "rejected" || status === "complimentary") {
+                amount = 0;
+            } else {
+                // Gram (gm) হলে ১০০০ দিয়ে ভাগ হবে
+                if (unit === 'gm') {
+                    amount = (qty / 1000.0) * price;
+                } else {
+                    amount = qty * price;
+                }
+            }
+
+            subtotal += amount;
+
+            // প্রতিটি row-এর Updated Total cell আপডেট
+            if (totalCell) {
+                totalCell.textContent = "৳ " + amount.toFixed(2);
+            }
+        });
+
+        var discount  = parseFloat(discountInput.value)  || 0;
+        var packaging = parseFloat(packagingInput.value) || 0;
+
+        // Python: final_total = updated_total_price + packaging - discount
+        var finalTotal = subtotal + packaging - discount;
+        if (finalTotal < 0) finalTotal = 0;
+
+        // Python: bkash_charge = round((final_total / 1000) * 18.50, 2)
+        var bkash = 0;
+        if (bkashCheckbox && bkashCheckbox.checked) {
+            bkash = Math.round((finalTotal / 1000) * 18.50 * 100) / 100;
+        }
+
+        // Python: final_payment = final_total + bkash_charge
+        var finalPayment = finalTotal + bkash;
+
+        // Payment Summary section আপডেট
+        document.getElementById("liveItemsTotal").textContent    = "৳ " + subtotal.toFixed(2);
+        document.getElementById("liveDiscount").textContent      = "- ৳ " + discount.toFixed(2);
+        document.getElementById("livePackaging").textContent     = "+ ৳ " + packaging.toFixed(2);
+        document.getElementById("liveFinalPayment").textContent  = "৳ " + finalPayment.toFixed(2);
+
+        // Order Summary section আপডেট
+        document.getElementById("summaryUpdatedTotal").textContent  = "৳ " + subtotal.toFixed(2);
+        document.getElementById("summaryDiscount").textContent      = "৳ " + discount.toFixed(2);
+        document.getElementById("summaryFinalPayment").textContent  = "৳ " + finalPayment.toFixed(2);
+    }
+
+
+    statusSelects.forEach(function (select) {
+        select.addEventListener("change", function () {
+            var row      = this.closest("tr[data-item-id]");
+            var qtyInput = row ? row.querySelector(".item-qty-input") : null;
+
+            if (qtyInput) {
+                // rejected হলে qty = 0
+                if (this.value === "rejected") {
+                    qtyInput.value = "0";
+                }
+            }
+
+            recalculate();
+        });
+    });
+
+
+    qtyInputs.forEach(function (input) {
+        input.addEventListener("input", recalculate);
+    });
+
+
+    if (discountInput)  discountInput.addEventListener("input",   recalculate);
+    if (packagingInput) packagingInput.addEventListener("input",  recalculate);
+    if (bkashCheckbox)  bkashCheckbox.addEventListener("change",  recalculate);
+
+
+    recalculate();
+
+})();
+</script>
 
 {% endblock %}

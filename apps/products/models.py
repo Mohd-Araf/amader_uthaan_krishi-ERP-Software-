@@ -14,10 +14,21 @@ class Product(models.Model):
     ]
 
     name = models.CharField(max_length=200)
-    price = models.FloatField(help_text="Per unit price")
+    price = models.FloatField(help_text="Per unit price (Per Kg for kg/gm)")
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES)
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='products/', null=True, blank=True)
+
+    @property
+    def is_fractional_allowed(self):
+        """kg, gm, hali ইউনিটে দশমিক মান এলাউ করা হবে"""
+        return self.unit in ['kg', 'gm', 'hali']
+
+    def calculate_price(self, quantity):
+        """ইউনিট অনুযায়ী দামের সঠিক হিসাব (গ্রামে থাকলে ১০০০ দিয়ে ভাগ)"""
+        if self.unit == 'gm':
+            return (quantity / 1000.0) * self.price
+        return quantity * self.price
 
     def __str__(self):
         return self.name
@@ -168,12 +179,16 @@ class OrderItem(models.Model):
 
     def total_price(self):
         price = self.price_at_order_time if self.price_at_order_time is not None else self.product.price
+        if self.product.unit == 'gm':
+            return (self.quantity / 1000.0) * price
         return self.quantity * price
 
     @property
     def updated_total(self):
         qty = self.updated_quantity if self.updated_quantity is not None else self.quantity
         price = self.price_at_order_time if self.price_at_order_time is not None else self.product.price
+        if self.product.unit == 'gm':
+            return (qty / 1000.0) * price
         return qty * price
 
     def __str__(self):

@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .bill-wrapper {
+        background: #ffffff;
+        border: 1.5px solid #d0d0d0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2.5rem;
+    }
+
+    .bill-header-banner {
+        background-color: #ffe680;
+        color: #1a1a1a;
+        font-weight: 800;
+        font-size: 1.35rem;
+        padding: 0.75rem 1rem;
+        text-align: center;
+        border-bottom: 2px solid #e6c200;
+        letter-spacing: 0.5px;
+    }
+
+    .bill-meta-info {
+        padding: 1rem 1.25rem;
+        background-color: #fafafa;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 0.95rem;
+    }
+
+    .table-memo {
+        margin-bottom: 0;
+        border-collapse: collapse;
+    }
+
+    .table-memo thead th {
+        background-color: #0070c0 !important;
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        border: 1px solid #005691 !important;
+        padding: 0.65rem 0.75rem;
+        vertical-align: middle;
+    }
+
+    .table-memo td {
+        border: 1px solid #d0d0d0 !important;
+        vertical-align: middle;
+        padding: 0.65rem 0.75rem;
+        font-size: 0.925rem;
+        color: #222222;
+    }
+
+    .summary-box-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .summary-box-value {
+        border: 1.5px solid #333333;
+        border-radius: 4px;
+        padding: 0.35rem 0.85rem;
+        min-width: 130px;
+        text-align: right;
+        font-weight: 700;
+        background-color: #ffffff;
+    }
+
+    .bkash-info-card {
+        background: #fff5f5;
+        border: 1.5px dashed #e53935;
+        border-radius: 8px;
+        padding: 1rem 1.25rem;
+    }
+
+    .bkash-text-red {
+        color: #c00000;
+        font-weight: 800;
+        font-size: 1.1rem;
+    }
+
+    .bill-footer-msg {
+        color: #7030a0;
+        font-style: italic;
+        font-weight: 600;
+        font-size: 1rem;
+        text-align: center;
+        margin-top: 1.25rem;
+        padding-top: 0.75rem;
+        border-top: 1px dashed #cccccc;
+    }
+</style>
+
+<div class="container mt-4 mb-5">
+
+    <!-- Back Button to List -->
+    <a href="{% url 'user_orders' %}" class="btn btn-outline-secondary mb-3 font-weight-bold">
+        <i class="fas fa-arrow-left"></i> Back to Orders List
+    </a>
+
+    <!-- Bill Container Memo Card -->
+    <div class="bill-wrapper">
+
+        <!-- Top Yellow Header Banner -->
+        <div class="bill-header-banner">
+            Amader Uthaan Krishi Bill — Order #{{ order.order_code }}
+        </div>
+
+        <!-- Meta Customer & Order Info -->
+        <div class="bill-meta-info">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <div><strong>Date:</strong> {{ order.created_at|date:"d.m.Y" }}</div>
+                    <div><strong>Name:</strong> {{ order.user.username }}</div>
+                </div>
+                <div class="mt-2 mt-sm-0 text-right">
+                    <div>
+                        <strong>Status: </strong>
+                        <span class="badge {% if order.status == 'accepted' %}badge-success{% elif order.status == 'rejected' %}badge-danger{% else %}badge-warning{% endif %} px-2 py-1">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="small text-muted mt-1">Total: {{ order.total_price|floatformat:2 }} ৳</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Memo Product Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-memo text-center">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">SL</th>
+                        <th>Product Name</th>
+                        <th style="width: 80px;">Qty</th>
+                        <th style="width: 70px;">Unit</th>
+                        <th style="width: 110px;">Unit Price</th>
+                        <th style="width: 110px;">Total</th>
+                        <th style="width: 110px;">Status</th>
+
+                        {% if order.status == "accepted" %}
+                            <th style="width: 110px;">Updated Qty</th>
+                            <th style="width: 120px;">Updated Total</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in order.items.all %}
+                        {% if not item.is_admin_added or item.is_visible_to_user %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td class="text-left font-weight-bold">{{ item.product.name }}</td>
+                            <td>
+                                {% if item.product.unit == 'gm' or item.product.unit == 'pcs' or item.product.unit == 'ati' or item.product.unit == 'fana' %}
+                                    {{ item.quantity|floatformat:0 }}
+                                {% else %}
+                                    {{ item.quantity }}
+                                {% endif %}
+                            </td>
+                            <td>{{ item.product.get_unit_display }}</td>
+                            <td>{{ item.price_at_order_time|default:item.product.price }} ৳</td>
+                            <td>{{ item.total_price|floatformat:2 }} ৳</td>
+                            <td>
+                                {% if order.status != "accepted" %}
+                                    <span class="badge badge-warning">Pending</span>
+                                {% else %}
+                                    {% if item.status == 'accepted' %}
+                                        <span class="badge badge-success">Accepted</span>
+                                    {% elif item.status == 'rejected' %}
+                                        <span class="badge badge-danger">Rejected</span>
+                                    {% elif item.status == 'complimentary' %}
+                                        <span class="badge badge-info">Complimentary</span>
+                                    {% else %}
+                                        <span class="badge badge-warning">Pending</span>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+
+                            {% if order.status == "accepted" %}
+                                <td>
+                                    {% if item.updated_quantity is not None %}
+                                        {% if item.product.unit == 'gm' or item.product.unit == 'pcs' or item.product.unit == 'ati' or item.product.unit == 'fana' %}
+                                            {{ item.updated_quantity|floatformat:0 }}
+                                        {% else %}
+                                            {{ item.updated_quantity }}
+                                        {% endif %}
+                                    {% else %}
+                                        {{ item.quantity }}
+                                    {% endif %}
+                                </td>
+                                <td class="font-weight-bold text-success">
+                                    {{ item.updated_total|floatformat:2 }} ৳
+                                </td>
+                            {% endif %}
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Bill Summary & Payment Info -->
+        <div class="p-3 bg-light">
+            {% if order.status == "accepted" %}
+                <div class="row align-items-center">
+
+                    <div class="col-md-6 col-12 mb-3 mb-md-0">
+                        <div class="bkash-info-card">
+                            <h6 class="font-weight-bold text-dark mb-1">💳 Payment Instructions</h6>
+                            <p class="small text-muted mb-2">Please send the final total bill amount via bKash to the number below:</p>
+                            <div class="bkash-text-red">
+                                Bkash Number: 01403181484
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-12">
+                        <div class="summary-box-row">
+                            <span class="font-weight-bold text-muted">Discount:</span>
+                            <div class="summary-box-value text-danger">- {{ order.discount|default:0 }} ৳</div>
+                        </div>
+                        <div class="summary-box-row">
+                            <span class="font-weight-bold text-muted">Packaging & Delivery:</span>
+                            <div class="summary-box-value">{{ order.packaging_charge|default:0 }} ৳</div>
+                        </div>
+                        <div class="summary-box-row">
+                            <span class="font-weight-bold">Final Total:</span>
+                            <div class="summary-box-value text-primary">{{ order.final_total|floatformat:2 }} ৳</div>
+                        </div>
+                        <div class="summary-box-row">
+                            <span class="font-weight-bold">Total Bill (with bKash):</span>
+                            <div class="summary-box-value text-success" style="font-size: 1.05rem;">BDT {{ order.final_payment|floatformat:2 }} ৳</div>
+                        </div>
+                    </div>
+
+                </div>
+            {% endif %}
+
+            <div class="bill-footer-msg">
+                We hope you enjoy our fresh harvests — thank you for supporting Amader Uthaan Krishi!
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

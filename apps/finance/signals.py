@@ -1,3 +1,4 @@
+
 from django.db.models.signals import post_save, post_migrate
 from django.dispatch import receiver
 
@@ -15,72 +16,120 @@ from .services import (
 
 
 # ==========================================================
-# 1. CREATE SALES VOUCHER AUTOMATICALLY WHEN ORDER ACCEPTED
+# 1. CREATE / UPDATE SALES VOUCHER WHEN ORDER IS ACCEPTED
 # ==========================================================
 
 @receiver(post_save, sender=Order)
 def create_order_sales_voucher(sender, instance, created, **kwargs):
     """
-    Automatically creates a Sales Voucher (Journal + Entries)
-    when an Order status changes to 'accepted'.
+    Automatically creates or updates a Sales Voucher (Journal + Entries)
+    when an Order status is 'accepted'.
     """
-    if created:
-        return
-
-    # Trigger only when order is accepted
+    # Trigger only when order status is accepted
     if instance.status != "accepted":
         return
 
-    # Check if a Sales Voucher already exists for this order
-    if instance.journals.filter(voucher_type="sales").exists():
-        return
-
-    # Call Sales Voucher Service
+    # Call Sales Voucher Service to create or sync updated items/charges
     create_sales_voucher(instance)
 
 
 # ==========================================================
-# 2. CREATE CUSTOMER ACCOUNT AUTOMATICALLY
+# 2. TRIGGER OPENING BALANCE JOURNAL WHEN ACCOUNT HAS OPENING BALANCE
+# ==========================================================
+
+@receiver(post_save, sender=Account)
+def trigger_account_opening_journal(sender, instance, created, **kwargs):
+    """
+    Automatically generates an Opening Balance Journal Voucher whenever an
+    Account has an opening_balance > 0.
+    """
+    if instance.opening_balance and instance.opening_balance > 0:
+        create_account_opening_journal(instance)
+
+
+# ==========================================================
+# 3. CREATE / UPDATE USER ACCOUNT AUTOMATICALLY
 # ==========================================================
 
 @receiver(post_save, sender=CustomUser)
-def create_customer_account(sender, instance, created, **kwargs):
+def sync_user_account(sender, instance, created, **kwargs):
     """
-    Automatically creates a Customer Account in the Chart of Accounts
-    when a new regular user registers.
+    Automatically creates or updates the Chart of Accounts
+    account associated with a CustomUser.
+
+    Normal user  -> Customer Account
+    Staff user   -> Supplier Account
+    Superuser    -> No party account
     """
-    if not created:
+
+    # ------------------------------------------------------
+    # Superuser should not have customer/supplier account
+    # ------------------------------------------------------
+    if instance.is_superuser:
         return
 
-    # Do not auto-create customer account for staff/superusers
-    if instance.is_staff or instance.is_superuser:
-        return
+    # ------------------------------------------------------
+    # Determine account type based on user status
+    # ------------------------------------------------------
+    if instance.is_staff:
+        # Staff = Supplier
+        type1 = "liability"
+        type2 = "supplier"
+        name = (
+            f"Supplier: "
+            f"{instance.username or instance.first_name or instance.email}"
+        )
+    else:
+        # Normal user = Customer
+        type1 = "asset"
+        type2 = "customer"
+        name = (
+            f"Customer: "
+            f"{instance.username or instance.first_name or instance.email}"
+        )
 
-    account, account_created = Account.objects.get_or_create(
-        customer=instance,
-        defaults={
-            "name": f"Customer: {instance.username or instance.first_name or instance.email}",
-            "type1": "asset",
-            "type2": "customer",
-            "status": "active",
-        },
-    )
+    # ------------------------------------------------------
+    # Find existing account
+    # ------------------------------------------------------
+    account = Account.objects.filter(customer=instance).first()
 
-    # Check if opening balance needs to be journalized
-    if account_created and account.opening_balance > 0:
-        create_account_opening_journal(account)
+    # ------------------------------------------------------
+    # Create if account does not exist
+    # ------------------------------------------------------
+    if not account:
+        account = Account.objects.create(
+            customer=instance,
+            name=name,
+            type1=type1,
+            type2=type2,
+            status="active",
+        )
 
+    # ------------------------------------------------------
+    # Update existing account
+    # ------------------------------------------------------
+    else:
+        account.name = name
+        account.type1 = type1
+        account.type2 = type2
+        account.status = "active"
+        account.save(
+            update_fields=[
+                "name",
+                "type1",
+                "type2",
+                "status",
+                "updated_at",
+            ]
+        )
 
 # ==========================================================
-# 3. CREATE PRODUCT ACCOUNT AUTOMATICALLY
+# 4. CREATE PRODUCT ACCOUNT AUTOMATICALLY
 # ==========================================================
 
 @receiver(post_save, sender=Product)
 def create_product_account(sender, instance, created, **kwargs):
-    """
-    Automatically creates a Revenue Account in Chart of Accounts
-    when a new product is created.
-    """
+
     if not created:
         return
 
@@ -96,7 +145,7 @@ def create_product_account(sender, instance, created, **kwargs):
 
 
 # ==========================================================
-# 4. CREATE EXPENSE ACCOUNT AUTOMATICALLY
+# 5. CREATE EXPENSE ACCOUNT AUTOMATICALLY
 # ==========================================================
 
 @receiver(post_save, sender=ExpenseCategory)
@@ -119,9 +168,9 @@ def create_expense_account(sender, instance, created, **kwargs):
     )
 
 
-# ==========================================================
-# 5. CREATE DEFAULT SYSTEM ACCOUNTS (POST MIGRATE)
-# ==========================================================
+
+# 6. CREATE DEFAULT SYSTEM ACCOUNTS (POST MIGRATE)
+
 
 @receiver(post_migrate)
 def create_default_system_accounts(sender, **kwargs):

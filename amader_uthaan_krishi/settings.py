@@ -70,18 +70,14 @@ DATABASES = {
 
 
 
+
+
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'OPTIONS': {
+            'min_length': 4,
+        },
     },
 ]
 
@@ -116,3 +112,4 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = '22201138@uap-bd.edu'
 EMAIL_HOST_PASSWORD = 'bdas zsrb fxjv jjtq'
+DEFAULT_FROM_EMAIL = 'Amader Uthaan Krishi <22201138@uap-bd.edu>'

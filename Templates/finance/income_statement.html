@@ -1,0 +1,963 @@
+
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}
+Income Statement (Profit & Loss)
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* ==========================================================
+       INCOME STATEMENT - ERP / ACCOUNTING REPORT STYLE
+       ========================================================== */
+
+    .income-report-wrapper {
+        width: 100%;
+        margin: 0;
+        padding: 18px 22px 35px;
+        background: #ffffff;
+    }
+
+
+    /* ==========================================================
+       REPORT HEADER
+       ========================================================== */
+
+    .income-report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #d9d9d9;
+    }
+
+    .income-report-title {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+        color: #333333;
+    }
+
+    .income-report-subtitle {
+        margin-top: 3px;
+        font-size: 12px;
+        color: #777777;
+    }
+
+
+    /* ==========================================================
+       ACTION BUTTONS
+       ========================================================== */
+
+    .report-actions {
+        display: flex;
+        gap: 7px;
+        align-items: center;
+    }
+
+    .report-action-btn {
+        height: 34px;
+        padding: 5px 16px;
+        border: 1px solid #bdbdbd;
+        border-radius: 2px;
+        background: #ffffff;
+        color: #444444;
+        font-size: 12px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .report-action-btn:hover {
+        background: #f4f4f4;
+        color: #222222;
+        text-decoration: none;
+    }
+
+    .report-action-btn.dashboard {
+        background: #2f7fb5;
+        border-color: #2f7fb5;
+        color: #ffffff;
+    }
+
+    .report-action-btn.dashboard:hover {
+        background: #286d9c;
+        color: #ffffff;
+    }
+
+
+    /* ==========================================================
+       FILTER AREA
+       ========================================================== */
+
+    .report-filter {
+        border: 1px solid #cfcfcf;
+        background: #fafafa;
+        padding: 10px 12px;
+        margin-bottom: 16px;
+    }
+
+    .report-filter-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    .report-filter-field {
+        flex: 1;
+    }
+
+    .report-filter-field label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #444444;
+    }
+
+    .report-filter-field input {
+        width: 100%;
+        height: 31px;
+        padding: 4px 8px;
+        border: 1px solid #c8c8c8;
+        border-radius: 2px;
+        background: #ffffff;
+        color: #333333;
+        font-size: 12px;
+        outline: none;
+    }
+
+    .report-filter-field input:focus {
+        border-color: #6fa3c5;
+        box-shadow: none;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 5px;
+    }
+
+    .filter-load-btn {
+        height: 31px;
+        min-width: 160px;
+        border: 1px solid #2f7fb5;
+        border-radius: 1px;
+        background: #2f7fb5;
+        color: #ffffff;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .filter-load-btn:hover {
+        background: #286d9c;
+    }
+
+    .filter-reset-btn {
+        height: 31px;
+        min-width: 75px;
+        border: 1px solid #c5c5c5;
+        border-radius: 1px;
+        background: #ffffff;
+        color: #555555;
+        font-size: 12px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .filter-reset-btn:hover {
+        background: #eeeeee;
+        color: #333333;
+        text-decoration: none;
+    }
+
+
+    /* ==========================================================
+       REPORT CARD
+       ========================================================== */
+
+    .income-report-card {
+        border: 1px solid #cfcfcf;
+        background: #ffffff;
+        padding: 0;
+        box-shadow: none;
+    }
+
+
+    /* ==========================================================
+       REPORT TABLE
+       ========================================================== */
+
+    .income-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        margin: 0;
+        font-size: 12px;
+    }
+
+    .income-table th,
+    .income-table td {
+        border: 1px solid #d2d2d2;
+        padding: 5px 8px;
+        height: 25px;
+        vertical-align: middle;
+    }
+
+
+    /* ==========================================================
+       TABLE HEADER
+       ========================================================== */
+
+    .income-table thead th {
+        background: #eeeeee;
+        color: #333333;
+        font-size: 11px;
+        font-weight: 600;
+        text-align: left;
+    }
+
+    .income-table thead th.notes-column {
+        width: 13%;
+        text-align: center;
+    }
+
+    .income-table thead th.amount-column {
+        width: 20%;
+        text-align: right;
+    }
+
+
+    /* ==========================================================
+       REPORT ROWS
+       ========================================================== */
+
+    .income-table tbody td {
+        background: #ffffff;
+        color: #333333;
+    }
+
+    .income-table tbody tr:hover td {
+        background: #f8f8f8;
+    }
+
+    .particular-column {
+        width: 67%;
+    }
+
+    .notes-column {
+        width: 13%;
+        text-align: center;
+        color: #777777;
+    }
+
+    .amount-column {
+        width: 20%;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+
+    /* ==========================================================
+       MAIN SECTION ROW
+       ========================================================== */
+
+    .main-section-row td {
+        background: #e8e8f2 !important;
+        color: #333333 !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 11px;
+        padding: 5px 8px !important;
+    }
+
+    .main-section-row .section-total {
+        text-align: right;
+        font-weight: 700;
+    }
+
+
+    /* ==========================================================
+       SUB SECTION
+       ========================================================== */
+
+    .sub-section-row td {
+        background: #f1f1f7 !important;
+        color: #444444 !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 11px;
+    }
+
+
+    /* ==========================================================
+       REVENUE
+       ========================================================== */
+
+    .revenue-row td {
+        background: #ffffff;
+    }
+
+    .revenue-amount {
+        color: #333333;
+        font-weight: 500;
+    }
+
+
+    /* ==========================================================
+       EXPENSE
+       ========================================================== */
+
+    .expense-row td {
+        background: #ffffff;
+    }
+
+    .expense-amount {
+        color: #333333;
+        font-weight: 500;
+    }
+
+    /* ==========================================================
+       ACCOUNT ITEM INDENT
+       ========================================================== */
+
+    .account-item {
+        padding-left: 3ch !important;
+    }
+
+
+    /* ==========================================================
+       TOTAL ROW
+       ========================================================== */
+
+    .total-row td {
+        background: #eeeeee !important;
+        font-weight: 700;
+        color: #333333;
+        border-top: 1px solid #bdbdbd;
+    }
+
+    .total-row .amount-column {
+        font-weight: 700;
+    }
+
+
+    /* ==========================================================
+       EMPTY ROW
+       ========================================================== */
+
+    .empty-row td {
+        text-align: center;
+        color: #777777;
+        background: #ffffff;
+        padding: 9px;
+    }
+
+
+    /* ==========================================================
+       PROFIT / LOSS
+       ========================================================== */
+
+    .profit-row td {
+        background: #ffffff !important;
+        border-top: 2px solid #888888 !important;
+        border-bottom: 2px solid #888888 !important;
+        font-weight: 700;
+        font-size: 13px;
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+    }
+
+    .profit-row.profit td {
+        color: #333333;
+    }
+
+    .profit-row.loss td {
+        color: #333333;
+    }
+
+    .profit-label {
+        font-weight: 700;
+    }
+
+    .profit-note {
+        text-align: center;
+        font-size: 10px;
+        color: #777777;
+        font-weight: normal;
+    }
+
+    .profit-amount {
+        text-align: right;
+        font-weight: 700;
+    }
+
+
+    /* ==========================================================
+       FOOTER NOTE
+       ========================================================== */
+
+    .report-footer-note {
+        padding: 8px 10px;
+        font-size: 10px;
+        color: #777777;
+        border-top: 1px solid #d2d2d2;
+        background: #fafafa;
+    }
+
+
+    /* ==========================================================
+       PRINT
+       ========================================================== */
+
+    @media print {
+
+        body {
+            background: #ffffff !important;
+        }
+
+        .income-report-wrapper {
+            padding: 0;
+        }
+
+        nav,
+        .navbar,
+        header nav {
+            display: none !important;
+        }
+
+        .report-actions,
+        .report-filter {
+            display: none !important;
+        }
+
+        .income-report-header {
+            margin-bottom: 10px;
+        }
+
+        .income-report-card {
+            border: 1px solid #000000;
+        }
+
+        .income-table th,
+        .income-table td {
+            border: 1px solid #000000;
+        }
+
+        .main-section-row td,
+        .sub-section-row td,
+        .total-row td {
+            background: #eeeeee !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+
+
+    /* ==========================================================
+       RESPONSIVE
+       ========================================================== */
+
+    @media (max-width: 768px) {
+
+        .income-report-wrapper {
+            padding: 12px;
+        }
+
+        .income-report-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .report-actions {
+            width: 100%;
+        }
+
+        .report-action-btn {
+            flex: 1;
+        }
+
+        .report-filter-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-buttons {
+            width: 100%;
+        }
+
+        .filter-load-btn,
+        .filter-reset-btn {
+            flex: 1;
+        }
+
+        .income-table {
+            min-width: 650px;
+        }
+
+        .income-report-card {
+            overflow-x: auto;
+        }
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="income-report-wrapper">
+
+
+    <!-- ======================================================
+         HEADER
+         ====================================================== -->
+
+    <div class="income-report-header">
+
+        <div>
+
+            <h3 class="income-report-title">
+                Income Statement
+            </h3>
+
+            <div class="income-report-subtitle">
+                Profit & Loss Financial Report
+            </div>
+
+        </div>
+
+
+        <div class="report-actions">
+
+            <button
+                onclick="window.print()"
+                class="report-action-btn"
+                type="button"
+            >
+                <i class="fas fa-print me-1"></i>
+                Print Statement
+            </button>
+
+
+            <a
+                href="{% url 'financial_dashboard' %}"
+                class="report-action-btn dashboard"
+            >
+                <i class="fas fa-tachometer-alt me-1"></i>
+                Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ======================================================
+         DATE FILTER
+         ====================================================== -->
+
+    <div class="report-filter">
+
+        <form method="GET">
+
+            <div class="report-filter-row">
+
+
+                <div class="report-filter-field">
+
+                    <label>
+                        From Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="from_date"
+                        value="{{ from_date }}"
+                    >
+
+                </div>
+
+
+
+                <div class="report-filter-field">
+
+                    <label>
+                        To Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="to_date"
+                        value="{{ to_date }}"
+                    >
+
+                </div>
+
+
+
+                <div class="filter-buttons">
+
+                    <button
+                        type="submit"
+                        class="filter-load-btn"
+                    >
+                        <i class="fas fa-filter me-1"></i>
+                        Load
+                    </button>
+
+
+                    <a
+                        href="{% url 'income_statement' %}"
+                        class="filter-reset-btn"
+                    >
+                        <i class="fas fa-redo me-1"></i>
+                        Reset
+                    </a>
+
+                </div>
+
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- ======================================================
+         STATEMENT
+         ====================================================== -->
+
+    <div class="income-report-card">
+
+        <table class="income-table">
+
+
+            <!-- ==================================================
+                 TABLE HEADER
+                 ================================================== -->
+
+            <thead>
+
+                <tr>
+
+                    <th class="particular-column">
+                        Particulars
+                    </th>
+
+                    <th class="notes-column">
+                        Notes
+                    </th>
+
+                    <th class="amount-column">
+                        Amount
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+
+            <tbody>
+
+
+                <!-- ==============================================
+                     REVENUE HEADER
+                     ============================================== -->
+
+                <tr class="main-section-row">
+
+                    <td>
+                        PL - Revenue
+                    </td>
+
+                    <td></td>
+
+                    <td class="section-total">
+                        ৳ {{ total_revenue|floatformat:2|intcomma }}
+                    </td>
+
+                </tr>
+
+
+                <!-- ==============================================
+                     REVENUE
+                     ============================================== -->
+
+                <tr class="sub-section-row">
+
+                    <td>
+                        Revenue
+                    </td>
+
+                    <td></td>
+
+                    <td></td>
+
+                </tr>
+
+
+                <tr class="revenue-row">
+
+                    <td class="account-item">
+                        Sales Revenue
+                    </td>
+
+                    <td class="notes-column">
+                    </td>
+
+                    <td class="amount-column revenue-amount">
+                        ৳ {{ sales_revenue|floatformat:2|intcomma }}
+                    </td>
+
+                </tr>
+
+
+                <tr class="revenue-row">
+
+                    <td class="account-item">
+                        Packaging Charge Revenue
+                    </td>
+
+                    <td class="notes-column">
+                    </td>
+
+                    <td class="amount-column revenue-amount">
+                        ৳ {{ packaging_revenue|floatformat:2|intcomma }}
+                    </td>
+
+                </tr>
+
+
+                <tr class="revenue-row">
+
+                    <td class="account-item">
+                        bKash Charge Revenue
+                    </td>
+
+                    <td class="notes-column">
+                    </td>
+
+                    <td class="amount-column revenue-amount">
+                        ৳ {{ bkash_revenue|floatformat:2|intcomma }}
+                    </td>
+
+                </tr>
+
+
+                {% if other_revenue > 0 %}
+
+                <tr class="revenue-row">
+
+                    <td class="account-item">
+                        Other Revenue
+                    </td>
+
+                    <td class="notes-column">
+                    </td>
+
+                    <td class="amount-column revenue-amount">
+                        ৳ {{ other_revenue|floatformat:2|intcomma }}
+                    </td>
+
+                </tr>
+
+                {% endif %}
+
+
+
+                <!-- ==============================================
+                     TOTAL REVENUE
+                     ============================================== -->
+
+                <tr class="total-row">
+
+                    <td class="account-item">
+                        Total Revenue
+                    </td>
+
+                    <td></td>
+
+                    <td class="amount-column">
+                        ৳ {{ total_revenue|floatformat:2|intcomma }}
+                    </td>
+
+                </tr>
+
+
+
+                <!-- ==============================================
+                     EXPENSE HEADER
+                     ============================================== -->
+
+                <tr class="main-section-row">
+
+                    <td>
+                        PL - Expense
+                    </td>
+
+                    <td></td>
+
+                    <td class="section-total">
+                        ৳ {{ total_expenses|floatformat:2|intcomma }}
+                    </td>
+
+                </tr>
+
+
+                <!-- ==============================================
+                     EXPENSE
+                     ============================================== -->
+
+                {% if sales_discount > 0 %}
+
+                <tr class="expense-row">
+
+                    <td class="account-item">
+                        Sales Discount
+                    </td>
+
+                    <td class="notes-column">
+                    </td>
+
+                    <td class="amount-column expense-amount">
+                        ৳ {{ sales_discount|floatformat:2|intcomma }}
+                    </td>
+
+                </tr>
+
+                {% endif %}
+
+
+
+                {% for item in operating_expenses %}
+
+                <tr class="expense-row">
+
+                    <td class="account-item">
+                        {{ item.account.name }}
+                    </td>
+
+                    <td class="notes-column">
+                    </td>
+
+                    <td class="amount-column expense-amount">
+                        ৳ {{ item.amount|floatformat:2|intcomma }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                    {% if sales_discount == 0 %}
+
+                    <tr class="empty-row">
+
+                        <td colspan="3">
+                            No expenses recorded for this period.
+                        </td>
+
+                    </tr>
+
+                    {% endif %}
+
+                {% endfor %}
+
+
+
+                <!-- ==============================================
+                     TOTAL EXPENSE
+                     ============================================== -->
+
+                <tr class="total-row">
+
+                    <td class="account-item">
+                        Total Expenses
+                    </td>
+
+                    <td></td>
+
+                    <td class="amount-column">
+                        ৳ {{ total_expenses|floatformat:2|intcomma }}
+                    </td>
+
+                </tr>
+
+
+
+                <!-- ==============================================
+                     PROFIT / LOSS
+                     ============================================== -->
+
+                <tr
+                    class="profit-row
+                    {% if is_profit %}
+                        profit
+                    {% else %}
+                        loss
+                    {% endif %}"
+                >
+
+                    <td class="profit-label">
+                        {% if is_profit %}
+
+                            Profit
+
+                        {% else %}
+
+                            Loss
+
+                        {% endif %}
+                    </td>
+
+
+                    <td class="profit-note">
+                        Revenue - Expense
+                    </td>
+
+
+                    <td class="profit-amount">
+
+                        ৳ {{ net_profit|floatformat:2|intcomma }}
+
+                    </td>
+
+                </tr>
+
+
+            </tbody>
+
+        </table>
+
+
+        <!-- ==================================================
+             FOOTER
+             ================================================== -->
+
+        <div class="report-footer-note">
+
+            Income Statement — Profit & Loss Financial Report
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+{% endblock %}

@@ -10,65 +10,47 @@
 
             <div class="col-lg-8">
 
+                <div class="hero-video-box">
 
-    <div class="hero-video-box">
+                    <video
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                        class="hero-video">
 
+                        <source src="/static/videos/WhatsApp Video 2026-08-02 at 00.39.39.mp4" type="video/mp4">
 
-        <video
-            autoplay
-            muted
-            loop
-            playsinline
-            class="hero-video">
+                    </video>
 
+                    <div class="hero-video-overlay"></div>
 
-            <source src="/static/videos/WhatsApp Video 2026-08-02 at 00.39.39.mp4" type="video/mp4">
+                    <div class="hero-video-content">
 
+                        <h1>
+                            Fresh Organic<br>
+                            <em>Vegetables</em>
+                        </h1>
 
-        </video>
+                        <p>
+                            Fresh from farm directly to your home.
+                        </p>
 
+                        <div>
+                            <a href="{% url 'shop' %}" class="hero-btn">
+                                Shop Now →
+                            </a>
 
+                            <a href="{% url 'about' %}" class="learn-btn">
+                                Learn More
+                            </a>
+                        </div>
 
-        <div class="hero-video-overlay"></div>
+                    </div>
 
-
-
-        <div class="hero-video-content">
-
-
-            <h1>
-                Fresh Organic<br>
-                <em>Vegetables</em>
-            </h1>
-
-
-            <p>
-                Fresh from farm directly to your home.
-            </p>
-
-
-            <div>
-
-                <a href="{% url 'shop' %}" class="hero-btn">
-                    Shop Now →
-                </a>
-
-
-                <a href="{% url 'about' %}" class="learn-btn">
-                    Learn More
-                </a>
-
+                </div>
 
             </div>
-
-
-        </div>
-
-
-    </div>
-
-
-</div>
 
             <!-- ================= RIGHT BANNER ================= -->
             <div class="col-lg-4">
@@ -100,9 +82,10 @@
 
     <div class="container">
 
-        <div class="row g-3 text-center">
+        <!-- 3 Columns in 1 Row on Mobile (col-4) -->
+        <div class="row g-2 g-md-3 text-center">
 
-            <div class="col-md-4">
+            <div class="col-4 col-md-4">
                 <div class="feature-box">
                     <div class="feature-icon-wrap">
                         <span class="feature-icon">🚚</span>
@@ -112,7 +95,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-4 col-md-4">
                 <div class="feature-box">
                     <div class="feature-icon-wrap">
                         <span class="feature-icon">🌿</span>
@@ -122,7 +105,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-4 col-md-4">
                 <div class="feature-box">
                     <div class="feature-icon-wrap">
                         <span class="feature-icon">💳</span>
@@ -150,7 +133,7 @@
             <p>Fresh products selected for you</p>
         </div>
 
-        <!-- Products (3 columns in Mobile: col-4, 4 rows: slice 12) -->
+        <!-- Products (3 columns in Mobile: col-4) -->
         <div class="row g-2 g-md-4">
 
             {% for p in products|slice:":12" %}
@@ -162,29 +145,43 @@
                     <!-- Badge -->
                     <div class="product-badge">Fresh</div>
 
-                    <!-- Image -->
-                    <div class="product-image-box">
-                        {% if p.image %}
-                        <img src="{{ p.image.url }}"
-                             class="product-image"
-                             alt="{{ p.name }}">
-                        {% else %}
-                        <img src="https://via.placeholder.com/300x220"
-                             class="product-image">
-                        {% endif %}
-                        <div class="product-image-overlay"></div>
-                    </div>
+                    <!-- Square Image Box (Click to view Details) -->
+                    <a href="{% url 'product_details' p.id %}" class="d-block text-decoration-none">
+                        <div class="product-image-box">
+                            {% if p.image %}
+                            <img src="{{ p.image.url }}"
+                                 class="product-image"
+                                 alt="{{ p.name }}">
+                            {% else %}
+                            <img src="https://via.placeholder.com/300x300"
+                                 class="product-image"
+                                 alt="No Image">
+                            {% endif %}
+                            <div class="product-image-overlay"></div>
+                        </div>
+                    </a>
 
                     <!-- Body -->
-                    <div class="product-body">
-                        <h5 class="product-name">{{ p.name }}</h5>
+                    <div class="product-body text-center">
+                        <h5 class="product-name">
+                            <a href="{% url 'product_details' p.id %}" class="text-decoration-none text-dark">
+                                {{ p.name }}
+                            </a>
+                        </h5>
+
                         <div class="product-price">
                             ৳ {{ p.price }}
-                            <span>/ {{ p.get_unit_display }}</span>
+                            <span>/ {% if p.unit == 'gm' %}Kg{% else %}{{ p.get_unit_display }}{% endif %}</span>
                         </div>
-                        <a href="{% url 'shop' %}" class="shop-btn">
-                            Shop Now <span class="btn-arrow">→</span>
-                        </a>
+
+                        <!-- Add To Cart Form for Shop Now button -->
+                        <form method="POST" action="{% url 'add_to_cart' p.id %}" class="w-100 mt-auto">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="shop-btn">
+                                Shop Now <span class="btn-arrow">→</span>
+                            </button>
+                        </form>
                     </div>
 
                 </div>
@@ -253,10 +250,10 @@ body {
     position: absolute;
     inset: 0;
     background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.08) 0%,
-    rgba(0, 0, 0, 0.20) 100%
-);
+        180deg,
+        rgba(0, 0, 0, 0.08) 0%,
+        rgba(0, 0, 0, 0.20) 100%
+    );
 }
 
 .hero-video-content {
@@ -545,9 +542,11 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
+/* Square Image Box Aspect Ratio */
 .product-image-box {
     position: relative;
-    height: 220px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     overflow: hidden;
     background: #fdfdfd;
 }
@@ -570,10 +569,11 @@ body {
 }
 
 .product-body {
-    padding: 20px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    text-align: center;
 }
 
 .product-name {
@@ -584,11 +584,25 @@ body {
     line-height: 1.3;
 }
 
+.product-name a {
+    color: inherit;
+    transition: color 0.2s ease;
+}
+
+.product-name a:hover {
+    color: var(--green-primary);
+}
+
+/* Centered Price & Unit on Desktop & Mobile */
 .product-price {
     font-size: 20px;
     font-weight: 700;
     color: var(--green-primary);
     margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
 }
 
 .product-price span {
@@ -598,7 +612,7 @@ body {
 }
 
 .shop-btn {
-    margin-top: auto;
+    width: 100%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -606,17 +620,17 @@ body {
     padding: 10px 18px;
     border-radius: var(--radius-pill);
     background: var(--cream);
-    color: var(--green-primary) !important;
-    text-decoration: none !important;
+    color: var(--green-primary);
     font-weight: 600;
     font-size: 14px;
     transition: all 0.3s ease;
     border: 1px solid var(--cream-dark);
+    cursor: pointer;
 }
 
 .shop-btn:hover {
     background: var(--green-primary);
-    color: var(--white) !important;
+    color: var(--white);
     border-color: var(--green-primary);
 }
 
@@ -668,71 +682,114 @@ body {
         padding: 24px 20px;
     }
 
+    /* Feature Section 3 Columns in 1 Row for Mobile */
     .feature-section {
-        padding: 30px 0;
-    }
-
-    .product-section {
-        padding: 30px 0 50px 0;
-    }
-}
-
-/* Mobile 3-Column Specific Optimizations (under 576px) */
-@media (max-width: 575px) {
-    .hero-video-box {
-        min-height: 310px;
+        padding: 20px 0;
     }
 
     .feature-box {
-        padding: 20px 12px;
+        padding: 12px 6px;
+        border-radius: 12px;
     }
 
-    /* 3 Column Product Card Styles for Mobile */
+    .feature-icon-wrap {
+        width: 44px;
+        height: 44px;
+        margin: 0 auto 8px auto;
+    }
+
+    .feature-icon {
+        font-size: 20px;
+    }
+
+    .feature-box h5 {
+        font-size: 11.5px;
+        margin-bottom: 4px;
+    }
+
+    .feature-box p {
+        font-size: 9.5px;
+        line-height: 1.2;
+    }
+
+    .product-section {
+        padding: 25px 0 40px 0;
+    }
+
+    /* 3-Column Grid Padding */
+    .product-section .row > [class*="col-"] {
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+
+    /* Compact Square Product Card for Mobile */
     .product-card {
-        border-radius: 10px;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
     }
 
     .product-badge {
-        font-size: 9px;
+        font-size: 8.5px;
         padding: 2px 6px;
         top: 6px;
         left: 6px;
     }
 
     .product-image-box {
-        height: 110px;
+        aspect-ratio: 1 / 1;
+        padding: 5px;
+        background: #fff;
+    }
+
+    .product-image {
+        border-radius: 8px;
     }
 
     .product-body {
-        padding: 8px 6px;
+        padding: 6px 4px;
         text-align: center;
     }
 
     .product-name {
-        font-size: 12px;
-        margin-bottom: 4px;
-        white-space: nowrap;
+        font-size: 11.5px;
+        line-height: 1.2;
+        margin-bottom: 2px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
         overflow: hidden;
-        text-overflow: ellipsis;
+        min-height: 28px;
     }
 
+    /* Centered Inline Price & Unit on Mobile */
     .product-price {
-        font-size: 13px;
-        margin-bottom: 6px;
+        font-size: 12px;
+        margin-bottom: 5px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        white-space: nowrap;
     }
 
     .product-price span {
-        display: block;
-        font-size: 10px;
-        margin-top: -2px;
+        font-size: 9.5px;
+        font-weight: 500;
+        color: var(--text-soft);
+        background: transparent;
+        padding: 0;
+        border-radius: 0;
+        display: inline;
     }
 
     .shop-btn {
-        padding: 5px 6px;
+        padding: 5px 4px;
         font-size: 10px;
-        gap: 3px;
-        border-radius: 20px;
+        gap: 2px;
+        border-radius: 16px;
         width: 100%;
+        margin-top: auto;
     }
 }
 

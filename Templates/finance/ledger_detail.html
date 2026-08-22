@@ -312,53 +312,44 @@ Ledger Detail
 
                     </tbody>
 
-                    <tfoot class="bg-light">
-
-                        <tr class="font-weight-bold">
-
-                            <td colspan="4" class="text-right">
-
-                                Total
-
-                            </td>
-
-                            <td class="text-right text-success">
-
-                                {{ total_debit|floatformat:2|intcomma }}
-
-                            </td>
-
-                            <td class="text-right text-danger">
-
-                                {{ total_credit|floatformat:2|intcomma }}
-
-                            </td>
-
-                            <td class="text-right">
-
-                                {% if balance >= 0 %}
-
-                                    <span class="text-success">
-
-                                        {{ balance|floatformat:2|intcomma }} Dr
-
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="text-danger">
-
-                                        {{ balance|floatformat:2|cut:"-"|intcomma }} Cr
-
-                                    </span>
-
-                                {% endif %}
-
-                            </td>
-
-                        </tr>
-
-                    </tfoot>
+<tfoot class="bg-light">
+    <tr class="font-weight-bold">
+        <td colspan="4" class="text-right">
+            Total
+        </td>
+        <td class="text-right text-success">
+            {{ total_debit|floatformat:2|intcomma }}
+        </td>
+        <td class="text-right text-danger">
+            {{ total_credit|floatformat:2|intcomma }}
+        </td>
+        <td class="text-right">
+            {% if balance == 0 %}
+                <span>0.00</span>
+            {% elif is_debit_account %}
+                {% if balance > 0 %}
+                    <span class="text-success">
+                        {{ balance|floatformat:2|intcomma }} Dr
+                    </span>
+                {% else %}
+                    <span class="text-danger">
+                        {{ balance|floatformat:2|cut:"-"|intcomma }} Cr
+                    </span>
+                {% endif %}
+            {% else %}
+                {% if balance > 0 %}
+                    <span class="text-danger">
+                        {{ balance|floatformat:2|intcomma }} Cr
+                    </span>
+                {% else %}
+                    <span class="text-success">
+                        {{ balance|floatformat:2|cut:"-"|intcomma }} Dr
+                    </span>
+                {% endif %}
+            {% endif %}
+        </td>
+    </tr>
+</tfoot>
 
                 </table>
 

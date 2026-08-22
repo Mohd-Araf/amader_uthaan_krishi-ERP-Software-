@@ -1,0 +1,1122 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Balance Sheet Statement{% endblock %}
+
+{% block extra_css %}
+<style>
+
+    /* ==========================================================
+       BALANCE SHEET - ERP / ACCOUNTING REPORT STYLE
+       ========================================================== */
+
+    .balance-report-wrapper {
+        width: 100%;
+        margin: 0;
+        padding: 18px 22px 35px;
+        background: #ffffff;
+    }
+
+
+    /* ==========================================================
+       REPORT HEADER
+       ========================================================== */
+
+    .balance-report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #d9d9d9;
+    }
+
+    .balance-report-title {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+        color: #333333;
+    }
+
+    .balance-report-subtitle {
+        margin-top: 3px;
+        font-size: 12px;
+        color: #777777;
+    }
+
+
+    /* ==========================================================
+       ACTION BUTTONS
+       ========================================================== */
+
+    .report-actions {
+        display: flex;
+        gap: 7px;
+        align-items: center;
+    }
+
+    .report-action-btn {
+        height: 34px;
+        padding: 5px 16px;
+        border: 1px solid #bdbdbd;
+        border-radius: 2px;
+        background: #ffffff;
+        color: #444444;
+        font-size: 12px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .report-action-btn:hover {
+        background: #f4f4f4;
+        color: #222222;
+        text-decoration: none;
+    }
+
+    .report-action-btn.dashboard {
+        background: #2f7fb5;
+        border-color: #2f7fb5;
+        color: #ffffff;
+    }
+
+    .report-action-btn.dashboard:hover {
+        background: #286d9c;
+        color: #ffffff;
+    }
+
+
+    /* ==========================================================
+       FILTER AREA
+       ========================================================== */
+
+    .report-filter {
+        border: 1px solid #cfcfcf;
+        background: #fafafa;
+        padding: 10px 12px;
+        margin-bottom: 16px;
+    }
+
+    .report-filter-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    .report-filter-field {
+        flex: 1;
+    }
+
+    .report-filter-field label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #444444;
+    }
+
+    .report-filter-field input {
+        width: 100%;
+        height: 31px;
+        padding: 4px 8px;
+        border: 1px solid #c8c8c8;
+        border-radius: 2px;
+        background: #ffffff;
+        color: #333333;
+        font-size: 12px;
+        outline: none;
+    }
+
+    .report-filter-field input:focus {
+        border-color: #6fa3c5;
+        box-shadow: none;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 5px;
+    }
+
+    .filter-load-btn {
+        height: 31px;
+        min-width: 160px;
+        border: 1px solid #2f7fb5;
+        border-radius: 1px;
+        background: #2f7fb5;
+        color: #ffffff;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .filter-load-btn:hover {
+        background: #286d9c;
+    }
+
+    .filter-reset-btn {
+        height: 31px;
+        min-width: 75px;
+        border: 1px solid #c5c5c5;
+        border-radius: 1px;
+        background: #ffffff;
+        color: #555555;
+        font-size: 12px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .filter-reset-btn:hover {
+        background: #eeeeee;
+        color: #333333;
+        text-decoration: none;
+    }
+
+
+    /* ==========================================================
+       REPORT CARDS
+       ========================================================== */
+
+    .report-card {
+        border: 1px solid #cfcfcf !important;
+        border-radius: 0 !important;
+        background: #ffffff;
+        padding: 0 !important;
+        box-shadow: none !important;
+        overflow: hidden;
+    }
+
+
+    /* ==========================================================
+       SECTION HEADER
+       ========================================================== */
+
+    .section-header {
+        margin: 0 !important;
+        padding: 7px 10px !important;
+        border-radius: 0 !important;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .assets-bg {
+        background: #e8e8f2 !important;
+        color: #333333 !important;
+    }
+
+    .liabilities-bg {
+        background: #e8e8f2 !important;
+        color: #333333 !important;
+    }
+
+    .equity-bg {
+        background: #e8e8f2 !important;
+        color: #333333 !important;
+    }
+
+
+    /* ==========================================================
+       TABLE
+       ========================================================== */
+
+    .balance-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+        font-size: 12px;
+    }
+
+    .balance-table th,
+    .balance-table td {
+        border: 1px solid #d2d2d2;
+        padding: 5px 8px;
+        height: 25px;
+        vertical-align: middle;
+    }
+
+    .balance-table thead th {
+        background: #eeeeee;
+        color: #333333;
+        font-size: 11px;
+        font-weight: 600;
+        text-align: left;
+    }
+
+    .balance-table thead th:last-child {
+        text-align: right;
+    }
+
+    .balance-table tbody td {
+        background: #ffffff;
+        color: #333333;
+    }
+
+    .balance-table tbody tr:hover td {
+        background: #f8f8f8;
+    }
+
+    .balance-table tfoot td {
+        background: #eeeeee !important;
+        font-weight: 700;
+        color: #333333;
+        border-top: 1px solid #bdbdbd;
+    }
+
+
+    /* ==========================================================
+       CATEGORY ROW
+       ========================================================== */
+
+    .category-row td {
+        background: #f1f1f7 !important;
+        color: #444444 !important;
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+    }
+
+    .category-row i {
+        margin-right: 7px;
+    }
+
+
+    /* ==========================================================
+       ACCOUNT ITEMS
+       ========================================================== */
+
+    .account-item {
+        padding-left: 3ch !important;
+    }
+
+    .account-balance {
+        text-align: right;
+        white-space: nowrap;
+        font-weight: 500;
+        color: #333333;
+    }
+
+
+    /* ==========================================================
+       EMPTY ROW
+       ========================================================== */
+
+    .empty-row td {
+        color: #777777 !important;
+        background: #ffffff !important;
+        padding: 9px !important;
+    }
+
+
+    /* ==========================================================
+       TOTAL ROWS
+       ========================================================== */
+
+    .total-row td {
+        background: #eeeeee !important;
+        font-weight: 700;
+        color: #333333 !important;
+        border-top: 1px solid #bdbdbd;
+    }
+
+
+    /* ==========================================================
+       TOTAL LIABILITIES + EQUITY
+       ========================================================== */
+
+    .total-liabilities-equity {
+        margin: 0 !important;
+        border-radius: 0 !important;
+        padding: 9px 10px !important;
+        background: #eeeeee !important;
+        color: #333333 !important;
+        border-top: 2px solid #888888;
+        border-bottom: 2px solid #888888;
+    }
+
+    .total-liabilities-equity .total-value {
+        color: #333333 !important;
+        font-weight: 700;
+    }
+
+
+    /* ==========================================================
+       BALANCE STATUS
+       ========================================================== */
+
+    .balance-status-card {
+        border-radius: 0;
+        padding: 10px 14px;
+        font-size: 12px;
+    }
+
+    .status-ok {
+        background: #f1f1f1;
+        color: #333333;
+        border: 1px solid #bdbdbd;
+    }
+
+    .status-error {
+        background: #f1f1f1;
+        color: #333333;
+        border: 1px solid #bdbdbd;
+    }
+
+
+    /* ==========================================================
+       PRINT
+       ========================================================== */
+
+    @media print {
+
+        body {
+            background: #ffffff !important;
+        }
+
+        .balance-report-wrapper {
+            padding: 0;
+        }
+
+        .report-actions,
+        .report-filter {
+            display: none !important;
+        }
+
+        nav,
+        .navbar,
+        header nav {
+            display: none !important;
+        }
+
+        .balance-report-header {
+            margin-bottom: 10px;
+        }
+
+        .report-card {
+            border: 1px solid #000000 !important;
+            box-shadow: none !important;
+        }
+
+        .balance-table th,
+        .balance-table td {
+            border: 1px solid #000000;
+        }
+
+        .section-header,
+        .category-row td,
+        .total-row td,
+        .total-liabilities-equity {
+            background: #eeeeee !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .balance-status-card {
+            margin-top: 10px !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+
+
+    /* ==========================================================
+       RESPONSIVE
+       ========================================================== */
+
+    @media (max-width: 992px) {
+
+        .balance-report-wrapper {
+            padding: 12px;
+        }
+
+        .balance-report-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .report-actions {
+            width: 100%;
+        }
+
+        .report-action-btn {
+            flex: 1;
+        }
+
+        .report-filter-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-buttons {
+            width: 100%;
+        }
+
+        .filter-load-btn,
+        .filter-reset-btn {
+            flex: 1;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        .balance-table {
+            min-width: 600px;
+        }
+
+        .report-card {
+            overflow-x: auto;
+        }
+
+        .balance-status-card {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 10px;
+        }
+
+        .balance-status-card .text-end {
+            text-align: left !important;
+        }
+    }
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="balance-report-wrapper">
+
+    <!-- ======================================================
+         HEADER
+         ====================================================== -->
+
+    <div class="balance-report-header">
+
+        <div>
+
+            <h3 class="balance-report-title">
+                Balance Sheet Statement
+            </h3>
+
+            <div class="balance-report-subtitle">
+                Real-time Financial Position
+            </div>
+
+        </div>
+
+
+        <div class="report-actions">
+
+            <button
+                onclick="window.print()"
+                class="report-action-btn"
+                type="button"
+            >
+                <i class="fas fa-print me-1"></i>
+                Print Balance Sheet
+            </button>
+
+
+            <a
+                href="{% url 'financial_dashboard' %}"
+                class="report-action-btn dashboard"
+            >
+                <i class="fas fa-tachometer-alt me-1"></i>
+                Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         DATE FILTER
+         ====================================================== -->
+
+ <div class="report-filter">
+
+    <form method="GET">
+
+        <div class="report-filter-row">
+
+            <div class="report-filter-field">
+
+                <label>
+                    From Date
+                </label>
+
+                <input
+                    type="date"
+                    name="from_date"
+                    value="{{ from_date }}"
+                >
+
+            </div>
+
+
+            <div class="report-filter-field">
+
+                <label>
+                    To Date
+                </label>
+
+                <input
+                    type="date"
+                    name="to_date"
+                    value="{{ to_date }}"
+                >
+
+            </div>
+
+
+            <div class="filter-buttons">
+
+                <button
+                    type="submit"
+                    class="filter-load-btn"
+                >
+                    <i class="fas fa-filter me-1"></i>
+                    Load
+                </button>
+
+
+                <a
+                    href="{% url 'balance_sheet' %}"
+                    class="filter-reset-btn"
+                >
+                    <i class="fas fa-redo me-1"></i>
+                    Reset
+                </a>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+    <!-- ======================================================
+         BALANCE SHEET
+         ====================================================== -->
+
+    <div class="row">
+
+        <!-- ==================================================
+             LEFT COLUMN: ASSETS
+             ================================================== -->
+
+        <div class="col-lg-6 mb-4">
+
+            <div class="card report-card h-100">
+
+                <!-- ASSETS HEADER -->
+
+                <div class="section-header assets-bg">
+
+                    <span>
+                        Assets
+                    </span>
+
+                    <span>
+                        ৳ {{ total_assets|floatformat:2|intcomma }}
+                    </span>
+
+                </div>
+
+
+                <div class="table-responsive">
+
+                    <table class="balance-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Asset Category / Account
+                                </th>
+
+                                <th>
+                                    Balance
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            <!-- CASH ACCOUNTS -->
+
+                            <tr class="category-row">
+
+                                <td colspan="2">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    Cash Accounts
+                                </td>
+
+                            </tr>
+
+
+                            {% for acc in cash_assets %}
+
+                            <tr>
+
+                                <td class="account-item">
+                                    {{ acc.name }}
+                                </td>
+
+                                <td class="account-balance">
+                                    ৳ {{ acc.filtered_balance|floatformat:2|intcomma }}
+                                </td>
+
+                            </tr>
+
+                            {% empty %}
+
+                            <tr class="empty-row">
+
+                                <td colspan="2" class="account-item">
+                                    No Cash Accounts found
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+
+                            <!-- BANK ACCOUNTS -->
+
+                            <tr class="category-row">
+
+                                <td colspan="2">
+                                    <i class="fas fa-university"></i>
+                                    Bank Accounts
+                                </td>
+
+                            </tr>
+
+
+                            {% for acc in bank_assets %}
+
+                            <tr>
+
+                                <td class="account-item">
+                                    {{ acc.name }}
+                                </td>
+
+                                <td class="account-balance">
+                                    ৳ {{ acc.filtered_balance|floatformat:2|intcomma }}
+                                </td>
+
+                            </tr>
+
+                            {% empty %}
+
+                            <tr class="empty-row">
+
+                                <td colspan="2" class="account-item">
+                                    No Bank Accounts found
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+
+                            <!-- CUSTOMER RECEIVABLES -->
+
+                            <tr class="category-row">
+
+                                <td colspan="2">
+                                    <i class="fas fa-users"></i>
+                                    Customer Receivables
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td class="account-item">
+                                    Total Customer Balances
+                                </td>
+
+                                <td class="account-balance">
+                                    ৳ {{ total_customer|floatformat:2|intcomma }}
+                                </td>
+
+                            </tr>
+
+
+                            <!-- OTHER ASSETS -->
+
+                            {% if other_assets %}
+
+                            <tr class="category-row">
+
+                                <td colspan="2">
+                                    <i class="fas fa-boxes"></i>
+                                    Other Assets
+                                </td>
+
+                            </tr>
+
+
+                            {% for acc in other_assets %}
+
+                            <tr>
+
+                                <td class="account-item">
+                                    {{ acc.name }}
+                                </td>
+
+                                <td class="account-balance">
+                                    ৳ {{ acc.filtered_balance|floatformat:2|intcomma }}
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                            {% endif %}
+
+
+                        </tbody>
+
+
+                        <tfoot>
+
+                            <tr class="total-row">
+
+                                <td>
+                                    Total Assets
+                                </td>
+
+                                <td class="account-balance">
+                                    ৳ {{ total_assets|floatformat:2|intcomma }}
+                                </td>
+
+                            </tr>
+
+                        </tfoot>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==================================================
+             RIGHT COLUMN: LIABILITIES & EQUITY
+             ================================================== -->
+
+        <div class="col-lg-6 mb-4">
+
+            <div class="card report-card h-100">
+
+
+                <!-- ==================================================
+                     LIABILITIES
+                     ================================================== -->
+
+                <div class="section-header liabilities-bg">
+
+                    <span>
+                        Liabilities
+                    </span>
+
+                    <span>
+                        ৳ {{ total_liabilities|floatformat:2|intcomma }}
+                    </span>
+
+                </div>
+
+
+                <table class="balance-table mb-4">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Liability Account
+                            </th>
+
+                            <th>
+                                Balance
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        <!-- SUPPLIER PAYABLES -->
+
+                        <tr class="category-row">
+
+                            <td colspan="2">
+                                <i class="fas fa-truck"></i>
+                                Accounts Payable / Suppliers
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+
+                            <td class="account-item">
+                                Total Supplier Payables
+                            </td>
+
+                            <td class="account-balance">
+                                ৳ {{ total_supplier|floatformat:2|intcomma }}
+                            </td>
+
+                        </tr>
+
+
+                        <!-- OTHER LIABILITIES -->
+
+                        {% if other_liabilities %}
+
+                        <tr class="category-row">
+
+                            <td colspan="2">
+                                Other Liabilities
+                            </td>
+
+                        </tr>
+
+
+                        {% for acc in other_liabilities %}
+
+                        <tr>
+
+                            <td class="account-item">
+                                {{ acc.name }}
+                            </td>
+
+                            <td class="account-balance">
+                                ৳ {{ acc.filtered_balance|floatformat:2|intcomma }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                        {% endif %}
+
+
+                    </tbody>
+
+
+                    <tfoot>
+
+                        <tr class="total-row">
+
+                            <td>
+                                Total Liabilities
+                            </td>
+
+                            <td class="account-balance">
+                                ৳ {{ total_liabilities|floatformat:2|intcomma }}
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+
+                <!-- ==================================================
+                     EQUITY
+                     ================================================== -->
+
+                <div class="section-header equity-bg">
+
+                    <span>
+                        Equity
+                    </span>
+
+                    <span>
+                        ৳ {{ total_equity|floatformat:2|intcomma }}
+                    </span>
+
+                </div>
+
+
+                <table class="balance-table mb-4">
+
+                    <tbody>
+
+                        <tr>
+
+                            <td class="account-item fw-bold">
+                                Opening Balance Equity
+                            </td>
+
+                            <td class="account-balance fw-bold">
+                                ৳ {{ opening_equity|floatformat:2|intcomma }}
+                            </td>
+
+                        </tr>
+
+
+                        <tr>
+
+                            <td class="account-item fw-bold">
+                                Current Period Net Profit / (Loss)
+                            </td>
+
+                            <td class="account-balance fw-bold
+                                {% if current_net_profit >= 0 %}
+                                    text-success
+                                {% else %}
+                                    text-danger
+                                {% endif %}
+                            ">
+
+                                ৳ {{ current_net_profit|floatformat:2|intcomma }}
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+
+                    <tfoot>
+
+                        <tr class="total-row">
+
+                            <td>
+                                Total Equity
+                            </td>
+
+                            <td class="account-balance">
+                                ৳ {{ total_equity|floatformat:2|intcomma }}
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+
+                <!-- ==================================================
+                     TOTAL LIABILITIES + EQUITY
+                     ================================================== -->
+
+                <div class="total-liabilities-equity d-flex justify-content-between align-items-center">
+
+                    <span class="fw-bold text-uppercase">
+                        Total Liabilities + Equity
+                    </span>
+
+                    <span class="total-value">
+                        ৳ {{ total_liabilities_equity|floatformat:2|intcomma }}
+                    </span>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         SYSTEM BALANCE AUDIT CHECK
+         ====================================================== -->
+
+    <div class="balance-status-card
+        {% if is_balanced %}
+            status-ok
+        {% else %}
+            status-error
+        {% endif %}
+        d-flex justify-content-between align-items-center mt-2"
+    >
+
+        <div class="d-flex align-items-center">
+
+            {% if is_balanced %}
+
+                <i class="fas fa-check-circle fa-2x me-3"></i>
+
+                <div>
+
+                    <h5 class="mb-0 fw-bold">
+                        Balance Sheet Balanced Perfectly!
+                    </h5>
+
+                    <small>
+                        Total Assets equals Total Liabilities + Total Equity
+                        (Difference: ৳ 0.00)
+                    </small>
+
+                </div>
+
+            {% else %}
+
+                <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+
+                <div>
+
+                    <h5 class="mb-0 fw-bold">
+                        Balance Sheet Out of Balance!
+                    </h5>
+
+                    <small>
+                        Total Assets and (Total Liabilities + Equity)
+                        do not match.
+                    </small>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="text-end">
+
+            <span class="fs-6 fw-bold">
+                Difference:
+            </span>
+
+            <span class="fs-5 fw-bold ms-2">
+                ৳ {{ difference|floatformat:2|intcomma }}
+            </span>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

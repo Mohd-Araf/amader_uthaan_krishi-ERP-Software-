@@ -1,254 +1,248 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- ================= HERO SECTION ================= -->
-<section class="hero-section">
-
-    <div class="container-fluid px-lg-5 px-3">
-
-        <div class="row g-3 align-items-stretch">
-
-            <div class="col-lg-8">
-
-                <div class="hero-slider-box">
-
-                    <div id="homeSlider"
-                         class="carousel slide carousel-fade h-100"
-                         data-ride="carousel"
-                         data-interval="4000">
-
-                        <!-- Indicators -->
-                        <ol class="carousel-indicators custom-indicators">
-                            <li data-target="#homeSlider" data-slide-to="0" class="active"></li>
-                            <li data-target="#homeSlider" data-slide-to="1"></li>
-                            <li data-target="#homeSlider" data-slide-to="2"></li>
-                        </ol>
-
-                        <!-- Slides -->
-                        <div class="carousel-inner h-100">
-
-                            <!-- Slide 1 -->
-                            <div class="carousel-item active h-100">
-                                <div class="hero-overlay"></div>
-                                <img src="/static/images/b2.png"
-                                     class="hero-slide-img"
-                                     alt="Fresh Vegetables">
-                                <div class="hero-content">
-                                    <span class="hero-tag">New Arrivals</span>
-                                    <h1>Fresh Organic<br><em>Products</em></h1>
-                                    <p>Farm fresh vegetables directly from trusted farmers.</p>
-                                    <a href="{% url 'shop' %}" class="hero-btn">
-                                        Shop Now <span class="btn-arrow">→</span>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Slide 2 -->
-                            <div class="carousel-item h-100">
-                                <div class="hero-overlay"></div>
-                                <img src="/static/images/b1.png"
-                                     class="hero-slide-img"
-                                     alt="Healthy Fruits">
-                                <div class="hero-content">
-                                    <span class="hero-tag">Best Sellers</span>
-                                    <h1>Healthy &<br><em>Natural Foods</em></h1>
-                                    <p>Pure, safe and healthy food for your family.</p>
-                                    <a href="{% url 'shop' %}" class="hero-btn">
-                                        Explore Products <span class="btn-arrow">→</span>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Slide 3 -->
-                            <div class="carousel-item h-100">
-                                <div class="hero-overlay"></div>
-                                <img src="/static/images/b3.png"
-                                     class="hero-slide-img"
-                                     alt="Daily Essentials">
-                                <div class="hero-content">
-                                    <span class="hero-tag">Daily Deals</span>
-                                    <h1>Daily Grocery<br><em>Essentials</em></h1>
-                                    <p>Fast delivery with affordable prices.</p>
-                                    <a href="{% url 'shop' %}" class="hero-btn">
-                                        Buy Today <span class="btn-arrow">→</span>
-                                    </a>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <!-- Controls -->
-                        <a class="carousel-control-prev"
-                           href="#homeSlider"
-                           role="button"
-                           data-slide="prev">
-                            <span class="slider-arrow">&#10094;</span>
-                        </a>
-                        <a class="carousel-control-next"
-                           href="#homeSlider"
-                           role="button"
-                           data-slide="next">
-                            <span class="slider-arrow">&#10095;</span>
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- ================= RIGHT BANNER ================= -->
-            <div class="col-lg-4">
-
-                <div class="side-banner">
-                    <img src="/static/images/mainbanner.jpeg"
-                         class="side-banner-img"
-                         alt="Uthaan Krishi">
-                    <div class="side-banner-overlay">
-                        <div class="side-badge">🌿 Certified Organic</div>
-                        <h3>100%<br>Organic</h3>
-                        <p>Fresh From Farm</p>
-                        <a href="{% url 'shop' %}" class="side-btn">
-                            Shop Collection <span class="btn-arrow">→</span>
-                        </a>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ================= FEATURE SECTION ================= -->
-<section class="feature-section">
-
-    <div class="container">
-
-        <div class="row g-3 text-center">
-
-            <div class="col-md-4">
-                <div class="feature-box">
-                    <div class="feature-icon-wrap">
-                        <span class="feature-icon">🚚</span>
-                    </div>
-                    <h5>Fast Delivery</h5>
-                    <p>Quick delivery across your area.</p>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="feature-box">
-                    <div class="feature-icon-wrap">
-                        <span class="feature-icon">🌿</span>
-                    </div>
-                    <h5>Organic Products</h5>
-                    <p>Fresh and healthy farm products.</p>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="feature-box">
-                    <div class="feature-icon-wrap">
-                        <span class="feature-icon">💳</span>
-                    </div>
-                    <h5>Secure Payment</h5>
-                    <p>Trusted and secure checkout system.</p>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ================= PRODUCTS SECTION ================= -->
-<section class="product-section">
-
-    <div class="container">
-
-        <!-- Title -->
-        <div class="section-title text-center">
-            <span class="section-label">Our Selection</span>
-            <h2>Popular Products</h2>
-            <p>Fresh products selected for you</p>
-        </div>
-
-        <!-- Products -->
-        <div class="row g-4">
-
-            {% for p in products|slice:":8" %}
-
-            <div class="col-lg-3 col-md-4 col-sm-6">
-
-                <div class="product-card">
-
-                    <!-- Badge -->
-                    <div class="product-badge">Fresh</div>
-
-                    <!-- Image -->
-                    <div class="product-image-box">
-                        {% if p.image %}
-                        <img src="{{ p.image.url }}"
-                             class="product-image"
-                             alt="{{ p.name }}">
-                        {% else %}
-                        <img src="https://via.placeholder.com/300x220"
-                             class="product-image">
-                        {% endif %}
-                        <div class="product-image-overlay"></div>
-                    </div>
-
-                    <!-- Body -->
-                    <div class="product-body">
-                        <h5 class="product-name">{{ p.name }}</h5>
-                        <div class="product-price">
-                            ৳ {{ p.price }}
-                            <span>/ {{ p.get_unit_display }}</span>
-                        </div>
-                        <a href="{% url 'shop' %}" class="shop-btn">
-                            Shop Now <span class="btn-arrow">→</span>
-                        </a>
-                    </div>
-
-                </div>
-
-            </div>
-
-            {% endfor %}
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ================= CSS ================= -->
 <style>
+    .bill-wrapper {
+        background: #ffffff;
+        border: 1.5px solid #d0d0d0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2.5rem;
+    }
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap');
+    .bill-header-banner {
+        background-color: #ffe680;
+        color: #1a1a1a;
+        font-weight: 800;
+        font-size: 1.35rem;
+        padding: 0.75rem 1rem;
+        text-align: center;
+        border-bottom: 2px solid #e6c200;
+    }
 
-/* ================= CSS VARIABLES ================= */
-:root {
-    --green-primary: #1a7a3c;
-    --green-light:   #22a052;
-    --green-accent:  #4cca7a;
-    --cream:         #f8f6f0;
-    --cream-dark:    #ede9df;
-    --text-dark:     #1a1f16;
-    --text-mid:      #4a5244;
-    --text-soft:     #8a9488;
-    --white:         #ffffff;
-    --shadow-soft:   0 8px 32px rgba(26,122,60,0.10);
-    --shadow-card:   0 4px 24px rgba(26,30,22,0.08);
-    --radius-lg:     22px;
-    --radius-md:     14px;
-    --radius-pill:   50px;
-}
+    .bill-meta-info {
+        padding: 1rem 1.25rem;
+        background-color: #fafafa;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 0.95rem;
+    }
 
+    .table-memo {
+        margin-bottom: 0;
+        border-collapse: collapse;
+    }
+
+    .table-memo thead th {
+        background-color: #0070c0 !important;
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        border: 1px solid #005691 !important;
+        padding: 0.65rem 0.75rem;
+        vertical-align: middle;
+    }
+
+    .table-memo td {
+        border: 1px solid #d0d0d0 !important;
+        vertical-align: middle;
+        padding: 0.65rem 0.75rem;
+        font-size: 0.925rem;
+    }
+
+    .summary-box-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .summary-box-value {
+        border: 1.5px solid #333333;
+        border-radius: 4px;
+        padding: 0.35rem 0.85rem;
+        min-width: 130px;
+        text-align: right;
+        font-weight: 700;
+        background-color: #ffffff;
+    }
+
+    .bkash-info-card {
+        background: #fff5f5;
+        border: 1.5px dashed #e53935;
+        border-radius: 8px;
+        padding: 1rem 1.25rem;
+    }
+
+    .bkash-text-red {
+        color: #c00000;
+        font-weight: 800;
+        font-size: 1.1rem;
+    }
+
+    .bill-footer-msg {
+        color: #7030a0;
+        font-style: italic;
+        font-weight: 600;
+        font-size: 1rem;
+        text-align: center;
+        margin-top: 1.25rem;
+        padding-top: 0.75rem;
+        border-top: 1px dashed #cccccc;
+    }
 </style>
+
+<div class="container mt-4 mb-5">
+    <h3 class="text-center mb-4 font-weight-bold" style="color: #0f172a;">My Personal Orders</h3>
+
+    <!-- Search Bar -->
+    <form method="get" class="mb-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <input type="text" name="q" value="{{ search_query }}" placeholder="Search by Order ID or Product name..." class="form-control" style="border-radius: 10px 0 0 10px;">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary px-4 font-weight-bold" style="border-radius: 0 10px 10px 0;">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {% for order in orders %}
+    <div class="bill-wrapper">
+        <div class="bill-header-banner">
+            Amader Uthaan Krishi Bill — Order #{{ order.order_code }}
+        </div>
+
+        <div class="bill-meta-info">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <div><strong>Date:</strong> {{ order.created_at|date:"d.m.Y" }}</div>
+                    <div><strong>Name:</strong> {{ order.user.username }}</div>
+                </div>
+                <div class="mt-2 mt-sm-0 text-right">
+                    <div>
+                        <strong>Status: </strong>
+                        <span class="badge {% if order.status == 'accepted' %}badge-success{% elif order.status == 'rejected' %}badge-danger{% else %}badge-warning{% endif %} px-2 py-1">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="small text-muted mt-1">Total: {{ order.total_price|floatformat:2 }} ৳</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-memo text-center">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">SL</th>
+                        <th>Product Name</th>
+                        <th style="width: 80px;">Qty</th>
+                        <th style="width: 70px;">Unit</th>
+                        <th style="width: 110px;">Unit Price</th>
+                        <th style="width: 110px;">Total</th>
+                        <th style="width: 110px;">Status</th>
+                        {% if order.status == "accepted" %}
+                            <th style="width: 110px;">Updated Qty</th>
+                            <th style="width: 120px;">Updated Total</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                        {% if not item.is_admin_added or item.is_visible_to_user %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td class="text-left font-weight-bold">{{ item.product.name }}</td>
+                            <td>
+                                {% if item.product.unit == 'gm' or item.product.unit == 'pcs' or item.product.unit == 'ati' or item.product.unit == 'fana' %}
+                                    {{ item.quantity|floatformat:0 }}
+                                {% else %}
+                                    {{ item.quantity }}
+                                {% endif %}
+                            </td>
+                            <td>{{ item.product.get_unit_display }}</td>
+                            <td>{{ item.price_at_order_time|default:item.product.price }} ৳</td>
+                            <td>{{ item.total_price|floatformat:2 }} ৳</td>
+                            <td>
+                                {% if order.status != "accepted" %}
+                                    <span class="badge badge-warning">Pending</span>
+                                {% else %}
+                                    {% if item.status == 'accepted' %}
+                                        <span class="badge badge-success">Accepted</span>
+                                    {% elif item.status == 'rejected' %}
+                                        <span class="badge badge-danger">Rejected</span>
+                                    {% elif item.status == 'complimentary' %}
+                                        <span class="badge badge-info">Complimentary</span>
+                                    {% else %}
+                                        <span class="badge badge-warning">Pending</span>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            {% if order.status == "accepted" %}
+                                <td>
+                                    {% if item.updated_quantity is not None %}
+                                        {% if item.product.unit == 'gm' or item.product.unit == 'pcs' or item.product.unit == 'ati' or item.product.unit == 'fana' %}
+                                            {{ item.updated_quantity|floatformat:0 }}
+                                        {% else %}
+                                            {{ item.updated_quantity }}
+                                        {% endif %}
+                                    {% else %}
+                                        {{ item.quantity }}
+                                    {% endif %}
+                                </td>
+                                <td class="font-weight-bold text-success">{{ item.updated_total|floatformat:2 }} ৳</td>
+                            {% endif %}
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="p-3 bg-light">
+            {% if order.status == "accepted" %}
+                <div class="row align-items-center">
+                    <div class="col-md-6 col-12 mb-3 mb-md-0">
+                        <div class="bkash-info-card">
+                            <h6 class="font-weight-bold text-dark mb-1">💳 Payment Instructions</h6>
+                            <p class="small text-muted mb-2">Please send the final total bill amount via bKash to the number below:</p>
+                            <div class="bkash-text-red">Bkash Number: 01403181484</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="summary-box-row">
+                            <span class="font-weight-bold text-muted">Discount:</span>
+                            <div class="summary-box-value text-danger">- {{ order.discount|default:0 }} ৳</div>
+                        </div>
+                        <div class="summary-box-row">
+                            <span class="font-weight-bold text-muted">Packaging & Delivery:</span>
+                            <div class="summary-box-value">{{ order.packaging_charge|default:0 }} ৳</div>
+                        </div>
+                        <div class="summary-box-row">
+                            <span class="font-weight-bold">Final Total:</span>
+                            <div class="summary-box-value text-primary">{{ order.final_total|floatformat:2 }} ৳</div>
+                        </div>
+                        <div class="summary-box-row">
+                            <span class="font-weight-bold">Total Bill (with bKash):</span>
+                            <div class="summary-box-value text-success">BDT {{ order.final_payment|floatformat:2 }} ৳</div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="bill-footer-msg">
+                We hope you enjoy our fresh harvests — thank you for supporting Amader Uthaan Krishi!
+            </div>
+        </div>
+    </div>
+    {% empty %}
+        <div class="card p-5 text-center shadow-sm" style="border-radius: 12px;">
+            <h5 class="text-muted mb-0">You have no placed orders yet.</h5>
+        </div>
+    {% endfor %}
+</div>
 
 {% endblock %}

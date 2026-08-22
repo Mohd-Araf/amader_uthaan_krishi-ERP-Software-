@@ -8,7 +8,37 @@ from .models import (
     PaymentReceipt,
     ExpenseCategory,
     Expense,
+    VoucherPaymentLine,
 )
+
+
+# ==========================================================
+# Voucher Payment Line Settlement Admin
+# ==========================================================
+
+@admin.register(VoucherPaymentLine)
+class VoucherPaymentLineAdmin(admin.ModelAdmin):
+    list_display = (
+        "payment_journal",
+        "reference_voucher",
+        "account",
+        "amount",
+        "created_at",
+    )
+
+    search_fields = (
+        "payment_journal__voucher_no",
+        "reference_voucher__voucher_no",
+        "account__name",
+    )
+
+    list_filter = (
+        "created_at",
+    )
+
+    readonly_fields = (
+        "created_at",
+    )
 
 
 # ==========================================================
@@ -161,11 +191,11 @@ class JournalAdmin(admin.ModelAdmin):
 
     @admin.display(description="Total Debit")
     def get_total_debit(self, obj):
-        return obj.total_debit
+        return f"৳ {obj.total_debit:,.2f}"
 
     @admin.display(description="Total Credit")
     def get_total_credit(self, obj):
-        return obj.total_credit
+        return f"৳ {obj.total_credit:,.2f}"
 
 
 # ==========================================================
@@ -216,7 +246,7 @@ class AccountAdmin(admin.ModelAdmin):
 
     @admin.display(description="Current Balance")
     def get_current_balance(self, obj):
-        return obj.current_balance
+        return f"৳ {obj.current_balance:,.2f}"
 
 
 # ==========================================================

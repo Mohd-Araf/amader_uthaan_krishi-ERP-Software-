@@ -1,94 +1,560 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container mt-4">
+<style>
+    /* ================= SOFT & MODERN PALETTE ================= */
+    body {
+        background-color: #fafbfd;
+    }
 
-    <h3 class="text-center mb-4">Amader Uthaan Krishi Bill</h3>
+    .cart-title {
+        font-weight: 700;
+        color: #1e293b;
+        letter-spacing: -0.5px;
+        white-space: nowrap;
+    }
 
+    .cart-card {
+        border: 1px solid #cbd5e1;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+        background: #ffffff;
+        overflow: hidden;
+    }
+
+    .table-cart {
+        margin-bottom: 0;
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    /* Colorful Soft Header & Visible Table Lines */
+    .table-cart thead th {
+        background-color: #1a7a3c;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+        padding: 0.95rem 0.8rem;
+    }
+
+    .table-cart td {
+        vertical-align: middle;
+        padding: 0.85rem 0.7rem;
+        color: #334155;
+        font-size: 0.92rem;
+        border-bottom: 1px solid #e2e8f0;
+        border-right: 1px solid #f1f5f9;
+    }
+
+    .table-cart td:last-child {
+        border-right: none;
+    }
+
+    .table-cart tbody tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    .table-cart tbody tr:hover {
+        background-color: #f1f5f9;
+    }
+
+    /* ================= UNIFIED SLEEK QUANTITY BOX ================= */
+    .qty-input-group {
+        display: flex;
+        align-items: stretch;
+        width: fit-content;
+        max-width: 120px;
+        margin: 0 auto;
+        border: 1.5px solid #1a7a3c;
+        border-radius: 18px;
+        overflow: hidden;
+        background: #ffffff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        height: 32px;
+    }
+
+    .qty-input-group:focus-within {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    }
+
+    .qty-input-group input {
+        border: none !important;
+        outline: none !important;
+        background: transparent !important;
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #0f172a;
+        flex: 1 1 auto;
+        min-width: 36px;
+        height: 100%;
+        padding: 0 3px;
+        box-shadow: none !important;
+    }
+
+    .qty-input-group .input-group-text {
+        border: none !important;
+        background-color: #e8f5e9 !important;
+        color: #1a7a3c;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0 6px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        white-space: nowrap; /* Ensures "Hali" is never cut off */
+        border-left: 1px solid #c8e6c9 !important;
+        flex: 0 0 auto;
+    }
+
+    /* Soft Total Box */
+    .total-box {
+        background: #f0fdf4;
+        border: 1.5px dashed #86efac;
+        border-radius: 14px;
+        padding: 0.9rem 1.4rem;
+    }
+
+    .total-box h4 {
+        color: #166534;
+        font-size: 1.15rem;
+    }
+
+    .total-amount-text {
+        color: #15803d;
+        font-weight: 800;
+    }
+
+    /* ================= COMPACT SOFT BUTTONS ================= */
+    .btn-action {
+        border-radius: 20px;
+        padding: 0.5rem 1.1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.25s ease;
+        border: 1.5px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-soft-warning {
+        background-color: #fef3c7;
+        color: #92400e;
+        border-color: #fde68a;
+    }
+
+    .btn-soft-warning:hover {
+        background-color: #fde68a;
+        color: #78350f;
+    }
+
+    .btn-soft-secondary {
+        background-color: #f1f5f9;
+        color: #475569;
+        border-color: #cbd5e1;
+    }
+
+    .btn-soft-secondary:hover {
+        background-color: #e2e8f0;
+        color: #334155;
+    }
+
+    .btn-soft-success {
+        background-color: #dcfce7;
+        color: #15803d;
+        border-color: #86efac;
+    }
+
+    .btn-soft-success:hover {
+        background-color: #bbf7d0;
+        color: #166534;
+    }
+
+    /* ================= PHONE RESPONSIVE VIEW (NO HORIZONTAL SCROLL) ================= */
+    @media (max-width: 767px) {
+        .container {
+            padding-left: 4px !important;
+            padding-right: 4px !important;
+        }
+
+        /* Single Line Title on Mobile */
+        .cart-title {
+            font-size: 1.15rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 1rem !important;
+        }
+
+        .cart-card {
+            border-radius: 10px;
+        }
+
+        /* Lock table & disable horizontal scroll */
+        .table-responsive {
+            overflow-x: hidden !important;
+        }
+
+        .table-cart {
+            table-layout: fixed !important;
+            width: 100% !important;
+        }
+
+        /* Precise Column Width Allocation for Mobile (Total = 100%) */
+        .col-sl { width: 6% !important; }
+        .col-item { width: 27% !important; }
+        .col-qty { width: 28% !important; }
+        .col-price { width: 18% !important; }
+        .col-total { width: 15% !important; }
+        .col-remove { width: 6% !important; }
+
+        .table-cart thead th {
+            font-size: 0.62rem !important;
+            padding: 0.4rem 0.1rem !important;
+            letter-spacing: 0;
+            text-align: center !important;
+            background-color: #1a7a3c;
+            color: #ffffff;
+        }
+
+        .table-cart td {
+            padding: 0.4rem 0.1rem !important;
+            font-size: 0.73rem !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Compact Unified Quantity Pill for Mobile (Full visibility for "Hali") */
+        .qty-input-group {
+            max-width: 74px !important;
+            border-radius: 10px !important;
+            border-width: 1px !important;
+            border-color: #1a7a3c !important;
+            height: 24px !important;
+        }
+
+        .qty-input-group input {
+            height: 24px !important;
+            font-size: 0.65rem !important;
+            padding: 0 1px !important;
+            min-width: 24px !important;
+        }
+
+        .qty-input-group .input-group-text {
+            height: 24px !important;
+            font-size: 0.56rem !important;
+            padding: 0 3px !important;
+            white-space: nowrap !important;
+        }
+
+        .price-text {
+            font-size: 0.72rem !important;
+            line-height: 1.1;
+        }
+
+        .price-text small {
+            display: block;
+            font-size: 7.5px !important;
+        }
+
+        .btn-remove-mobile {
+            width: 20px !important;
+            height: 20px !important;
+            padding: 0 !important;
+            font-size: 0.65rem !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        /* Responsive Total Box */
+        .total-box-wrapper {
+            justify-content: center !important;
+        }
+
+        .total-box {
+            width: 100%;
+            text-align: center !important;
+            padding: 0.75rem 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .total-box h4 {
+            font-size: 1rem !important;
+        }
+
+        /* Full Width Compact Action Buttons on Mobile */
+        .action-buttons-group {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .btn-action {
+            width: 100%;
+            margin: 3px 0 !important;
+            padding: 0.55rem 1rem;
+            font-size: 0.85rem;
+        }
+    }
+</style>
+
+<div class="container mt-4 mb-5">
+
+    <h3 class="text-center mb-4 cart-title">🌿 Amader Uthaan Krishi Bill</h3>
+
+    {% if items %}
     <form method="POST">
-    {% csrf_token %}
+        {% csrf_token %}
 
-    <table class="table table-bordered text-center shadow">
+        <div class="card cart-card">
+            <div class="table-responsive">
+                <table class="table table-bordered table-cart text-center align-middle">
 
-        <thead class="thead-dark">
-            <tr>
-                <th>SL</th>
-                <th>Item</th>
-                <th>Quantity</th>
-                <th>Unit Price</th>
-                <th>Total</th>
-                <th>Remove</th>
-            </tr>
-        </thead>
+                    <thead>
+                        <tr>
+                            <th class="col-sl">SL</th>
+                            <th class="col-item">Item</th>
+                            <th class="col-qty">Quantity</th>
+                            <th class="col-price">Unit Price</th>
+                            <th class="col-total">Total</th>
+                            <th class="col-remove">Remove</th>
+                        </tr>
+                    </thead>
 
-        <tbody>
-            {% for item in items %}
-            <tr>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <!-- SL -->
+                            <td class="col-sl">{{ forloop.counter }}</td>
 
-                <!-- SL -->
-                <td>{{ forloop.counter }}</td>
+                            <!-- Product Name Only -->
+                            <td class="col-item font-weight-bold text-dark text-left">
+                                {{ item.product.name }}
+                            </td>
 
-                <!-- Product -->
-                <td class="font-weight-bold">
-                    {{ item.product.name }}
-                </td>
+                            <!-- Dynamic Smart Quantity Pill Input -->
+                            <td class="col-qty">
+                                {% if item.product.unit == 'gm' %}
+                                    <div class="qty-input-group qty-gram-wrapper">
+                                        <!-- Hidden real input for backend submission -->
+                                        <input type="hidden"
+                                               name="qty_{{ item.product.id }}"
+                                               value="{{ item.quantity|floatformat:0 }}"
+                                               class="gram-real-input">
 
-                <td style="width:120px;">
-                    <input type="number"
-                           name="qty_{{ item.product.id }}"
-                           value="{{ item.quantity }}"
-                           min="0"
-                           class="form-control text-center">
-                </td>
+                                        <!-- Display input formatted for user (gm or Kg) -->
+                                        <input type="number"
+                                               value="{{ item.quantity|floatformat:0 }}"
+                                               class="gram-display-input"
+                                               oninput="handleGramInput(this)"
+                                               onchange="handleGramInput(this)">
 
-                <td>{{ item.product.price }} ৳</td>
+                                        <span class="input-group-text">gm</span>
+                                    </div>
+                                {% elif item.product.unit == 'hali' %}
+                                    <!-- Hali: Strictly Steps by 0.5 (0.5, 1, 1.5, 2, 2.5...) -->
+                                    <div class="qty-input-group">
+                                        <input type="number"
+                                               name="qty_{{ item.product.id }}"
+                                               value="{{ item.quantity }}"
+                                               min="0.5"
+                                               step="0.5"
+                                               onchange="validateHali(this)">
+                                        <span class="input-group-text">{{ item.product.get_unit_display }}</span>
+                                    </div>
+                                {% elif item.product.unit == 'pcs' or item.product.unit == 'ati' or item.product.unit == 'fana' %}
+                                    <!-- Pcs, Ati, Fana: Strictly Integer Steps (1, 2, 3, 4...) -->
+                                    <div class="qty-input-group">
+                                        <input type="number"
+                                               name="qty_{{ item.product.id }}"
+                                               value="{{ item.quantity|floatformat:0 }}"
+                                               min="1"
+                                               step="1"
+                                               onchange="validateInt(this)">
+                                        <span class="input-group-text">{{ item.product.get_unit_display }}</span>
+                                    </div>
+                                {% else %}
+                                    <div class="qty-input-group">
+                                        <input type="number"
+                                               name="qty_{{ item.product.id }}"
+                                               value="{{ item.quantity }}"
+                                               min="0.1"
+                                               step="0.1">
+                                        <span class="input-group-text">{{ item.product.get_unit_display }}</span>
+                                    </div>
+                                {% endif %}
+                            </td>
 
-                <td class="font-weight-bold text-success">
-                    {{ item.total }} ৳
-                </td>
+                            <!-- Unit Price -->
+                            <td class="col-price price-text">
+                                {% if item.product.unit == 'gm' %}
+                                    {{ item.product.price }} ৳ <small class="text-muted">/ Kg</small>
+                                {% else %}
+                                    {{ item.product.price }} ৳ <small class="text-muted">/ {{ item.product.get_unit_display }}</small>
+                                {% endif %}
+                            </td>
 
-                <td>
-                    <button type="submit"
-                            name="qty_{{ item.product.id }}"
-                            value="0"
-                            class="btn btn-danger btn-sm">
-                        ⛔
-                    </button>
-                </td>
+                            <!-- Calculated Total Price -->
+                            <td class="col-total font-weight-bold text-success">
+                                {{ item.total|floatformat:2 }} ৳
+                            </td>
 
-            </tr>
-            {% endfor %}
-        </tbody>
+                            <!-- Remove Item -->
+                            <td class="col-remove">
+                                <button type="submit"
+                                        name="remove_product"
+                                        value="{{ item.product.id }}"
+                                        class="btn btn-outline-danger btn-sm rounded-circle btn-remove-mobile"
+                                        title="Remove Item">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
 
-    </table>
+                </table>
+            </div>
+        </div>
 
-    <div class="text-right">
-        <h4 class="mt-3">
-            Total: <span class="text-primary">{{ total }} ৳</span>
-        </h4>
-    </div>
+        <!-- Total Bill Box -->
+        <div class="d-flex justify-content-end total-box-wrapper mt-4">
+            <div class="total-box text-right">
+                <h4 class="mb-0 font-weight-bold">
+                    Total Amount: <span class="total-amount-text">{{ total|floatformat:2 }} ৳</span>
+                </h4>
+            </div>
+        </div>
 
-    <div class="text-center mt-4">
-
-        <button type="submit" class="btn btn-warning mr-2">
-            🔄 Update Cart
-        </button>
-
+        <!-- Compact Action Buttons -->
+        <div class="d-flex flex-wrap justify-content-center action-buttons-group gap-2 mt-4">
+            <button type="submit" class="btn btn-soft-warning btn-action m-1">
+                🔄 Update Cart
+            </button>
     </form>
 
-        <a href="{% url 'shop' %}" class="btn btn-secondary">
-            Continue Shopping
-        </a>
+            <a href="{% url 'shop' %}" class="btn btn-soft-secondary btn-action m-1">
+                🛒 Continue Shopping
+            </a>
 
-        <form method="POST" action="{% url 'order_confirm' %}" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-success">
-                 Confirm Order
-            </button>
-        </form>
+            <form method="POST" action="{% url 'order_confirm' %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-soft-success btn-action m-1">
+                    ✅ Confirm Order
+                </button>
+            </form>
+        </div>
 
-    </div>
+    {% else %}
+        <!-- Empty Cart Notice -->
+        <div class="card cart-card p-5 text-center">
+            <h4 class="text-muted mb-3">Your cart is currently empty!</h4>
+            <div>
+                <a href="{% url 'shop' %}" class="btn btn-soft-secondary btn-action">
+                    Go to Shop
+                </a>
+            </div>
+        </div>
+    {% endif %}
 
 </div>
+
+<!-- Intelligent Gram <-> Kg Dynamic Converter & Unit Validator JS -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.qty-gram-wrapper').forEach(function(wrapper) {
+            let visibleInput = wrapper.querySelector('.gram-display-input');
+            let hiddenInput = wrapper.querySelector('.gram-real-input');
+            let unitSpan = wrapper.querySelector('.input-group-text');
+
+            if (!visibleInput || !hiddenInput || !unitSpan) return;
+
+            let initialGram = parseFloat(hiddenInput.value) || 0;
+
+            if (initialGram >= 1000) {
+                visibleInput.value = Math.round((initialGram / 1000) * 100) / 100;
+                unitSpan.textContent = 'Kg';
+                visibleInput.step = '0.05';
+                visibleInput.min = '0.05';
+            } else {
+                visibleInput.value = initialGram;
+                unitSpan.textContent = 'gm';
+                visibleInput.step = '50';
+                visibleInput.min = '50';
+            }
+        });
+    });
+
+    function handleGramInput(visibleInput) {
+        let wrapper = visibleInput.closest('.qty-gram-wrapper');
+        if (!wrapper) return;
+        let hiddenInput = wrapper.querySelector('.gram-real-input');
+        let unitSpan = wrapper.querySelector('.input-group-text');
+
+        let val = parseFloat(visibleInput.value) || 0;
+        let currentUnit = unitSpan.textContent.trim();
+
+        if (currentUnit === 'Kg') {
+            if (val > 0 && val < 0.95) {
+                // Switch from Kg to gm
+                let gramVal = Math.round(val * 1000);
+                visibleInput.value = gramVal;
+                hiddenInput.value = gramVal;
+                unitSpan.textContent = 'gm';
+                visibleInput.step = '50';
+                visibleInput.min = '50';
+            } else {
+                let gramVal = Math.round(val * 1000);
+                hiddenInput.value = gramVal;
+            }
+        } else {
+            // Current unit is gm
+            if (val >= 1000) {
+                // Switch from gm to Kg
+                let kgVal = Math.round((val / 1000) * 100) / 100;
+                visibleInput.value = kgVal;
+                hiddenInput.value = Math.round(val);
+                unitSpan.textContent = 'Kg';
+                visibleInput.step = '0.05';
+                visibleInput.min = '0.05';
+            } else {
+                hiddenInput.value = Math.round(val);
+            }
+        }
+    }
+
+    // Validate Hali to 0.5 increments (0.5, 1.0, 1.5, 2.0...)
+    function validateHali(input) {
+        let val = parseFloat(input.value);
+        if (isNaN(val) || val < 0.5) {
+            input.value = 0.5;
+        } else {
+            input.value = Math.round(val * 2) / 2;
+        }
+    }
+
+    // Validate Integer Units (Pcs, Ati, Fana) to whole numbers (1, 2, 3...)
+    function validateInt(input) {
+        let val = parseFloat(input.value);
+        if (isNaN(val) || val < 1) {
+            input.value = 1;
+        } else {
+            input.value = Math.round(val);
+        }
+    }
+</script>
 
 {% endblock %}

@@ -12,7 +12,7 @@ urlpatterns = [
     path('accounts/', include('apps.accounts.urls')),
     path('products/', include('apps.products.urls')),
     path('dashboard/', include('apps.dashboard.urls')),
-    path('contact/', views.contact, name='contact'),
+    path('contact/', views.contact_view, name='contact'),
     path('about/', views.about, name='about'),
     path("finance/", include("apps.finance.urls")
 ),

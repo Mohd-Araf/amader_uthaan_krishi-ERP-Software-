@@ -3,179 +3,125 @@
 {% load static %}
 
 {% block extra_css %}
-
 <link rel="stylesheet" href="{% static 'css/finance.css' %}">
-
 {% endblock %}
-
 
 {% block title %}
 Product Ledger
 {% endblock %}
 
 {% block content %}
-
-<div class="container-fluid">
+<div class="container-fluid py-3">
 
     <!-- Header -->
     <div class="card shadow-sm border-0 mb-4">
-
         <div class="card-body">
-
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center">
-
                 <div>
-
                     <h3 class="font-weight-bold mb-1">
-                        <i class="fas fa-boxes text-success"></i>
-                        Product Ledger
+                        <i class="fas fa-boxes text-success me-2"></i> Product Revenue Ledger
                     </h3>
-
                     <p class="text-muted mb-0">
-                        View all product accounts and balances.
+                        View all product accounts and sales revenue balances
                     </p>
-
                 </div>
-
                 <div class="mt-3 mt-lg-0">
-
-                    <a href="{% url 'financial_dashboard' %}"
-                       class="btn btn-outline-primary">
-
-                        <i class="fas fa-arrow-left"></i>
-                        Dashboard
-
+                    <span class="badge bg-success text-white p-2 me-2" style="font-size: 14px;">
+                        Total Products: {{ products|length }}
+                    </span>
+                    <a href="{% url 'financial_dashboard' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i> Dashboard
                     </a>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
     <!-- Product Ledger Table -->
-
     <div class="card shadow-sm border-0">
-
-        <div class="card-header bg-white">
-
-            <h5 class="mb-0">
-                Product Accounts
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 font-weight-bold">
+                <i class="fas fa-list me-2 text-primary"></i> Product Accounts
             </h5>
-
         </div>
-
-        <div class="table-responsive">
-
-            <table class="table table-hover table-bordered mb-0">
-
-                <thead class="thead-light">
-
-                    <tr>
-
-                        <th>#</th>
-
-                        <th>Product</th>
-
-                        <th class="text-right">Debit</th>
-
-                        <th class="text-right">Credit</th>
-
-                        <th class="text-right">Balance</th>
-
-                        <th class="text-center">Entries</th>
-
-                        <th class="text-center">Action</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-                                    {% for product in products %}
-
-                    <tr>
-
-                        <td>
-                            {{ forloop.counter }}
-                        </td>
-
-                        <td>
-                            <strong>{{ product.account.name }}</strong>
-                        </td>
-
-                        <td class="text-right text-success">
-                            {{ product.debit|floatformat:2|intcomma }}
-                        </td>
-
-                        <td class="text-right text-danger">
-                            {{ product.credit|floatformat:2|intcomma }}
-                        </td>
-
-                        <td class="text-right">
-
-                            {% if product.balance >= 0 %}
-
-                                <span class="badge badge-success px-3 py-2">
-                                    {{ product.balance|floatformat:2|intcomma }} Dr
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge badge-danger px-3 py-2">
-                                    {{ product.balance|floatformat:2|cut:"-"|intcomma }} Cr
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <td class="text-center">
-                            {{ product.count }}
-                        </td>
-
-                        <td class="text-center">
-
-                            <a href="{% url 'ledger_detail' product.account.id %}"
-                               class="btn btn-sm btn-primary">
-
-                                <i class="fas fa-eye"></i>
-                                View
-
-                            </a>
-
-                        </td>
-
-                    </tr>
-
-                    {% empty %}
-
-                    <tr>
-
-                        <td colspan="7" class="text-center py-5">
-
-                            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-
-                            <h5 class="text-muted">
-                                No Product Ledger Found
-                            </h5>
-
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-dark text-white">
+                        <tr>
+                            <th width="50">#</th>
+                            <th>Account Code</th>
+                            <th>Product Name</th>
+                            <th>Account Type</th>
+                            <th class="text-right">Total Revenue Balance</th>
+                            <th class="text-center" width="160">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <span class="badge bg-secondary">{{ product.account.account_code }}</span>
+                            </td>
+                            <td>
+                                <strong class="text-dark">{{ product.account.name }}</strong>
+                            </td>
+                            <td>
+                                <span class="badge bg-info text-dark">{{ product.account.get_type1_display }}</span>
+                            </td>
+                            <td class="text-right font-weight-bold">
+                                {% if product.balance >= 0 %}
+                                    <span class="text-success">৳ {{ product.balance|floatformat:2|intcomma }}</span>
+                                {% else %}
+                                    <span class="text-danger">৳ {{ product.balance|floatformat:2|cut:"-"|intcomma }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <a href="{% url 'ledger_detail' product.account.id %}" class="btn btn-sm btn-primary px-3">
+                                    <i class="fas fa-eye me-1"></i> View Ledger
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No Product Ledger Found</h5>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-
     </div>
 
 </div>
 
+<style>
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.table th,
+.table td {
+    vertical-align: middle;
+}
+
+.table thead th {
+    white-space: nowrap;
+}
+
+.badge {
+    font-size: 13px;
+    padding: 6px 12px;
+}
+
+.btn {
+    border-radius: 8px;
+    font-weight: 600;
+}
+</style>
 {% endblock %}

@@ -6,30 +6,80 @@
 <link rel="stylesheet" href="{% static 'css/finance.css' %}">
 {% endblock %}
 
-{% block title %}
-Financial Dashboard
-{% endblock %}
+{% block title %}Financial Dashboard{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid px-4 py-3">
 
     <!-- ================= HEADER ================= -->
     <div class="finance-header mb-4">
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h1 class="finance-title">
-                    <i class="fas fa-chart-line mr-2"></i>
-                    Finance Dashboard
+                <h1 class="finance-title mb-1">
+                    <i class="fas fa-chart-line mr-2"></i>Finance Dashboard
                 </h1>
-                <p class="finance-subtitle mb-0">
-                    Complete financial overview of your business
-                </p>
+                <p class="finance-subtitle mb-0">Complete financial overview of your business</p>
             </div>
-            <div class="mt-3 mt-md-0">
-                <a href="{% url 'admin_panel' %}" class="btn btn-light back-btn">
-                    <i class="fas fa-arrow-left mr-2"></i>
-                    Back
-                </a>
+            <a href="{% url 'admin_panel' %}" class="btn btn-light back-btn">
+                <i class="fas fa-arrow-left mr-2"></i>Back
+            </a>
+        </div>
+
+        <!-- ================= SUMMARY CARDS ROW (HEADER নিচে) ================= -->
+        <div class="row mt-4">
+            <div class="col-xl-2 col-md-4 mb-2">
+                <div class="mini-stat-card">
+                    <div class="mini-icon bg-sale"><i class="fas fa-money-bill-wave"></i></div>
+                    <div class="mini-info">
+                        <div class="mini-label">Total Sales</div>
+                        <div class="mini-value text-success">৳ {{ total_sale|floatformat:2|intcomma }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 mb-2">
+                <div class="mini-stat-card">
+                    <div class="mini-icon bg-order"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="mini-info">
+                        <div class="mini-label">Total Orders</div>
+                        <div class="mini-value text-primary">{{ total_orders }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 mb-2">
+                <div class="mini-stat-card">
+                    <div class="mini-icon bg-customer"><i class="fas fa-users"></i></div>
+                    <div class="mini-info">
+                        <div class="mini-label">Total Customers</div>
+                        <div class="mini-value text-purple">{{ total_customers }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 mb-2">
+                <div class="mini-stat-card">
+                    <div class="mini-icon bg-discount"><i class="fas fa-tags"></i></div>
+                    <div class="mini-info">
+                        <div class="mini-label">Total Discount</div>
+                        <div class="mini-value text-danger">৳ {{ total_discount|floatformat:2|intcomma }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 mb-2">
+                <div class="mini-stat-card">
+                    <div class="mini-icon bg-packaging"><i class="fas fa-box-open"></i></div>
+                    <div class="mini-info">
+                        <div class="mini-label">Packaging Charge</div>
+                        <div class="mini-value text-warning">৳ {{ total_packaging|floatformat:2|intcomma }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 mb-2">
+                <div class="mini-stat-card">
+                    <div class="mini-icon bg-bkash"><i class="fas fa-mobile-alt"></i></div>
+                    <div class="mini-info">
+                        <div class="mini-label">bKash Charge</div>
+                        <div class="mini-value text-info">৳ {{ total_bkash|floatformat:2|intcomma }}</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -37,73 +87,47 @@ Financial Dashboard
     <!-- ================= MAIN LAYOUT ================= -->
     <div class="dashboard-layout">
 
-        <!-- ================= RIGHT MENU ================= -->
+        <!-- ================= LEFT MENU ================= -->
         <div class="dashboard-menu">
-
             <div class="menu-card">
                 <h5 class="menu-title">
-                    <i class="fas fa-bars mr-2"></i>
-                    Finance Menu
+                    <i class="fas fa-bars mr-2"></i>Finance Menu
                 </h5>
 
-                <!-- Dashboard home -->
-                <a href="{% url 'financial_dashboard' %}" class="menu-btn btn btn-dark">
-                    <i class="fas fa-home"></i>
-                    Dashboard
+                <!-- Dashboard -->
+                <a href="{% url 'financial_dashboard' %}" class="menu-btn menu-btn-dashboard">
+                    <i class="fas fa-home text-dark"></i> Dashboard
                 </a>
 
                 <!-- ================= Accounting MENU ================= -->
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white p-0">
-                        <a class="btn btn-light btn-block text-left py-3 px-4"
-                           data-toggle="collapse"
-                           href="#accountingMenu"
-                           role="button">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="fas fa-calculator text-success mr-2"></i>
-                                    <strong>Accounting</strong>
-                                </div>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </a>
-                    </div>
-
+                <div class="collapse-menu-card mb-3">
+                    <a class="collapse-menu-header header-water-accounting"
+                       data-toggle="collapse"
+                       href="#accountingMenu"
+                       role="button">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-calculator text-success mr-2"></i><strong>Accounting</strong></span>
+                            <i class="fas fa-chevron-down small"></i>
+                        </div>
+                    </a>
                     <div class="collapse" id="accountingMenu">
-                        <div class="list-group list-group-flush">
-
-                            <!-- Voucher -->
-                            <a href="{% url 'voucher_list' %}"
-                               class="list-group-item list-group-item-action">
-                                <i class="fas fa-file-invoice text-primary mr-2"></i>
-                                Voucher
+                        <div class="collapse-menu-body">
+                            <a href="{% url 'voucher_list' %}" class="collapse-menu-item">
+                                <i class="fas fa-file-invoice text-primary mr-2"></i>Voucher
                             </a>
-
-                            <!-- Journal submenu -->
-                            <a class="list-group-item list-group-item-action"
-                               data-toggle="collapse"
-                               href="#journalMenu">
-                                <i class="fas fa-book text-success mr-2"></i>
-                                Journal
-                                <i class="fas fa-chevron-down float-right"></i>
+                            <a class="collapse-menu-item" data-toggle="collapse" href="#journalMenu">
+                                <i class="fas fa-book text-success mr-2"></i>Journal
+                                <i class="fas fa-chevron-down float-right small"></i>
                             </a>
-
                             <div class="collapse" id="journalMenu">
-                                <a href="{% url 'journal_list' %}"
-                                   class="list-group-item list-group-item-action pl-5">
-                                    Journal List
+                                <a href="{% url 'journal_list' %}" class="collapse-menu-item pl-4">
+                                    <i class="fas fa-list-ul mr-2 text-muted"></i>Journal List
                                 </a>
-
-                                <!-- Fixed URL name: receive_payment (was receive_payment_create) -->
-                                <a href="{% url 'receive_payment' %}"
-                                   class="list-group-item list-group-item-action pl-5">
-                                    Receive Payment
+                                <a href="{% url 'receive_payment' %}" class="collapse-menu-item pl-4">
+                                    <i class="fas fa-hand-holding-usd mr-2 text-success"></i>Receive Payment
                                 </a>
-
-                                <!-- Fixed URL name: make_payment (was make_payment_direct) -->
-                                <a href="{% url 'make_payment' %}"
-                                   class="list-group-item list-group-item-action pl-5">
-                                    Payment
+                                <a href="{% url 'make_payment' %}" class="collapse-menu-item pl-4">
+                                    <i class="fas fa-paper-plane mr-2 text-danger"></i>Make Payment
                                 </a>
                             </div>
                         </div>
@@ -111,212 +135,93 @@ Financial Dashboard
                 </div>
 
                 <!-- Chart of Accounts -->
-                <a href="{% url 'account_list' %}" class="menu-btn btn btn-info">
-                    <i class="fas fa-wallet"></i>
-                    Chart of Accounts
+                <a href="{% url 'account_list' %}" class="menu-btn menu-btn-chart">
+                    <i class="fas fa-wallet text-info"></i> Chart of Accounts
                 </a>
 
                 <!-- Trial Balance -->
-                <a href="{% url 'trial_balance' %}" class="menu-btn btn btn-success">
-                    <i class="fas fa-balance-scale"></i>
-                    Trial Balance
+                <a href="{% url 'trial_balance' %}" class="menu-btn menu-btn-trial">
+                    <i class="fas fa-balance-scale text-success"></i> Trial Balance
                 </a>
 
-                <!-- ================= Ledger MENU ================= -->
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white p-0">
-                        <a class="btn btn-light btn-block text-left py-3 px-4"
-                           data-toggle="collapse"
-                           href="#ledgerMenu"
-                           role="button"
-                           aria-expanded="false">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="fas fa-book text-primary mr-2"></i>
-                                    <strong>Ledger</strong>
-                                </div>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div class="collapse" id="ledgerMenu">
-                        <div class="list-group list-group-flush">
-                            <a href="{% url 'customer_ledger' %}"
-                               class="list-group-item list-group-item-action">
-                                <i class="fas fa-users text-info mr-2"></i>
-                                Customer Ledger
+                <!-- ================= Reports MENU ================= -->
+                <div class="collapse-menu-card mb-3">
+                    <a class="collapse-menu-header header-water-reports"
+                       data-toggle="collapse"
+                       href="#reportsMenu"
+                       role="button">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-chart-bar text-primary mr-2"></i><strong>Financial Reports</strong></span>
+                            <i class="fas fa-chevron-down small"></i>
+                        </div>
+                    </a>
+                    <div class="collapse" id="reportsMenu">
+                        <div class="collapse-menu-body">
+                            <a href="{% url 'income_statement' %}" class="collapse-menu-item">
+                                <i class="fas fa-chart-line text-success mr-2"></i>Income Statement
+                                <small class="d-block pl-4 text-muted" style="font-size:11px;">Profit & Loss Report</small>
                             </a>
-                            <a href="{% url 'product_ledger' %}"
-                               class="list-group-item list-group-item-action">
-                                <i class="fas fa-box text-success mr-2"></i>
-                                Product Ledger
-                            </a>
-                            <a href="{% url 'cash_ledger' %}"
-                               class="list-group-item list-group-item-action">
-                                <i class="fas fa-money-bill-wave text-warning mr-2"></i>
-                                Cash Ledger
-                            </a>
-                            <a href="{% url 'other_ledger' %}"
-                               class="list-group-item list-group-item-action">
-                                <i class="fas fa-layer-group text-danger mr-2"></i>
-                                Other Ledger
+                            <a href="{% url 'balance_sheet' %}" class="collapse-menu-item">
+                                <i class="fas fa-balance-scale text-primary mr-2"></i>Balance Sheet
+                                <small class="d-block pl-4 text-muted" style="font-size:11px;">Assets = Liabilities + Equity</small>
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Create new Voucher -->
-                <a href="{% url 'voucher_create' %}" class="menu-btn btn btn-outline-success">
-                    <i class="fas fa-plus"></i>
-                    Create Voucher
+                <!-- ================= Ledger MENU ================= -->
+                <div class="collapse-menu-card mb-3">
+                    <a class="collapse-menu-header header-water-ledger"
+                       data-toggle="collapse"
+                       href="#ledgerMenu"
+                       role="button">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-book text-purple mr-2"></i><strong>Ledger</strong></span>
+                            <i class="fas fa-chevron-down small"></i>
+                        </div>
+                    </a>
+                    <div class="collapse" id="ledgerMenu">
+                        <div class="collapse-menu-body">
+                            <a href="{% url 'customer_ledger' %}" class="collapse-menu-item">
+                                <i class="fas fa-users text-info mr-2"></i>Customer Ledger
+                            </a>
+                            <a href="{% url 'product_ledger' %}" class="collapse-menu-item">
+                                <i class="fas fa-box text-success mr-2"></i>Product Ledger
+                            </a>
+                            <a href="{% url 'cash_ledger' %}" class="collapse-menu-item">
+                                <i class="fas fa-money-bill-wave text-warning mr-2"></i>Cash Ledger
+                            </a>
+                            <a href="{% url 'other_ledger' %}" class="collapse-menu-item">
+                                <i class="fas fa-layer-group text-danger mr-2"></i>Other Ledger
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Create Voucher -->
+                <a href="{% url 'voucher_create' %}" class="menu-btn menu-btn-create">
+                    <i class="fas fa-plus text-success"></i> Create Voucher
                 </a>
 
                 <!-- Contra Voucher -->
-                <a href="{% url 'create_contra' %}" class="menu-btn btn btn-outline-dark">
-                    <i class="fas fa-exchange-alt"></i>
-                    Contra Voucher
+                <a href="{% url 'create_contra' %}" class="menu-btn menu-btn-contra">
+                    <i class="fas fa-exchange-alt text-dark"></i> Contra Voucher
                 </a>
             </div>
         </div>
 
         <!-- ================= MAIN CONTENT ================= -->
         <div class="dashboard-main">
-            <div class="row">
-
-                <!-- SALES -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card summary-card h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="card-label">Total Sales</div>
-                                    <div class="card-number text-success">
-                                        ৳ {{ total_sale|floatformat:2|intcomma }}
-                                    </div>
-                                </div>
-                                <div class="summary-icon bg-sale">
-                                    <i class="fas fa-money-bill-wave"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ORDERS -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card summary-card h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="card-label">Total Orders</div>
-                                    <div class="card-number text-primary">
-                                        {{ total_orders }}
-                                    </div>
-                                </div>
-                                <div class="summary-icon bg-order">
-                                    <i class="fas fa-shopping-cart"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CUSTOMERS -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card summary-card h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="card-label">Total Customers</div>
-                                    <div class="card-number text-purple">
-                                        {{ total_customers }}
-                                    </div>
-                                </div>
-                                <div class="summary-icon bg-customer">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- DISCOUNT -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card summary-card h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="card-label">Total Discount</div>
-                                    <div class="card-number text-danger">
-                                        ৳ {{ total_discount|floatformat:2|intcomma }}
-                                    </div>
-                                </div>
-                                <div class="summary-icon bg-discount">
-                                    <i class="fas fa-tags"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PACKAGING -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card summary-card h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="card-label">Packaging Charge</div>
-                                    <div class="card-number text-warning">
-                                        ৳ {{ total_packaging|floatformat:2|intcomma }}
-                                    </div>
-                                </div>
-                                <div class="summary-icon bg-packaging">
-                                    <i class="fas fa-box-open"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- BKASH -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card summary-card h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="card-label">Bkash Charge</div>
-                                    <div class="card-number text-info">
-                                        ৳ {{ total_bkash|floatformat:2|intcomma }}
-                                    </div>
-                                </div>
-                                <div class="summary-icon bg-bkash">
-                                    <i class="fas fa-mobile-alt"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
 
             <!-- LATEST TRANSACTIONS -->
-            <div class="card mt-4"
-                 style="
-                     border:none;
-                     border-radius:20px;
-                     overflow:hidden;
-                     box-shadow:0 10px 25px rgba(0,0,0,.08);
-                 ">
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center flex-wrap">
-                    <h5 class="mb-2 mb-md-0 font-weight-bold">
-                        <i class="fas fa-history mr-2"></i>
-                        Latest Transactions
+            <div class="card transactions-card">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 font-weight-bold">
+                        <i class="fas fa-history mr-2"></i>Latest Transactions
+                        <small class="ml-2 text-muted" style="font-size:13px;font-weight:400;">(Last 25)</small>
                     </h5>
-                    <a href="{% url 'journal_list' %}"
-                       class="btn btn-light btn-sm">
-                        <i class="fas fa-list mr-1"></i>
-                        View All
+                    <a href="{% url 'journal_list' %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-list mr-1"></i>View All
                     </a>
                 </div>
 
@@ -325,7 +230,7 @@ Financial Dashboard
                         <thead class="thead-light">
                             <tr>
                                 <th>Voucher</th>
-                                <th>Customer</th>
+                                <th>Customer & ID</th>
                                 <th>Type</th>
                                 <th>Amount</th>
                                 <th>Status</th>
@@ -342,16 +247,23 @@ Financial Dashboard
                                 </td>
                                 <td>
                                     {% if journal.customer %}
-                                        {{ journal.customer.username }}
+                                        <span class="font-weight-bold text-dark">{{ journal.customer.name }}</span>
+                                        {% if journal.customer.customer and journal.customer.customer.user_id %}
+                                            <div class="small text-muted">ID: #{{ journal.customer.customer.user_id }}</div>
+                                        {% elif journal.customer.user_id %}
+                                            <div class="small text-muted">ID: #{{ journal.customer.user_id }}</div>
+                                        {% elif journal.customer.id %}
+                                            <div class="small text-muted">ID: #{{ journal.customer.id }}</div>
+                                        {% endif %}
                                     {% else %}
-                                        <span class="text-muted">N/A</span>
+                                        <span class="text-muted">—</span>
                                     {% endif %}
                                 </td>
                                 <td>
                                     <span class="badge badge-info">{{ journal.get_voucher_type_display }}</span>
                                 </td>
                                 <td>
-                                    <strong class="text-success">৳ {{ journal.grand_total|floatformat:2|intcomma }}</strong>
+                                    <strong class="text-success">৳ {{ journal.total_debit|floatformat:2|intcomma }}</strong>
                                 </td>
                                 <td>
                                     {% if journal.status == "posted" %}
@@ -364,17 +276,15 @@ Financial Dashboard
                                 </td>
                                 <td>
                                     {{ journal.created_at|date:"d M Y" }}<br>
-                                    <small>{{ journal.created_at|time:"h:i A" }}</small>
+                                    <small class="text-muted">{{ journal.created_at|time:"h:i A" }}</small>
                                 </td>
                                 <td>
                                     <a href="{% url 'voucher_detail' journal.voucher_no %}"
-                                       class="btn btn-success btn-sm rounded-circle"
-                                       title="View">
+                                       class="btn btn-success btn-sm rounded-circle" title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     <a href="{% url 'voucher_edit' journal.voucher_no %}"
-                                       class="btn btn-warning btn-sm rounded-circle"
-                                       title="Edit">
+                                       class="btn btn-warning btn-sm rounded-circle" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 </td>
@@ -382,7 +292,7 @@ Financial Dashboard
                         {% empty %}
                             <tr>
                                 <td colspan="7" class="text-center py-5">
-                                    <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+                                    <i class="fas fa-folder-open fa-4x text-muted mb-3 d-block"></i>
                                     <h5 class="text-muted">No Transaction Found</h5>
                                 </td>
                             </tr>
@@ -391,114 +301,172 @@ Financial Dashboard
                     </table>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
 
 <style>
-/* ------------------- COLORS ------------------- */
-.text-purple{color:#6610f2;}
+/* ================= COLORS ================= */
+.text-purple { color: #6610f2; }
 
-/* ------------------- GLOBAL ------------------- */
-body{background:#f4f7fb;}
+/* ================= GLOBAL ================= */
+body { background: #f0f2f5; }
 
-/* ------------------- HEADER ------------------- */
-.finance-header{
-    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-    border-radius:22px;
-    padding:30px;
-    color:white;
-    box-shadow:0 15px 35px rgba(0,0,0,.15);
+/* ================= HEADER ================= */
+.finance-header {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    border-radius: 18px;
+    padding: 28px 30px 20px 30px;
+    color: white;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
 }
-.finance-title{font-size:34px;font-weight:800;}
-.finance-subtitle{opacity:.85;font-size:15px;}
+.finance-title { font-size: 30px; font-weight: 800; margin: 0; }
+.finance-subtitle { opacity: 0.8; font-size: 14px; }
+.back-btn {
+    border-radius: 10px;
+    padding: 9px 18px;
+    font-weight: 600;
+    transition: 0.25s;
+}
+.back-btn:hover { transform: translateX(-4px); }
 
-/* Back button */
-.back-btn{
-    border-radius:12px;
-    padding:10px 20px;
-    font-weight:600;
-    transition:.3s;
+/* ================= MINI STAT CARDS (Header row) ================= */
+.mini-stat-card {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    backdrop-filter: blur(4px);
+    transition: 0.25s;
 }
-.back-btn:hover{transform:translateX(-5px);}
+.mini-stat-card:hover {
+    background: rgba(255,255,255,0.20);
+    transform: translateY(-2px);
+}
+.mini-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 18px;
+    flex-shrink: 0;
+}
+.mini-label { font-size: 11px; color: rgba(255,255,255,0.75); font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; }
+.mini-value { font-size: 17px; font-weight: 800; color: #fff; line-height: 1.2; }
 
-/* ------------------- LAYOUT ------------------- */
-.dashboard-layout{
-    display:flex;
-    gap:25px;
-    margin-top:25px;
+/* ================= ICON BACKGROUNDS ================= */
+.bg-sale      { background: #198754; }
+.bg-order     { background: #0d6efd; }
+.bg-customer  { background: #6610f2; }
+.bg-discount  { background: #dc3545; }
+.bg-packaging { background: #fd7e14; }
+.bg-bkash     { background: #20c997; }
+
+/* ================= LAYOUT ================= */
+.dashboard-layout {
+    display: flex;
+    gap: 22px;
+    margin-top: 22px;
+    align-items: flex-start;
+}
+.dashboard-main { flex: 1; min-width: 0; }
+
+/* ================= MENU ================= */
+.dashboard-menu { width: 255px; flex-shrink: 0; }
+.menu-card {
+    background: white;
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 20px;
+}
+.menu-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #212529; }
+
+/* Water Color (Soft Pastel Translucent) Menu Styling */
+.menu-btn {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 11px 14px; margin-bottom: 10px;
+    border-radius: 10px; font-weight: 600;
+    transition: 0.25s ease; text-decoration: none; border: none;
 }
 
-/* ------------------- MENU ------------------- */
-.dashboard-menu{width:260px;flex-shrink:0;}
-.menu-card{
-    background:white;
-    border-radius:20px;
-    padding:20px;
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-}
-.menu-title{font-size:18px;font-weight:700;margin-bottom:20px;}
-.menu-btn{
-    display:flex;align-items:center;gap:12px;width:100%;
-    padding:13px 15px;margin-bottom:12px;
-    border-radius:12px;text-decoration:none;
-    font-weight:600;transition:.3s;
-}
-.menu-btn:hover{transform:translateX(-5px);}
+.menu-btn-dashboard { background-color: #f1f5f9; color: #1e293b; }
+.menu-btn-dashboard:hover { background-color: #e2e8f0; color: #0f172a; transform: translateX(4px); text-decoration: none; }
 
-/* ------------------- MAIN ------------------- */
-.dashboard-main{flex:1;}
+.menu-btn-chart { background-color: #e0f2fe; color: #0369a1; }
+.menu-btn-chart:hover { background-color: #bae6fd; color: #0284c7; transform: translateX(4px); text-decoration: none; }
 
-/* ------------------- SUMMARY CARD ------------------- */
-.summary-card{
-    border:none;border-radius:20px;background:white;
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-    transition:.3s;
-}
-.summary-card:hover{
-    transform:translateY(-7px);
-    box-shadow:0 18px 35px rgba(0,0,0,.15);
-}
-.summary-icon{
-    width:70px;height:70px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    color:white;font-size:28px;
-}
-.bg-sale{background:#198754;}
-.bg-order{background:#0d6efd;}
-.bg-customer{background:#6610f2;}
-.bg-discount{background:#dc3545;}
-.bg-packaging{background:#fd7e14;}
-.bg-bkash{background:#20c997;}
-.card-label{color:#777;font-size:14px;}
-.card-number{font-size:28px;font-weight:800;}
+.menu-btn-trial { background-color: #dcfce7; color: #15803d; }
+.menu-btn-trial:hover { background-color: #bbf7d0; color: #166534; transform: translateX(4px); text-decoration: none; }
 
-/* ------------------- RESPONSIVE ------------------- */
-@media(max-width:992px){
-    .dashboard-layout{flex-direction:column-reverse;}
-    .dashboard-menu{width:100%;}
-    .menu-btn{display:inline-flex;width:48%;margin-right:1%;}
-    .finance-title{font-size:28px;}
+.menu-btn-create { background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.menu-btn-create:hover { background-color: #d1fae5; color: #065f46; transform: translateX(4px); text-decoration: none; }
+
+.menu-btn-contra { background-color: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+.menu-btn-contra:hover { background-color: #f1f5f9; color: #1e293b; transform: translateX(4px); text-decoration: none; }
+
+/* Collapse Menu Cards Water Colors */
+.collapse-menu-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
 }
-@media(max-width:576px){
-    .finance-header{padding:20px;text-align:center;}
-    .finance-title{font-size:24px;}
-    .dashboard-menu{margin-top:10px;}
-    .menu-btn{width:100%;}
-    .summary-icon{width:55px;height:55px;font-size:22px;}
-    .card-number{font-size:22px;}
-    .list-group-item{
-        transition:.25s;
-        border-left:4px solid transparent;
-    }
-    .list-group-item:hover{
-        background:#f8f9fa;
-        border-left:4px solid #0d6efd;
-        padding-left:30px;
-    }
-    .card-header a{text-decoration:none;}
-    .card-header a:hover{background:#f8f9fa;}
+.header-water-accounting { background: #f0fdf4; color: #166534; }
+.header-water-reports { background: #eff6ff; color: #1e40af; }
+.header-water-ledger { background: #faf5ff; color: #6b21a8; }
+
+.collapse-menu-header {
+    display: block;
+    padding: 11px 14px;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s;
 }
+.collapse-menu-header:hover { opacity: 0.85; text-decoration: none; }
+.collapse-menu-body { background: white; }
+.collapse-menu-item {
+    display: block;
+    padding: 9px 14px;
+    font-size: 13.5px;
+    color: #495057;
+    text-decoration: none;
+    border-top: 1px solid #f0f0f0;
+    transition: 0.2s;
+}
+.collapse-menu-item:hover {
+    background: #f8f9fa;
+    color: #0d6efd;
+    padding-left: 20px;
+    text-decoration: none;
+}
+
+/* ================= TRANSACTIONS TABLE ================= */
+.transactions-card {
+    border: none;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+}
+.transactions-card .table th {
+    font-size: 13px;
+    font-weight: 600;
+    color: #495057;
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+}
+.transactions-card .table td {
+    font-size: 13.5px;
+    vertical-align: middle;
+    padding: 10px 12px;
+}
+.transactions-card .table tbody tr:hover { background: #f8f9fb; }
 </style>
 
 {% endblock %}

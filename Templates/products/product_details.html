@@ -1,623 +1,319 @@
 {% extends 'base.html' %}
-
-
 {% block content %}
 
-
 <style>
-
-body{
-    background:#f6f6f6;
-}
-
-
-/* Main Container */
-
-.product-wrapper{
-
-    margin-top:40px;
-
-}
-
-
-
-/* Image Card */
-
-
-.product-image-card{
-
-    background:white;
-
-    border-radius:18px;
-
-    padding:18px;
-
-    height:500px;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    box-shadow:
-    0 4px 18px rgba(0,0,0,0.08);
-
-}
-
-
-
-.product-main-image{
-
-    width:100%;
-
-    height:100%;
-
-    object-fit:cover;
-
-    border-radius:15px;
-
-    transition:0.3s ease;
-
-}
-
-
-
-.product-main-image:hover{
-
-    transform:scale(1.03);
-
-}
-
-
-
-
-/* Details Card */
-
-
-.product-info-card{
-
-
-    background:white;
-
-    border-radius:18px;
-
-    padding:30px;
-
-    min-height:500px;
-
-    box-shadow:
-    0 4px 18px rgba(0,0,0,0.08);
-
-
-}
-
-
-
-
-.product-title{
-
-    font-size:32px;
-
-    font-weight:700;
-
-    color:#222;
-
-}
-
-
-
-.category-badge{
-
-    background:#198754;
-
-    color:white;
-
-    padding:6px 16px;
-
-    border-radius:20px;
-
-    font-size:14px;
-
-}
-
-
-
-
-.price-box{
-
-
-    background:#fff4e5;
-
-    padding:15px;
-
-    border-radius:12px;
-
-
-}
-
-
-
-.price{
-
-    color:#e53935;
-
-    font-size:35px;
-
-    font-weight:800;
-
-}
-
-
-
-.unit{
-
-    font-size:18px;
-
-    color:#555;
-
-}
-
-
-
-
-.description{
-
-    color:#666;
-
-    line-height:1.8;
-
-    font-size:16px;
-
-}
-
-
-
-
-
-/* Quantity */
-
-
-.quantity-area{
-
-    display:flex;
-
-    align-items:center;
-
-    margin-top:15px;
-
-}
-
-
-
-.quantity-area button{
-
-
-    width:42px;
-
-    height:42px;
-
-    border:none;
-
-    background:#198754;
-
-    color:white;
-
-    font-size:22px;
-
-
-}
-
-
-
-
-.quantity-area input{
-
-
-    width:65px;
-
-    height:42px;
-
-    border:1px solid #ddd;
-
-    text-align:center;
-
-    font-size:18px;
-
-
-}
-
-
-
-
-/* Buttons */
-
-
-.action-buttons{
-
-
-    display:flex;
-
-    gap:15px;
-
-    margin-top:30px;
-
-
-}
-
-
-
-.cart-btn{
-
-
-    flex:1;
-
-    height:55px;
-
-    background:#198754;
-
-    color:white;
-
-    font-size:18px;
-
-    border-radius:12px;
-
-
-}
-
-
-
-.buy-btn{
-
-
-    flex:1;
-
-    height:55px;
-
-    background:#ff9800;
-
-    color:white;
-
-    font-size:18px;
-
-    border-radius:12px;
-
-
-}
-
-
-
-.cart-btn:hover{
-
-    background:#157347;
-
-    color:white;
-
-}
-
-
-
-.buy-btn:hover{
-
-    background:#f57c00;
-
-    color:white;
-
-}
-
-
-
-
-@media(max-width:768px){
-
-
-.product-image-card{
-
-    height:350px;
-
-}
-
-
-.product-title{
-
-    font-size:25px;
-
-}
-
-
-
-.action-buttons{
-
-    flex-direction:column;
-
-}
-
-
-
-}
-
-
-
-
+    body {
+        background: #f6f6f6;
+    }
+
+    .product-wrapper {
+        margin-top: 40px;
+        margin-bottom: 50px;
+    }
+
+    /* Image Card */
+    .product-image-card {
+        background: white;
+        border-radius: 18px;
+        padding: 18px;
+        height: 480px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+    }
+
+    .product-main-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+    }
+
+    .product-main-image:hover {
+        transform: scale(1.03);
+    }
+
+    /* Details Card */
+    .product-info-card {
+        background: white;
+        border-radius: 18px;
+        padding: 30px;
+        min-height: 480px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+    }
+
+    .product-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .category-badge {
+        background: #198754;
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .price-box {
+        background: #fff4e5;
+        padding: 15px 20px;
+        border-radius: 12px;
+        border-left: 5px solid #ff9800;
+    }
+
+    .price {
+        color: #e53935;
+        font-size: 35px;
+        font-weight: 800;
+    }
+
+    .unit {
+        font-size: 18px;
+        color: #475569;
+        font-weight: 600;
+    }
+
+    .description {
+        color: #475569;
+        line-height: 1.8;
+        font-size: 16px;
+    }
+
+    /* Quantity Area */
+    .quantity-area {
+        display: flex;
+        align-items: center;
+        margin-top: 15px;
+    }
+
+    .quantity-area button {
+        width: 44px;
+        height: 44px;
+        border: none;
+        background: #198754;
+        color: white;
+        font-size: 22px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .quantity-area button:first-child {
+        border-radius: 10px 0 0 10px;
+    }
+
+    .quantity-area button:last-child {
+        border-radius: 0 10px 10px 0;
+    }
+
+    .quantity-area button:hover {
+        background: #146c43;
+    }
+
+    .quantity-area input {
+        width: 80px;
+        height: 44px;
+        border: 1.5px solid #198754;
+        border-left: none;
+        border-right: none;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .unit-tag {
+        margin-left: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #64748b;
+        background: #f1f5f9;
+        padding: 8px 14px;
+        border-radius: 8px;
+    }
+
+    /* Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .cart-btn {
+        flex: 1;
+        height: 55px;
+        background: #198754;
+        color: white;
+        font-size: 18px;
+        font-weight: 600;
+        border-radius: 12px;
+        border: none;
+        transition: all 0.25s ease;
+    }
+
+    .buy-btn {
+        flex: 1;
+        height: 55px;
+        background: #ff9800;
+        color: white;
+        font-size: 18px;
+        font-weight: 600;
+        border-radius: 12px;
+        border: none;
+        transition: all 0.25s ease;
+    }
+
+    .cart-btn:hover {
+        background: #157347;
+        color: white;
+    }
+
+    .buy-btn:hover {
+        background: #f57c00;
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .product-image-card {
+            height: 320px;
+        }
+
+        .product-title {
+            font-size: 24px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
 </style>
-
-
-
-
 
 <div class="container product-wrapper">
 
-
-
-<div class="row g-4">
-
-
-
-    <!-- IMAGE -->
-
-
-    <div class="col-md-5">
-
-
-        <div class="product-image-card">
-
-
-            {% if product.image %}
-
-
-            <img src="{{ product.image.url }}"
-                 class="product-main-image"
-                 alt="{{ product.name }}">
-
-
-
-            {% else %}
-
-
-            <img src="https://via.placeholder.com/600x600?text=No+Image"
-                 class="product-main-image">
-
-
-
-            {% endif %}
-
-
-
-        </div>
-
-
-
+    <!-- Back to shop link -->
+    <div class="mb-3">
+        <a href="{% url 'shop' %}" class="text-decoration-none font-weight-bold text-success">
+            ← Back to Shop
+        </a>
     </div>
 
+    <div class="row g-4">
 
-
-
-
-
-
-    <!-- PRODUCT DETAILS -->
-
-
-    <div class="col-md-7">
-
-
-        <div class="product-info-card">
-
-
-
-            <h1 class="product-title">
-
-                {{ product.name }}
-
-            </h1>
-
-
-
-            <span class="category-badge">
-
-                Fresh Product
-
-            </span>
-
-
-
-
-            <hr>
-
-
-
-            <div class="price-box">
-
-
-                <span class="price">
-
-                    {{ product.price }} TK
-
-                </span>
-
-
-                <span class="unit">
-
-                    / {{ product.get_unit_display }}
-
-                </span>
-
-
-            </div>
-
-
-
-
-
-            <div class="mt-4">
-
-
-                <h5>
-
-                    Description
-
-                </h5>
-
-
-                <p class="description">
-
-
-                {% if product.description %}
-
-                    {{ product.description }}
-
+        <!-- IMAGE -->
+        <div class="col-md-5 mb-4 mb-md-0">
+            <div class="product-image-card">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="product-main-image" alt="{{ product.name }}">
                 {% else %}
-
-                    Fresh quality product collected from farmers.
-
+                    <img src="https://via.placeholder.com/600x600?text=No+Image" class="product-main-image" alt="No Image">
                 {% endif %}
-
-
-                </p>
-
-
             </div>
-
-
-
-
-
-
-            <form method="POST"
-                  action="{% url 'add_to_cart' product.id %}">
-
-
-                {% csrf_token %}
-
-
-
-                <h5 class="mt-4">
-
-                    Quantity
-
-                </h5>
-
-
-
-
-                <div class="quantity-area">
-
-
-                    <button type="button"
-                            onclick="decrease()">
-
-                        -
-
-                    </button>
-
-
-
-
-                    <input type="number"
-                           id="qty"
-                           name="quantity"
-                           value="1"
-                           min="1">
-
-
-
-
-                    <button type="button"
-                            onclick="increase()">
-
-                        +
-
-                    </button>
-
-
-
-                </div>
-
-
-
-
-
-
-
-                <div class="action-buttons">
-
-
-                    <button type="submit"
-                            class="btn cart-btn">
-
-                        🛒 Add To Cart
-
-                    </button>
-
-
-
-
-                    <button type="button"
-                            class="btn buy-btn">
-
-                        ⚡ Buy Now
-
-                    </button>
-
-
-
-                </div>
-
-
-
-
-            </form>
-
-
-
-
         </div>
 
+        <!-- PRODUCT DETAILS -->
+        <div class="col-md-7">
+            <div class="product-info-card">
 
+                <h1 class="product-title mb-2">
+                    {{ product.name }}
+                </h1>
+
+                <span class="category-badge">
+                    Fresh Agricultural Product
+                </span>
+
+                <hr class="my-3">
+
+                <!-- Price Box -->
+                <div class="price-box mb-4">
+                    <span class="price">
+                        {{ product.price }} TK
+                    </span>
+                    <span class="unit">
+                        {% if product.unit == 'gm' %}/ Kg{% else %}/ {{ product.get_unit_display }}{% endif %}
+                    </span>
+                </div>
+
+                <!-- Description -->
+                <div class="mt-4">
+                    <h5 class="font-weight-bold text-dark mb-2">Description</h5>
+                    <p class="description">
+                        {% if product.description %}
+                            {{ product.description }}
+                        {% else %}
+                            Fresh quality product directly collected from local farmers.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Form -->
+                <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                    {% csrf_token %}
+
+                    <h5 class="mt-4 font-weight-bold text-dark mb-2">Select Quantity</h5>
+
+                    <div class="quantity-area">
+                        <button type="button" onclick="decrease()">-</button>
+
+                        {% if product.unit == 'gm' %}
+                            <input type="number" id="qty" name="quantity" value="250" min="50" step="50">
+                            <span class="unit-tag">Grams (gm)</span>
+                        {% elif product.unit == 'pcs' or product.unit == 'ati' or product.unit == 'fana' %}
+                            <input type="number" id="qty" name="quantity" value="1" min="1" step="1">
+                            <span class="unit-tag">{{ product.get_unit_display }}</span>
+                        {% else %}
+                            <input type="number" id="qty" name="quantity" value="1" min="0.5" step="0.5">
+                            <span class="unit-tag">{{ product.get_unit_display }}</span>
+                        {% endif %}
+
+                        <button type="button" onclick="increase()">+</button>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button type="submit" class="btn cart-btn">
+                            🛒 Add To Cart
+                        </button>
+
+                        <button type="submit" formaction="{% url 'add_to_cart' product.id %}" class="btn buy-btn">
+                            ⚡ Buy Now
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
 
     </div>
 
-
-
 </div>
 
-
-
-</div>
-
-
-
-
-
-
+<!-- Smart JS for Quantity Controls -->
 <script>
-
-
-function increase(){
-
-    let qty=document.getElementById("qty");
-
-    qty.value=parseInt(qty.value)+1;
-
-}
-
-
-
-function decrease(){
-
-    let qty=document.getElementById("qty");
-
-    if(parseInt(qty.value)>1){
-
-        qty.value=parseInt(qty.value)-1;
-
+    function increase() {
+        let input = document.getElementById("qty");
+        let step = parseFloat(input.getAttribute("step")) || 1;
+        let val = parseFloat(input.value) || 0;
+        input.value = Math.round((val + step) * 100) / 100;
     }
 
-}
-
-
+    function decrease() {
+        let input = document.getElementById("qty");
+        let step = parseFloat(input.getAttribute("step")) || 1;
+        let min = parseFloat(input.getAttribute("min")) || 1;
+        let val = parseFloat(input.value) || 0;
+        if (val - step >= min) {
+            input.value = Math.round((val - step) * 100) / 100;
+        }
+    }
 </script>
-
-
 
 {% endblock %}

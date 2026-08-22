@@ -1,248 +1,142 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
 
-    <h3 class="text-center mb-4">Supplier Panel</h3>
-
-    <form method="get" class="mb-3">
-
-        <input type="text"
-               name="q"
-               value="{{ search_query }}"
-               placeholder="Search by user id or username"
-               class="form-control">
-
-        <button class="btn btn-primary mt-2">
-            Search
-        </button>
-
-    </form>
-
-    {% for order in orders %}
+    <a href="{% url 'staff_orders' %}" class="btn btn-outline-secondary mb-3 font-weight-bold">
+        <i class="fas fa-arrow-left"></i> Back to Staff Orders List
+    </a>
 
     <div class="card mb-4 shadow p-3">
 
-        <h5>
-            Order #{{ order.order_code }}
-            <span class="badge badge-info">
+        <h5 class="font-weight-bold mb-3">
+            Order #{{ order.order_code }} — Customer: {{ order.user.username }}
+            <span class="badge badge-info ml-2">
                 {{ order.get_status_display }}
             </span>
         </h5>
 
         <form method="POST">
-
             {% csrf_token %}
+            <input type="hidden" name="order_id" value="{{ order.id }}">
 
-            <input type="hidden"
-                   name="order_id"
-                   value="{{ order.id }}">
+            <div class="table-responsive">
+                <table class="translate-table table table-bordered text-center mt-2">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Serial</th>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Update Qty</th>
+                            <th>Unit</th>
+                            <th>Status</th>
+                            <th>Remark</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
 
-            <table class="translate-table table table-bordered text-center mt-3">
+                    <tbody>
+                        {% for item in order.items.all %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td class="font-weight-bold text-left">{{ item.product.name }}</td>
+                            <td>{{ item.quantity }}</td>
 
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Serial</th>
-                        <th>Item</th>
-                        <th>Qty</th>
-                        <th>Update Qty</th>
-                        <th>Unit</th>
-                        <!--<th>Unit Price</th>-->
-                        <!--<th>Total</th>-->
-                        <!--<th>Updated Total</th>-->
-                        <th>Status</th>
-                        <th>Remark</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
+                            <td>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    name="qty_{{ item.id }}"
+                                    value="{% if item.updated_quantity is not None %}{{ item.updated_quantity }}{% else %}{{ item.quantity }}{% endif %}"
+                                    class="form-control form-control-sm">
+                            </td>
 
-                <tbody>
+                            <td>{{ item.product.get_unit_display }}</td>
 
-                    {% for item in order.items.all %}
+                            <!-- STATUS BADGE -->
+                            <td>
+                                {% if item.status == 'pending' %}
+                                    <span class="badge badge-warning">Pending</span>
+                                {% elif item.status == 'accepted' %}
+                                    <span class="badge badge-success">Accepted</span>
+                                {% elif item.status == 'rejected' %}
+                                    <span class="badge badge-danger">Rejected</span>
+                                {% endif %}
+                            </td>
 
-                    <tr>
+                            <!-- REMARK -->
+                            <td>
+                                <input
+                                    type="text"
+                                    name="remark_{{ item.id }}"
+                                    value="{{ item.remarks|default:'' }}"
+                                    class="form-control form-control-sm"
+                                    placeholder="Enter remark">
+                            </td>
 
-                        <td>{{ forloop.counter }}</td>
+                            <!-- ACTION SELECT -->
+                            <td>
+                                <select
+                                    name="status_{{ item.id }}"
+                                    class="form-control form-control-sm">
+                                    <option value="pending" {% if item.status == "pending" %}selected{% endif %}>Pending</option>
+                                    <option value="accepted" {% if item.status == "accepted" %}selected{% endif %}>Accept</option>
+                                    <option value="rejected" {% if item.status == "rejected" %}selected{% endif %}>Reject</option>
+                                </select>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-                        <td>{{ item.product.name }}</td>
-
-                        <td>{{ item.quantity }}</td>
-
-                        <td>
-
-                            <input
-                                type="number"
-                                step="0.01"
-                                name="qty_{{ item.id }}"
-                                value="{% if item.updated_quantity is not None %}{{ item.updated_quantity }}{% else %}{{ item.quantity }}{% endif %}"
-                                class="form-control form-control-sm">
-
-                        </td>
-
-                        <td>
-
-                            {{ item.product.get_unit_display }}
-
-                        </td>
-
-                        <!-- STATUS -->
-                        <td>
-
-                            {% if item.status == 'pending' %}
-
-                                <span class="badge badge-warning">
-                                    Pending
-                                </span>
-
-                            {% elif item.status == 'accepted' %}
-
-                                <span class="badge badge-success">
-                                    Accepted
-                                </span>
-
-                            {% elif item.status == 'rejected' %}
-
-                                <span class="badge badge-danger">
-                                    Rejected
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <!-- REMARK -->
-
-                        <td>
-
-                            <input
-                                type="text"
-                                name="remark_{{ item.id }}"
-                                value="{{ item.remarks|default:'' }}"
-                                class="form-control form-control-sm"
-                                placeholder="Enter remark">
-
-                        </td>
-
-                        <!-- ACTION -->
-
-                        <td>
-
-                            <select
-                                name="status_{{ item.id }}"
-                                class="form-control form-control-sm">
-
-                                <option value="pending"
-                                    {% if item.status == "pending" %}selected{% endif %}>
-                                    Pending
-                                </option>
-
-                                <option value="accepted"
-                                    {% if item.status == "accepted" %}selected{% endif %}>
-                                    Accept
-                                </option>
-
-                                <option value="rejected"
-                                    {% if item.status == "rejected" %}selected{% endif %}>
-                                    Reject
-                                </option>
-
-                            </select>
-
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-            <div class="text-right">
-
-                <button
-                    type="submit"
-                    class="btn btn-primary btn-sm">
-
-                    Save Changes
-
+            <div class="text-right mt-3">
+                <button type="submit" class="btn btn-primary px-4 font-weight-bold">
+                    <i class="fas fa-save"></i> Save Changes
                 </button>
-
             </div>
 
         </form>
 
     </div>
 
-    {% empty %}
-
-    <p class="text-center text-muted">
-        No orders assigned.
-    </p>
-
-    {% endfor %}
-
 </div>
 
 <script>
 window.onload = function () {
-
     setTimeout(() => {
-
         let tables = document.querySelectorAll(".translate-table");
-
         tables.forEach(table => {
-
             let rows = table.querySelectorAll("tr");
-
             rows.forEach(row => {
-
                 let cells = row.querySelectorAll("td, th");
-
                 cells.forEach((cell, index) => {
-
                     if (index === 5 || index === 6 || index === 7) return;
-
                     translateAndConvert(cell);
-
                 });
-
             });
-
         });
-
     }, 1000);
-
 };
 
 function translateAndConvert(element) {
-
     let text = element.innerText.trim();
-
     if (!text) return;
 
     fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=bn&dt=t&q=${encodeURIComponent(text)}`)
         .then(res => res.json())
         .then(data => {
-
             let translated = data[0][0][0];
-
             translated = convertNumbers(translated);
-
             element.innerText = translated;
-
         })
         .catch(err => console.log(err));
-
 }
 
 function convertNumbers(text) {
-
     const en = ['0','1','2','3','4','5','6','7','8','9'];
     const bn = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
-
     return text.replace(/[0-9]/g, d => bn[en.indexOf(d)]);
-
 }
 </script>
 

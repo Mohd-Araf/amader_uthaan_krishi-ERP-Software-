@@ -263,10 +263,16 @@ urlpatterns = [
         views.trial_balance,
         name="trial_balance"
     ),
+    path("income-statement/", views.income_statement, name="income_statement"),
+    path("balance-sheet/", views.balance_sheet, name="balance_sheet"),
 
     path(
         "get-account-journals/<int:account_id>/",
         views.get_account_journals,
         name="get_account_journals"
     ),
+    path("reports/export-all-ledgers-excel/",
+         views.export_all_ledgers_excel,
+         name="export_all_ledgers_excel"),
+
 ]

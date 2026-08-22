@@ -1,24 +1,30 @@
-from django.contrib.auth.decorators import login_required
+import random
+from datetime import timedelta
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, update_session_auth_hash
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.views import LoginView
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
-from .models import CustomUser, OTPCode
-from datetime import timedelta
 from django.utils import timezone
-from .forms import SignupForm, LoginForm, ForgotPasswordForm, VerifyCodeForm, ResetPasswordForm, CustomPasswordChangeForm
-import random
+from .models import CustomUser, OTPCode
+from .forms import (
+    SignupForm,
+    LoginForm,
+    ForgotPasswordForm,
+    VerifyCodeForm,
+    ResetPasswordForm,
+    CustomPasswordChangeForm,
+)
 
-from ..products.models import Order
 
-
-# Login
+# Login View
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
     authentication_form = LoginForm
 
-# Signup
+
+# Signup View
 def signup_view(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
@@ -31,6 +37,7 @@ def signup_view(request):
     return render(request, 'accounts/signin.html', {'form': form})
 
 
+# Forgot Password View
 def forgot_password_view(request):
     if request.method == 'POST':
         form = ForgotPasswordForm(request.POST)
@@ -55,71 +62,85 @@ def forgot_password_view(request):
         form = ForgotPasswordForm()
     return render(request, 'accounts/forgot_password.html', {'form': form})
 
-# Verify Code
+
+# Verify Code View
 def verify_code_view(request):
     user_id = request.session.get('reset_user')
-    remaining_seconds = 0
-    user = None
+    if not user_id:
+        messages.error(request, 'Session expired. Please request a new OTP.')
+        return redirect('forgot_password')
 
-    if user_id:
+    try:
         user = CustomUser.objects.get(id=user_id)
-        otp = OTPCode.objects.filter(user=user).last()
+    except CustomUser.DoesNotExist:
+        messages.error(request, 'User not found.')
+        return redirect('forgot_password')
 
-        if otp:
-            expiration_time = otp.created_at + timedelta(minutes=1)
-            remaining_seconds = int((expiration_time - timezone.now()).total_seconds())
-            if remaining_seconds < 0:
-                remaining_seconds = 0
+    otp = OTPCode.objects.filter(user=user).last()
+    remaining_seconds = 0
+
+    if otp:
+        expiration_time = otp.created_at + timedelta(minutes=1)
+        remaining_seconds = max(0, int((expiration_time - timezone.now()).total_seconds()))
 
     if request.method == 'POST':
         form = VerifyCodeForm(request.POST)
         if form.is_valid():
             code = form.cleaned_data['code']
+            valid_otp = OTPCode.objects.filter(user=user, code=code).last()
 
-            if user:
-                otp = OTPCode.objects.filter(user=user, code=code).last()
-
-                if otp:
-                    if otp.is_expired():
-                        otp.delete()
-                        messages.error(request, 'OTP has expired. Please request a new code.')
-                        return redirect('forgot_password')
-                    else:
-                        otp.delete()
-                        request.session['verified_user'] = user.id
-                        return redirect('reset_password')
+            if valid_otp:
+                if valid_otp.is_expired():
+                    valid_otp.delete()
+                    messages.error(request, 'OTP has expired. Please request a new code.')
+                    return redirect('forgot_password')
                 else:
-                    messages.error(request, 'Invalid Code')
-                    return redirect('verify_code')
+                    valid_otp.delete()
+                    request.session['verified_user'] = user.id
+                    request.session.pop('reset_user', None)
+                    return redirect('reset_password')
+            else:
+                messages.error(request, 'Invalid Code')
+                return redirect('verify_code')
         else:
             messages.error(request, "Invalid form input.")
     else:
         form = VerifyCodeForm()
 
-    context = {
+    return render(request, 'accounts/verify_code.html', {
         'form': form,
-        'remaining_seconds': remaining_seconds
-    }
+        'remaining_seconds': remaining_seconds,
+    })
 
-    return render(request, 'accounts/verify_code.html', context)
-# Reset Password
+
+# Reset Password View
 def reset_password_view(request):
     user_id = request.session.get('verified_user')
     if not user_id:
+        messages.error(request, 'Unauthorized access or session expired.')
         return redirect('forgot_password')
-    user = CustomUser.objects.get(id=user_id)
+
+    try:
+        user = CustomUser.objects.get(id=user_id)
+    except CustomUser.DoesNotExist:
+        messages.error(request, 'User not found.')
+        return redirect('forgot_password')
+
     if request.method == 'POST':
         form = ResetPasswordForm(request.POST)
         if form.is_valid():
             user.set_password(form.cleaned_data['password1'])
             user.save()
+            request.session.pop('verified_user', None)
             messages.success(request, 'Password reset successfully!')
             return redirect('login')
     else:
         form = ResetPasswordForm()
     return render(request, 'accounts/reset_password.html', {'form': form})
 
-# Change Password (Logged in user)
+
+# Change Password View
+@login_required
 def change_password_view(request):
     if request.method == 'POST':
         form = CustomPasswordChangeForm(user=request.user, data=request.POST)
@@ -131,4 +152,3 @@ def change_password_view(request):
     else:
         form = CustomPasswordChangeForm(user=request.user)
     return render(request, 'accounts/change_password.html', {'form': form})
-

@@ -1,5 +1,4 @@
-from decimal import Decimal
-
+from decimal import Decimal, ROUND_HALF_UP
 from django import forms
 from django.forms import inlineformset_factory
 from django.db.models import Q
@@ -12,6 +11,14 @@ from .models import (
     ExpenseCategory,
     PaymentReceipt,
 )
+
+TWO_DECIMAL = Decimal("0.01")
+ZERO = Decimal("0.00")
+
+def _q(val):
+    if val is None:
+        return ZERO
+    return Decimal(str(val)).quantize(TWO_DECIMAL, rounding=ROUND_HALF_UP)
 
 
 # ==========================================
@@ -61,7 +68,7 @@ class MakePaymentForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields["account"].queryset = (
+        account_qs = (
             Account.objects.filter(status="active")
             .filter(
                 Q(type1="expense")
@@ -71,12 +78,14 @@ class MakePaymentForm(forms.Form):
             )
             .order_by("name")
         )
-        self.fields["account"].empty_label = "Select Supplier / Liability / Payable / Expense Account"
+        self.fields["account"].queryset = account_qs
+        self.fields["account"].empty_label = "-- Choose Supplier / Liability / Expense Account --"
+        self.fields["account"].label_from_instance = lambda obj: f"{obj.name} (Current Due: ৳ {obj.current_balance:,.2f})"
 
-        self.fields["payment_account"].queryset = (
-            Account.objects.filter(status="active", type2__in=["cash", "bank"]).order_by("name")
-        )
-        self.fields["payment_account"].empty_label = "Select Cash or Bank Account"
+        payment_qs = Account.objects.filter(status="active", type2__in=["cash", "bank"]).order_by("name")
+        self.fields["payment_account"].queryset = payment_qs
+        self.fields["payment_account"].empty_label = "-- Choose Cash/Bank Account --"
+        self.fields["payment_account"].label_from_instance = lambda obj: f"{obj.name} (Balance: ৳ {obj.current_balance:,.2f})"
 
 
 # ==========================================
@@ -85,14 +94,14 @@ class MakePaymentForm(forms.Form):
 
 class ReceivePaymentForm(forms.Form):
     customer_account = forms.ModelChoiceField(
-        queryset=Account.objects.filter(status="active", type2="customer").order_by("name"),
+        queryset=Account.objects.none(),
         widget=forms.Select(attrs={"class": "form-select"}),
         label="Customer Account",
         required=True
     )
 
     payment_account = forms.ModelChoiceField(
-        queryset=Account.objects.filter(status="active", type2__in=["cash", "bank"]).order_by("name"),
+        queryset=Account.objects.none(),
         widget=forms.Select(attrs={"class": "form-select"}),
         label="Deposit To (Cash/Bank)",
         required=True
@@ -120,6 +129,19 @@ class ReceivePaymentForm(forms.Form):
             }
         )
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        cust_qs = Account.objects.filter(status="active", type2="customer").order_by("name")
+        self.fields["customer_account"].queryset = cust_qs
+        self.fields["customer_account"].empty_label = "-- Choose Customer Account --"
+        self.fields["customer_account"].label_from_instance = lambda obj: f"{obj.name} (Current Receivable: ৳ {obj.current_balance:,.2f})"
+
+        payment_qs = Account.objects.filter(status="active", type2__in=["cash", "bank"]).order_by("name")
+        self.fields["payment_account"].queryset = payment_qs
+        self.fields["payment_account"].empty_label = "-- Choose Deposit Account --"
+        self.fields["payment_account"].label_from_instance = lambda obj: f"{obj.name} (Balance: ৳ {obj.current_balance:,.2f})"
 
 
 # ==========================================
@@ -168,7 +190,6 @@ class AccountForm(forms.ModelForm):
             "type1",
             "type2",
             "opening_balance",
-
             "status",
         ]
         widgets = {
@@ -192,11 +213,6 @@ class AccountForm(forms.ModelForm):
                 attrs={
                     "class": "form-control",
                     "step": "0.01",
-                }
-            ),
-            "opening_balance_type": forms.Select(
-                attrs={
-                    "class": "form-select",
                 }
             ),
             "status": forms.Select(
@@ -290,13 +306,13 @@ class JournalEntryForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        debit = cleaned_data.get("debit") or Decimal("0.00")
-        credit = cleaned_data.get("credit") or Decimal("0.00")
+        debit = _q(cleaned_data.get("debit"))
+        credit = _q(cleaned_data.get("credit"))
 
-        if debit > 0 and credit > 0:
+        if debit > ZERO and credit > ZERO:
             raise forms.ValidationError("Debit and Credit cannot both contain a value on the same line.")
 
-        if debit == 0 and credit == 0:
+        if debit == ZERO and credit == ZERO:
             raise forms.ValidationError("Enter either Debit or Credit amount.")
 
         return cleaned_data
@@ -309,8 +325,8 @@ class JournalEntryForm(forms.ModelForm):
 class BaseJournalEntryFormSet(forms.BaseInlineFormSet):
     def clean(self):
         super().clean()
-        total_debit = Decimal("0.00")
-        total_credit = Decimal("0.00")
+        total_debit = ZERO
+        total_credit = ZERO
         entry_count = 0
 
         for form in self.forms:
@@ -321,19 +337,19 @@ class BaseJournalEntryFormSet(forms.BaseInlineFormSet):
                 continue
 
             account = form.cleaned_data.get("account")
-            debit = form.cleaned_data.get("debit") or Decimal("0.00")
-            credit = form.cleaned_data.get("credit") or Decimal("0.00")
+            debit = _q(form.cleaned_data.get("debit"))
+            credit = _q(form.cleaned_data.get("credit"))
 
             if account:
                 entry_count += 1
 
-            total_debit += debit
-            total_credit += credit
+            total_debit = _q(total_debit + debit)
+            total_credit = _q(total_credit + credit)
 
         if entry_count < 2:
             raise forms.ValidationError("At least two journal entries are required for a double entry voucher.")
 
-        if total_debit <= 0:
+        if total_debit <= ZERO:
             raise forms.ValidationError("Debit amount must be greater than zero.")
 
         if total_debit != total_credit:

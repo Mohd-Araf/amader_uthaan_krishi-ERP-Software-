@@ -1,19 +1,238 @@
 {% extends 'base.html' %}
 
-{% block title %}Sign Up{% endblock %}
+{% block title %}Create an Account{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <h2 class="mb-3">Sign Up</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
-        </form>
-        <p class="mt-2">
-            Already have an account? <a href="{% url 'login' %}">Login</a>
-        </p>
+<style>
+    /* Custom Styling for Professional Look */
+    .signup-container {
+        max-width: 650px;
+        margin: 2rem auto;
+    }
+
+    .signup-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    .signup-header {
+        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+        color: #ffffff;
+        padding: 2.5rem 2rem 2rem 2rem;
+        text-align: center;
+    }
+
+    .signup-header h3 {
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .signup-header p {
+        font-size: 0.95rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .signup-body {
+        padding: 2.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #344767;
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+
+    /* Auto styling for all form fields */
+    .form-group input,
+    .form-group select {
+        display: block;
+        width: 100%;
+        border-radius: 10px;
+        padding: 0.7rem 1rem;
+        font-size: 0.95rem;
+        border: 1.5px solid #e2e8f0;
+        background-color: #f8fafc;
+        color: #212529;
+        transition: all 0.25s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        background-color: #ffffff;
+        border-color: #0d6efd;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+    }
+
+    .field-hint {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.3rem;
+    }
+
+    .error-msg {
+        color: #dc3545;
+        font-size: 0.825rem;
+        margin-top: 0.3rem;
+        font-weight: 5deg;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #0d6efd, #0a58ca);
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        padding: 0.85rem 1.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(13, 110, 253, 0.35);
+        color: #ffffff;
+    }
+
+    .login-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.925rem;
+        color: #6c757d;
+    }
+
+    .login-footer a {
+        color: #0d6efd;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .login-footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="container">
+    <div class="signup-container">
+        <div class="card signup-card">
+            <!-- Header Section -->
+            <div class="signup-header">
+                <h3>Create an Account</h3>
+                <p>Join us today! Please fill in your information below.</p>
+            </div>
+
+            <!-- Body Section -->
+            <div class="signup-body">
+
+                <!-- Non-field / General Form Errors -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger rounded-3 mb-4">
+                        {% for error in form.non_field_errors %}
+                            <p class="mb-0 small"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <!-- Username -->
+                        <div class="col-md-6 form-group">
+                            <label for="{{ form.username.id_for_label }}">Username</label>
+                            {{ form.username }}
+                            {% for error in form.username.errors %}
+                                <div class="error-msg">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-md-6 form-group">
+                            <label for="{{ form.email.id_for_label }}">Email Address</label>
+                            {{ form.email }}
+                            {% for error in form.email.errors %}
+                                <div class="error-msg">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Country -->
+                        <div class="col-md-6 form-group">
+                            <label for="{{ form.country.id_for_label }}">Country</label>
+                            {{ form.country }}
+                            {% for error in form.country.errors %}
+                                <div class="error-msg">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Location -->
+                        <div class="col-md-6 form-group">
+                            <label for="{{ form.location.id_for_label }}">Location / City</label>
+                            {{ form.location }}
+                            {% for error in form.location.errors %}
+                                <div class="error-msg">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="form-group">
+                        <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                        {{ form.phone_number }}
+                        <div class="field-hint">Must start with <strong>+880</strong> (e.g., +8801700000000)</div>
+                        {% for error in form.phone_number.errors %}
+                            <div class="error-msg">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row">
+                        <!-- Password 1 -->
+                        <div class="col-md-6 form-group">
+                            <label for="{{ form.password1.id_for_label }}">Password</label>
+                            {{ form.password1 }}
+                            <div class="field-hint">Minimum 4 characters (e.g. 1234)</div>
+                            {% for error in form.password1.errors %}
+                                <div class="error-msg">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Password 2 -->
+                        <div class="col-md-6 form-group">
+                            <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                            {{ form.password2 }}
+                            {% for error in form.password2.errors %}
+                                <div class="error-msg">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-submit">
+                        Sign Up Account
+                    </button>
+                </form>
+
+                <!-- Footer Link -->
+                <div class="login-footer">
+                    Already have an account? <a href="{% url 'login' %}">Log In here</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

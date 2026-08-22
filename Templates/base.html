@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -291,8 +290,12 @@
       z-index: 1040;
     }
 
-    .user-dropdown-menu.show {
-      display: block;
+    /* FIX: Ensure dropdown opens cleanly when .show class is added */
+    .user-dropdown-menu.show,
+    .mobile-user-menu.show {
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
 
     .ddrop-link {
@@ -405,10 +408,6 @@
       padding: 6px 0;
       display: none;
       z-index: 1045;
-    }
-
-    .mobile-user-menu.show {
-      display: block;
     }
 
     /* Hamburger Button (Mobile) */
@@ -851,6 +850,13 @@
                 <a href="{% url 'admin_panel' %}" class="ddrop-link">
                     <i class="fa-solid fa-globe"></i> Admin Control
                 </a>
+            {% elif user.is_staff %}
+                <a href="{% url 'profile' %}" class="ddrop-link">
+                    <i class="fas fa-id-card"></i> Profile
+                </a>
+                <a href="{% url 'staff_orders' %}" class="ddrop-link">
+                    <i class="fas fa-box-open"></i> Staff Orders
+                </a>
             {% else %}
                 <a href="{% url 'profile' %}" class="ddrop-link">
                     <i class="fas fa-id-card"></i> My Profile
@@ -917,6 +923,16 @@
                 <a href="{% url 'admin_panel' %}" class="ddrop-link">
                     <i class="fa-solid fa-globe"></i>
                     Admin Control
+                </a>
+            {% elif user.is_staff %}
+                <a href="{% url 'profile' %}" class="ddrop-link">
+                    <i class="fas fa-id-card"></i>
+                    Profile
+                </a>
+
+                <a href="{% url 'staff_orders' %}" class="ddrop-link">
+                    <i class="fas fa-box-open"></i>
+                    Staff Orders
                 </a>
             {% else %}
                 <a href="{% url 'profile' %}" class="ddrop-link">
@@ -997,11 +1013,16 @@
           <div class="drawer-user-sub">Logged in</div>
         </div>
       </div>
-      <a href="{% url 'profile' %}"     class="dauth-btn outline"><i class="fas fa-id-card"></i>  My Profile</a>
-      <a href="{% url 'user_orders' %}" class="dauth-btn outline"><i class="fas fa-box-open"></i> My Orders</a>
+      <a href="{% url 'profile' %}" class="dauth-btn outline"><i class="fas fa-id-card"></i> My Profile</a>
+
       {% if user.is_superuser %}
-      <a href="{% url 'admin_panel' %}" class="dauth-btn outline"><i class="fa-solid fa-globe"></i> Admin Control</a>
+        <a href="{% url 'admin_panel' %}" class="dauth-btn outline"><i class="fa-solid fa-globe"></i> Admin Control</a>
+      {% elif user.is_staff %}
+        <a href="{% url 'staff_orders' %}" class="dauth-btn outline"><i class="fas fa-box-open"></i> Staff Orders</a>
+      {% else %}
+        <a href="{% url 'user_orders' %}" class="dauth-btn outline"><i class="fas fa-box-open"></i> My Orders</a>
       {% endif %}
+
       <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}
         <button type="submit" class="dauth-btn danger">
@@ -1056,9 +1077,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
-<script src="{% static 'js/navbar.js' %}"></script>
 
-<!-- Interactive Scripts -->
+<!-- Interactive Scripts (Fixed Dropdown Toggle) -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -1098,6 +1118,7 @@
     // User Dropdown Toggle (Desktop)
     if (userDropdownBtn && userDropdownMenu) {
       userDropdownBtn.addEventListener('click', function(e) {
+        e.preventDefault();
         e.stopPropagation();
         userDropdownMenu.classList.toggle('show');
       });
@@ -1112,6 +1133,7 @@
     // Mobile User Dropdown Toggle
     if (mobileUserBtn && mobileUserMenu) {
       mobileUserBtn.addEventListener('click', function(e) {
+        e.preventDefault();
         e.stopPropagation();
         mobileUserMenu.classList.toggle('show');
       });
@@ -1127,4 +1149,3 @@
 
 </body>
 </html>
-```
