@@ -1,34 +1,3 @@
-# ===================================================
-# 🌾 AMADER UTHAAN KRISHI ERP - DEPENDENCIES
-# ===================================================
 
-# --- Core Django Framework ---
-Django>=4.2,<5.2
-tzdata>=2024.1
-
-# --- Excel & Spreadsheet Export ---
-openpyxl>=3.1.2
-et-xmlfile>=1.1.0
-
-# --- PDF Generation (Voucher / Invoice Print) ---
-reportlab>=4.1.0
-
-# --- Image Processing (Products & User Avatars) ---
-Pillow>=10.2.0
-
-# --- Database Drivers (PostgreSQL / MySQL Support) ---
-psycopg2-binary>=2.9.9
-# mysqlclient>=2.2.4  # (Uncomment if using MySQL)
-
-# --- Environment & Configuration Management ---
-python-dotenv>=1.0.1
-django-environ>=0.11.2
-
-# --- Forms, UI & Helper Utilities ---
-django-crispy-forms>=2.1
-crispy-bootstrap5>=2024.2
-requests>=2.31.0
-
-# --- Production & Deployment ---
-gunicorn>=21.2.0
-whitenoise>=6.6.0
+whitenoise
+gunicorn
