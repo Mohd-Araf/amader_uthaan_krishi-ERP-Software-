@@ -3,136 +3,31 @@
 {% block title %}Create an Account{% endblock %}
 
 {% block content %}
-<style>
-    /* Custom Styling for Professional Look */
-    .signup-container {
-        max-width: 650px;
-        margin: 2rem auto;
-    }
+<!-- Google Fonts (Plus Jakarta Sans) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    .signup-card {
-        border: none;
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-        background: #ffffff;
-    }
+<div class="signup-wrapper">
+    <!-- Background Ambient Glows -->
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
 
-    .signup-header {
-        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
-        color: #ffffff;
-        padding: 2.5rem 2rem 2rem 2rem;
-        text-align: center;
-    }
-
-    .signup-header h3 {
-        font-weight: 700;
-        letter-spacing: -0.5px;
-        margin-bottom: 0.5rem;
-    }
-
-    .signup-header p {
-        font-size: 0.95rem;
-        opacity: 0.9;
-        margin: 0;
-    }
-
-    .signup-body {
-        padding: 2.5rem;
-    }
-
-    .form-group {
-        margin-bottom: 1.25rem;
-    }
-
-    .form-group label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #344767;
-        margin-bottom: 0.4rem;
-        display: block;
-    }
-
-    /* Auto styling for all form fields */
-    .form-group input,
-    .form-group select {
-        display: block;
-        width: 100%;
-        border-radius: 10px;
-        padding: 0.7rem 1rem;
-        font-size: 0.95rem;
-        border: 1.5px solid #e2e8f0;
-        background-color: #f8fafc;
-        color: #212529;
-        transition: all 0.25s ease;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus {
-        background-color: #ffffff;
-        border-color: #0d6efd;
-        outline: none;
-        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
-    }
-
-    .field-hint {
-        font-size: 0.8rem;
-        color: #6c757d;
-        margin-top: 0.3rem;
-    }
-
-    .error-msg {
-        color: #dc3545;
-        font-size: 0.825rem;
-        margin-top: 0.3rem;
-        font-weight: 5deg;
-    }
-
-    .btn-submit {
-        background: linear-gradient(135deg, #0d6efd, #0a58ca);
-        color: #ffffff;
-        border: none;
-        border-radius: 10px;
-        padding: 0.85rem 1.5rem;
-        font-weight: 600;
-        font-size: 1rem;
-        width: 100%;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-top: 0.5rem;
-    }
-
-    .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(13, 110, 253, 0.35);
-        color: #ffffff;
-    }
-
-    .login-footer {
-        text-align: center;
-        margin-top: 1.5rem;
-        font-size: 0.925rem;
-        color: #6c757d;
-    }
-
-    .login-footer a {
-        color: #0d6efd;
-        font-weight: 600;
-        text-decoration: none;
-    }
-
-    .login-footer a:hover {
-        text-decoration: underline;
-    }
-</style>
-
-<div class="container">
     <div class="signup-container">
-        <div class="card signup-card">
+        <div class="signup-card">
+            
             <!-- Header Section -->
             <div class="signup-header">
-                <h3>Create an Account</h3>
-                <p>Join us today! Please fill in your information below.</p>
+                <div class="icon-badge">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <line x1="19" y1="8" x2="19" y2="14"></line>
+                        <line x1="22" y1="11" x2="16" y2="11"></line>
+                    </svg>
+                </div>
+                <h2>Create an Account</h2>
+                <p class="subtitle">Join us today! Please fill in your information below.</p>
             </div>
 
             <!-- Body Section -->
@@ -140,14 +35,21 @@
 
                 <!-- Non-field / General Form Errors -->
                 {% if form.non_field_errors %}
-                    <div class="alert alert-danger rounded-3 mb-4">
+                    <div class="alert-error-box">
                         {% for error in form.non_field_errors %}
-                            <p class="mb-0 small"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}</p>
+                            <p class="error-text">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                                {{ error }}
+                            </p>
                         {% endfor %}
                     </div>
                 {% endif %}
 
-                <form method="post" novalidate>
+                <form method="post" novalidate class="signup-form">
                     {% csrf_token %}
 
                     <div class="row">
@@ -223,7 +125,11 @@
 
                     <!-- Submit Button -->
                     <button type="submit" class="btn-submit">
-                        Sign Up Account
+                        <span>Sign Up Account</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14"></path>
+                            <path d="m12 5 7 7-7 7"></path>
+                        </svg>
                     </button>
                 </form>
 
@@ -235,4 +141,241 @@
         </div>
     </div>
 </div>
+
+<style>
+/* Base Wrapper */
+.signup-wrapper {
+    min-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 40px 15px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #d8f3dc 50%, #f4fbf7 100%);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* Background Soft Glows */
+.bg-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.55;
+    pointer-events: none;
+}
+.glow-1 {
+    width: 380px;
+    height: 380px;
+    background: #74c69d;
+    top: -5%;
+    left: 10%;
+}
+.glow-2 {
+    width: 340px;
+    height: 340px;
+    background: #95d5b2;
+    bottom: -5%;
+    right: 10%;
+}
+
+/* Signup Card Container */
+.signup-container {
+    width: 100%;
+    max-width: 680px;
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+}
+
+.signup-card {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    box-shadow: 
+        0 20px 40px rgba(45, 106, 79, 0.08),
+        0 1px 3px rgba(0, 0, 0, 0.02);
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* Header */
+.signup-header {
+    text-align: center;
+    padding: 36px 30px 15px 30px;
+}
+
+.icon-badge {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 14px;
+    background: #d8f3dc;
+    color: #2d6a4f;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(45, 106, 79, 0.12);
+}
+
+.signup-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1b4332;
+    margin: 0 0 6px;
+    letter-spacing: -0.5px;
+}
+
+.signup-header .subtitle {
+    font-size: 13.5px;
+    color: #52796f;
+    margin: 0;
+}
+
+/* Body */
+.signup-body {
+    padding: 20px 36px 36px 36px;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d6a4f;
+    margin-bottom: 6px;
+}
+
+/* Input & Select Styling */
+.form-group input,
+.form-group select {
+    display: block;
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #1e3d2f;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1.5px solid #c7e6d2;
+    border-radius: 12px;
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+}
+
+.form-group input::placeholder {
+    color: #95a59d;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    background-color: #ffffff;
+    border-color: #2d6a4f;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.12);
+}
+
+/* Field Hints & Errors */
+.field-hint {
+    font-size: 12px;
+    color: #6b8f79;
+    margin-top: 5px;
+}
+
+.error-msg {
+    color: #d90429;
+    font-size: 12.5px;
+    font-weight: 500;
+    margin-top: 5px;
+}
+
+.alert-error-box {
+    background: #ffebe9;
+    border: 1.5px solid #ffc1be;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+
+.alert-error-box .error-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #c9184a;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Submit Button */
+.btn-submit {
+    width: 100%;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2d6a4f 0%, #1b4332 100%);
+    color: #ffffff;
+    font-size: 14.5px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 6px 18px rgba(45, 106, 79, 0.22);
+    transition: all 0.25s ease;
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    background: linear-gradient(135deg, #357a5b 0%, #204e3b 100%);
+    box-shadow: 0 8px 22px rgba(45, 106, 79, 0.32);
+    transform: translateY(-2px);
+    color: #ffffff;
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(45, 106, 79, 0.18);
+}
+
+/* Login Footer */
+.login-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13.5px;
+    color: #55705c;
+}
+
+.login-footer a {
+    color: #2d6a4f;
+    font-weight: 700;
+    text-decoration: none;
+    margin-left: 4px;
+    transition: color 0.2s ease;
+}
+
+.login-footer a:hover {
+    color: #1b4332;
+    text-decoration: underline;
+}
+
+/* Mobile responsive padding */
+@media (max-width: 576px) {
+    .signup-body {
+        padding: 15px 20px 25px 20px;
+    }
+    .signup-header {
+        padding: 28px 20px 10px 20px;
+    }
+}
+</style>
 {% endblock %}
