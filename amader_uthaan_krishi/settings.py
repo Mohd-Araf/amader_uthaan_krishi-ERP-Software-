@@ -1,17 +1,24 @@
+import os
 
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-c*s9d95xv1-4fu4jno--ai-mp*_il$jmnbvv_9iko=c#nrqkuu'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-c*s9d95xv1-4fu4jno--ai-mp*_il$jmnbvv_9iko=c#nrqkuu')
 
-
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [
     'amader-uthaan-krishi-erp-software.onrender.com',
+    '.onrender.com',
     'localhost',
     '127.0.0.1',
+    '*',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://amader-uthaan-krishi-erp-software.onrender.com',
+    'https://*.onrender.com',
 ]
 
 
@@ -103,7 +110,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

@@ -4,3 +4,5 @@ static/videos/
 *.mov
 *.avi
 *.mkv
+# MCP Config (API Keys)
+.mcp.json
