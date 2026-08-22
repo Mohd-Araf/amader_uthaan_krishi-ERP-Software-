@@ -6,6 +6,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
+from django.conf import settings
 from django.utils import timezone
 from .models import CustomUser, OTPCode
 from .forms import (
@@ -47,15 +48,19 @@ def forgot_password_view(request):
                 user = CustomUser.objects.get(email=email)
                 code = f"{random.randint(100000, 999999)}"
                 OTPCode.objects.create(user=user, code=code)
-                send_mail(
-                    'Your OTP Code',
-                    f'Your verification code is {code}',
-                    '22201138@uap-bd.edu',
-                    [email],
-                    fail_silently=False,
-                )
-                request.session['reset_user'] = user.id
-                return redirect('verify_code')
+                try:
+                    send_mail(
+                        'Your OTP Code - Amader Uthaan Krishi',
+                        f'Your verification code is {code}',
+                        getattr(settings, 'DEFAULT_FROM_EMAIL', '22201138@uap-bd.edu'),
+                        [email],
+                        fail_silently=False,
+                    )
+                    request.session['reset_user'] = user.id
+                    messages.success(request, f'Verification code sent to {email}')
+                    return redirect('verify_code')
+                except Exception as e:
+                    messages.error(request, f'Failed to send email: {str(e)}')
             except CustomUser.DoesNotExist:
                 messages.error(request, 'Email not found')
     else:
