@@ -18,7 +18,7 @@ class CustomUser(AbstractUser):
     country = models.CharField(max_length=50, choices=COUNTRY_CHOICES, blank=True, null=True)
     location = models.CharField(max_length=150, blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
-    profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    profile_image = models.FileField(upload_to='profiles/', blank=True, null=True)
 
     # Custom unique user ID starting from 10001
     user_id = models.IntegerField(unique=True, null=True, blank=True, editable=False)

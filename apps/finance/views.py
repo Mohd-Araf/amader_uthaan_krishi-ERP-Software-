@@ -13,8 +13,6 @@ from django.core.paginator import Paginator
 from django.db.models import Sum, Q
 from django.utils import timezone
 
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
 import datetime
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -1415,6 +1413,8 @@ def voucher_print(request, voucher_no):
 
 @user_passes_test(admin_required)
 def voucher_pdf(request, voucher_no):
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import A4
     voucher = get_object_or_404(Journal, Q(voucher_no=voucher_no) | Q(journal_id=voucher_no))
     response = HttpResponse(content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{voucher.voucher_no}.pdf"'

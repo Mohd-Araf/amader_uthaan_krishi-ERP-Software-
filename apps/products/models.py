@@ -17,7 +17,7 @@ class Product(models.Model):
     price = models.FloatField(help_text="Per unit price (Per Kg for kg/gm)")
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES)
     description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='products/', null=True, blank=True)
+    image = models.FileField(upload_to='products/', null=True, blank=True)
 
     @property
     def is_fractional_allowed(self):
