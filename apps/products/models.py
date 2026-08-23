@@ -200,6 +200,13 @@ class OrderItem(models.Model):
     def formatted_qty_unit_initial(self):
         return self.format_quantity(self.quantity, self.product.unit)
 
+    @property
+    def formatted_updated_qty_unit(self):
+        """Returns updated_quantity formatted with unit, or '—' if no update."""
+        if self.updated_quantity is None:
+            return "—"
+        return self.format_quantity(self.updated_quantity, self.product.unit)
+
     @staticmethod
     def format_quantity(qty, unit):
         if qty is None:

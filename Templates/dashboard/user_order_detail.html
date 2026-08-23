@@ -279,35 +279,38 @@
 
         {% else %}
 
-            <!-- ========== ACCEPTED TABLE (5 columns — no Status, no Unit) ========== -->
+            <!-- ========== ACCEPTED TABLE (6 columns — no Status, no Unit) ========== -->
             <table class="table table-bordered table-memo text-center">
                 <colgroup>
-                    <col class="acc-col-sl">
-                    <col class="acc-col-name">
-                    <col class="acc-col-qty">
-                    <col class="acc-col-price">
-                    <col class="acc-col-total">
+                    <col style="width:7%">
+                    <col style="width:28%">
+                    <col style="width:13%">
+                    <col style="width:14%">
+                    <col style="width:19%">
+                    <col style="width:19%">
                 </colgroup>
                 <thead>
                     <tr>
-                        <th class="acc-col-sl">SL</th>
-                        <th class="acc-col-name text-left">Product Name</th>
-                        <th class="acc-col-qty">Qty</th>
-                        <th class="acc-col-price">Unit Price</th>
-                        <th class="acc-col-total">Total</th>
+                        <th>SL</th>
+                        <th class="text-left">Product Name</th>
+                        <th>Qty</th>
+                        <th>Upd. Qty</th>
+                        <th>Total</th>
+                        <th>Upd. Total</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in order.items.all %}
                         {% if not item.is_admin_added or item.is_visible_to_user %}
                         <tr>
-                            <td class="acc-col-sl">{{ forloop.counter }}</td>
-                            <td class="text-left font-weight-bold acc-col-name">
+                            <td>{{ forloop.counter }}</td>
+                            <td class="text-left font-weight-bold">
                                 {{ item.product.name }}{% if item.status == 'complimentary' %} <small class="text-info font-italic">(Complimentary)</small>{% endif %}
                             </td>
-                            <td class="acc-col-qty font-weight-bold">{{ item.formatted_qty_unit }}</td>
-                            <td class="acc-col-price">{{ item.price_at_order_time|default:item.product.price }} ৳</td>
-                            <td class="font-weight-bold text-success acc-col-total">{{ item.updated_total|floatformat:2 }} ৳</td>
+                            <td>{{ item.formatted_qty_unit_initial }}</td>
+                            <td class="font-weight-bold">{{ item.formatted_updated_qty_unit }}</td>
+                            <td>{{ item.total_price|floatformat:2 }} ৳</td>
+                            <td class="font-weight-bold text-success">{{ item.updated_total|floatformat:2 }} ৳</td>
                         </tr>
                         {% endif %}
                     {% endfor %}
