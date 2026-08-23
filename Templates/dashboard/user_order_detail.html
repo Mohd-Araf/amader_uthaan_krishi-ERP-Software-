@@ -29,31 +29,54 @@
         font-size: 0.95rem;
     }
 
+    /* ===== TABLE: FIXED LAYOUT — NO SCROLL ON ANY SCREEN ===== */
     .table-memo {
         margin-bottom: 0;
         border-collapse: collapse;
         width: 100%;
+        table-layout: fixed;
     }
 
     .table-memo thead th {
         background-color: #0070c0 !important;
         color: #ffffff !important;
         font-weight: 700;
-        font-size: 0.9rem;
+        font-size: 0.88rem;
         text-transform: uppercase;
         border: 1px solid #005691 !important;
-        padding: 0.65rem 0.75rem;
+        padding: 0.6rem 0.5rem;
         vertical-align: middle;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     .table-memo td {
         border: 1px solid #d0d0d0 !important;
         vertical-align: middle;
-        padding: 0.65rem 0.75rem;
-        font-size: 0.925rem;
+        padding: 0.6rem 0.5rem;
+        font-size: 0.9rem;
         color: #222222;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
+    /* ===== ACCEPTED TABLE COLUMN WIDTHS (5 cols) ===== */
+    .acc-col-sl    { width: 8%; }
+    .acc-col-name  { width: 34%; }
+    .acc-col-qty   { width: 20%; }
+    .acc-col-price { width: 20%; }
+    .acc-col-total { width: 18%; }
+
+    /* ===== PENDING TABLE COLUMN WIDTHS (7 cols) ===== */
+    .pen-col-sl     { width: 7%; }
+    .pen-col-name   { width: 28%; }
+    .pen-col-qty    { width: 11%; }
+    .pen-col-unit   { width: 11%; }
+    .pen-col-price  { width: 16%; }
+    .pen-col-total  { width: 14%; }
+    .pen-col-status { width: 13%; }
+
+    /* ===== SUMMARY BOX ===== */
     .summary-box-row {
         display: flex;
         justify-content: space-between;
@@ -95,53 +118,77 @@
         border-top: 1px dashed #cccccc;
     }
 
-    /* Mobile Responsive Optimizations - Zero Scrollbar */
-    @media (max-width: 767px) {
+    /* ===== MOBILE — aggressively compact, zero scroll ===== */
+    @media (max-width: 575px) {
         .container {
-            padding-left: 8px !important;
-            padding-right: 8px !important;
+            padding-left: 6px !important;
+            padding-right: 6px !important;
         }
 
         .bill-wrapper {
             border-radius: 8px;
-            margin-bottom: 1.5rem;
         }
 
         .bill-header-banner {
-            font-size: 1.05rem;
-            padding: 0.5rem 0.75rem;
+            font-size: 0.88rem;
+            padding: 0.45rem 0.6rem;
+            letter-spacing: 0;
         }
 
         .bill-meta-info {
-            padding: 0.75rem;
-            font-size: 0.85rem;
+            padding: 0.6rem 0.75rem;
+            font-size: 0.8rem;
         }
 
         .table-memo thead th {
-            font-size: 0.75rem;
-            padding: 0.4rem 0.3rem !important;
+            font-size: 0.68rem;
+            padding: 0.35rem 0.2rem !important;
             letter-spacing: 0;
         }
 
         .table-memo td {
-            font-size: 0.8rem;
-            padding: 0.4rem 0.3rem !important;
+            font-size: 0.72rem;
+            padding: 0.35rem 0.2rem !important;
         }
-
-        /* Compact widths for Mobile view */
-        .col-sl { width: 28px !important; padding-left: 2px !important; padding-right: 2px !important; }
-        .col-name { width: auto !important; word-break: break-word; text-align: left !important; }
-        .col-qty { width: 58px !important; }
-        .col-unit { width: 42px !important; }
-        .col-price { width: 58px !important; }
-        .col-total { width: 62px !important; }
-        .col-status { width: 60px !important; }
 
         .summary-box-value {
-            min-width: 95px;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.85rem;
+            min-width: 85px;
+            padding: 0.2rem 0.4rem;
+            font-size: 0.8rem;
         }
+
+        .summary-box-row span,
+        .summary-box-row label {
+            font-size: 0.78rem;
+        }
+
+        .bkash-info-card {
+            padding: 0.6rem 0.75rem;
+        }
+
+        .bkash-text-red {
+            font-size: 0.9rem;
+        }
+
+        .bill-footer-msg {
+            font-size: 0.8rem;
+        }
+
+        /* Accepted 5-col tighter on small phones */
+        .acc-col-sl    { width: 9%; }
+        .acc-col-name  { width: 32%; }
+        .acc-col-qty   { width: 21%; }
+        .acc-col-price { width: 20%; }
+        .acc-col-total { width: 18%; }
+
+        /* Pending 7-col tighter on small phones */
+        .pen-col-sl     { width: 7%; }
+        .pen-col-name   { width: 25%; }
+        .pen-col-qty    { width: 11%; }
+        .pen-col-unit   { width: 11%; }
+        .pen-col-price  { width: 16%; }
+        .pen-col-total  { width: 15%; }
+        .pen-col-status { width: 15%; }
     }
 </style>
 
@@ -186,81 +233,88 @@
             </div>
         </div>
 
-        <!-- Memo Product Table -->
-        <div class="table-responsive">
+        <!-- Memo Product Table: NO table-responsive wrapper — fixed layout fills 100% width -->
+        {% if order.status != "accepted" %}
+
+            <!-- ========== PENDING / NON-ACCEPTED TABLE (7 columns) ========== -->
             <table class="table table-bordered table-memo text-center">
-                {% if order.status != "accepted" %}
-                    <!-- UNACCEPTED ORDER TABLE (Original 7 Columns) -->
-                    <thead>
+                <colgroup>
+                    <col class="pen-col-sl">
+                    <col class="pen-col-name">
+                    <col class="pen-col-qty">
+                    <col class="pen-col-unit">
+                    <col class="pen-col-price">
+                    <col class="pen-col-total">
+                    <col class="pen-col-status">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th class="pen-col-sl">SL</th>
+                        <th class="pen-col-name text-left">Product Name</th>
+                        <th class="pen-col-qty">Qty</th>
+                        <th class="pen-col-unit">Unit</th>
+                        <th class="pen-col-price">Unit Price</th>
+                        <th class="pen-col-total">Total</th>
+                        <th class="pen-col-status">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                        {% if not item.is_admin_added or item.is_visible_to_user %}
                         <tr>
-                            <th class="col-sl" style="width: 40px;">SL</th>
-                            <th class="col-name">Product Name</th>
-                            <th class="col-qty" style="width: 75px;">Qty</th>
-                            <th class="col-unit" style="width: 65px;">Unit</th>
-                            <th class="col-price" style="width: 95px;">Unit Price</th>
-                            <th class="col-total" style="width: 95px;">Total</th>
-                            <th class="col-status" style="width: 95px;">Status</th>
+                            <td class="pen-col-sl">{{ forloop.counter }}</td>
+                            <td class="text-left font-weight-bold pen-col-name">{{ item.product.name }}</td>
+                            <td class="pen-col-qty">{{ item.formatted_qty_unit_initial }}</td>
+                            <td class="pen-col-unit">{{ item.product.get_unit_display }}</td>
+                            <td class="pen-col-price">{{ item.price_at_order_time|default:item.product.price }} ৳</td>
+                            <td class="pen-col-total">{{ item.total_price|floatformat:2 }} ৳</td>
+                            <td class="pen-col-status">
+                                <span class="badge badge-warning">Pending</span>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in order.items.all %}
-                            {% if not item.is_admin_added or item.is_visible_to_user %}
-                            <tr>
-                                <td class="col-sl">{{ forloop.counter }}</td>
-                                <td class="text-left font-weight-bold col-name">{{ item.product.name }}</td>
-                                <td class="col-qty">
-                                    {% if item.product.unit == 'gm' or item.product.unit == 'pcs' or item.product.unit == 'ati' or item.product.unit == 'fana' %}
-                                        {{ item.quantity|floatformat:0 }}
-                                    {% else %}
-                                        {{ item.quantity }}
-                                    {% endif %}
-                                </td>
-                                <td class="col-unit">{{ item.product.get_unit_display }}</td>
-                                <td class="col-price">{{ item.price_at_order_time|default:item.product.price }} ৳</td>
-                                <td class="col-total">{{ item.total_price|floatformat:2 }} ৳</td>
-                                <td class="col-status">
-                                    <span class="badge badge-warning">Pending</span>
-                                </td>
-                            </tr>
-                            {% endif %}
-                        {% endfor %}
-                    </tbody>
-                {% else %}
-                    <!-- ACCEPTED ORDER TABLE (Clean 5 Columns - No Unit, No Status, Compact Name) -->
-                    <thead>
-                        <tr>
-                            <th class="col-sl" style="width: 40px;">SL</th>
-                            <th class="col-name" style="width: 38%;">Product Name</th>
-                            <th class="col-qty" style="width: 20%;">Qty</th>
-                            <th class="col-price" style="width: 20%;">Unit Price</th>
-                            <th class="col-total" style="width: 22%;">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in order.items.all %}
-                            {% if not item.is_admin_added or item.is_visible_to_user %}
-                            <tr>
-                                <td class="col-sl">{{ forloop.counter }}</td>
-                                <td class="text-left font-weight-bold col-name">
-                                    {{ item.product.name }}
-                                    {% if item.status == 'complimentary' %}
-                                        <span class="badge badge-info ml-1">Complimentary</span>
-                                    {% endif %}
-                                </td>
-                                <td class="col-qty font-weight-bold">
-                                    {{ item.formatted_qty_unit }}
-                                </td>
-                                <td class="col-price">{{ item.price_at_order_time|default:item.product.price }} ৳</td>
-                                <td class="font-weight-bold text-success col-total">
-                                    {{ item.updated_total|floatformat:2 }} ৳
-                                </td>
-                            </tr>
-                            {% endif %}
-                        {% endfor %}
-                    </tbody>
-                {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
             </table>
-        </div>
+
+        {% else %}
+
+            <!-- ========== ACCEPTED TABLE (5 columns — no Status, no Unit) ========== -->
+            <table class="table table-bordered table-memo text-center">
+                <colgroup>
+                    <col class="acc-col-sl">
+                    <col class="acc-col-name">
+                    <col class="acc-col-qty">
+                    <col class="acc-col-price">
+                    <col class="acc-col-total">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th class="acc-col-sl">SL</th>
+                        <th class="acc-col-name text-left">Product Name</th>
+                        <th class="acc-col-qty">Qty</th>
+                        <th class="acc-col-price">Unit Price</th>
+                        <th class="acc-col-total">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                        {% if not item.is_admin_added or item.is_visible_to_user %}
+                        <tr>
+                            <td class="acc-col-sl">{{ forloop.counter }}</td>
+                            <td class="text-left font-weight-bold acc-col-name">
+                                {{ item.product.name }}{% if item.status == 'complimentary' %} <small class="text-info font-italic">(Complimentary)</small>{% endif %}
+                            </td>
+                            <td class="acc-col-qty font-weight-bold">{{ item.formatted_qty_unit }}</td>
+                            <td class="acc-col-price">{{ item.price_at_order_time|default:item.product.price }} ৳</td>
+                            <td class="font-weight-bold text-success acc-col-total">{{ item.updated_total|floatformat:2 }} ৳</td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% endif %}
 
         <!-- Bill Summary & Payment Info -->
         <div class="p-3 bg-light">
@@ -283,7 +337,7 @@
                             <div class="summary-box-value text-danger">- {{ order.discount|default:0 }} ৳</div>
                         </div>
                         <div class="summary-box-row">
-                            <span class="font-weight-bold text-muted">Packaging & Delivery:</span>
+                            <span class="font-weight-bold text-muted">Packaging &amp; Delivery:</span>
                             <div class="summary-box-value">{{ order.packaging_charge|default:0 }} ৳</div>
                         </div>
                         <div class="summary-box-row">
