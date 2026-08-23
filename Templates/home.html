@@ -19,6 +19,9 @@
                         loop
                         playsinline
                         webkit-playsinline
+                        x5-playsinline
+                        x5-video-player-type="h5"
+                        x5-video-player-fullscreen="true"
                         preload="auto"
                         class="hero-video">
 
@@ -805,22 +808,35 @@ body {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var v = document.querySelector('.hero-video');
-    if (v) {
+    if (!v) return;
+
+    function startVideo() {
         v.muted = true;
+        v.defaultMuted = true;
         v.playsInline = true;
         var p = v.play();
         if (p !== undefined) {
-            p.catch(function() {
-                var startVideo = function() {
-                    v.play();
-                    document.removeEventListener('touchstart', startVideo);
-                    document.removeEventListener('click', startVideo);
-                };
-                document.addEventListener('touchstart', startVideo, { passive: true });
-                document.addEventListener('click', startVideo, { passive: true });
+            p.catch(function(err) {
+                console.log('Autoplay waiting for touch gesture');
             });
         }
     }
+
+    startVideo();
+
+    var userEvents = ['touchstart', 'touchmove', 'scroll', 'click', 'pointerdown'];
+    function onMobileUserAction() {
+        startVideo();
+        userEvents.forEach(function(ev) {
+            window.removeEventListener(ev, onMobileUserAction);
+            document.removeEventListener(ev, onMobileUserAction);
+        });
+    }
+
+    userEvents.forEach(function(ev) {
+        window.addEventListener(ev, onMobileUserAction, { passive: true });
+        document.addEventListener(ev, onMobileUserAction, { passive: true });
+    });
 });
 </script>
 

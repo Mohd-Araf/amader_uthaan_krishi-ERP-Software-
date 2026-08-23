@@ -458,6 +458,7 @@
       width: 300px;
       max-width: 85vw;
       height: 100vh;
+      height: 100dvh;
       background: var(--white);
       z-index: 1050;
       box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
@@ -466,6 +467,7 @@
       transform: translateX(100%);
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .mobile-drawer.active {
@@ -591,12 +593,13 @@
     /* Drawer Auth Area */
     .drawer-auth {
       margin-top: auto;
-      padding: 20px;
+      padding: 18px 20px 50px 20px;
       border-top: 1px solid var(--cream-dark);
       background: var(--cream);
       display: flex;
       flex-direction: column;
       gap: 10px;
+      flex-shrink: 0;
     }
 
     .drawer-user-badge {
