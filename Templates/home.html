@@ -11,21 +11,29 @@
 
             <div class="col-lg-8">
 
-                <div class="hero-video-box">
+                <div class="hero-video-box" id="heroBox">
 
+                    <!-- Video with image fallback for all devices -->
                     <video
                         autoplay
                         muted
                         loop
                         playsinline
                         webkit-playsinline
-                        preload="metadata"
-                        defaultMuted
-                        class="hero-video">
+                        preload="none"
+                        class="hero-video"
+                        id="heroVideo">
 
                         <source src="{% static 'videos/animation_video.mp4' %}" type="video/mp4">
 
                     </video>
+
+                    <!-- Fallback image shown if video fails to load -->
+                    <img
+                        id="heroImgFallback"
+                        src="{% static 'images/Bannar.jpg' %}"
+                        alt="Amader Uthaan Krishi"
+                        style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0;">
 
                     <div class="hero-video-overlay"></div>
 
@@ -804,24 +812,57 @@ body {
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var v = document.querySelector('.hero-video');
-    if (v) {
+(function() {
+    function showFallback() {
+        var v = document.getElementById('heroVideo');
+        var img = document.getElementById('heroImgFallback');
+        if (v) v.style.display = 'none';
+        if (img) img.style.display = 'block';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var v = document.getElementById('heroVideo');
+        if (!v) return;
+
+        // Force muted for autoplay policy
         v.muted = true;
-        v.setAttribute('muted', '');
-        v.setAttribute('playsinline', '');
-        v.setAttribute('webkit-playsinline', '');
+
+        // Show fallback on any video error
+        v.addEventListener('error', showFallback);
+
+        // Show fallback if source child errors
+        var source = v.querySelector('source');
+        if (source) {
+            source.addEventListener('error', showFallback);
+        }
+
+        // Try to play
         var playPromise = v.play();
         if (playPromise !== undefined) {
-            playPromise.catch(function() {
-                // If browser blocks auto-play, play on first user touch anywhere
+            playPromise.then(function() {
+                // Playing fine - hide fallback
+                var img = document.getElementById('heroImgFallback');
+                if (img) img.style.display = 'none';
+            }).catch(function() {
+                // Autoplay blocked - try on first touch
                 document.body.addEventListener('touchstart', function() {
-                    v.play();
+                    v.play().catch(showFallback);
+                }, { once: true });
+                // On desktop - try on first click/scroll
+                document.body.addEventListener('click', function() {
+                    v.play().catch(showFallback);
                 }, { once: true });
             });
         }
-    }
-});
+
+        // Final safety: if video hasn't started within 5 seconds, show image
+        setTimeout(function() {
+            if (v.paused || v.readyState < 2) {
+                showFallback();
+            }
+        }, 5000);
+    });
+})();
 </script>
 
 {% endblock %}
