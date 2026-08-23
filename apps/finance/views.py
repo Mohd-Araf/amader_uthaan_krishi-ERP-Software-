@@ -1000,11 +1000,24 @@ def trial_balance(request):
     return render(request, "finance/trial_balance.html", data)
 
 
+def _safe_reportlab_import():
+    import sys, types
+    if 'PIL' not in sys.modules or sys.modules['PIL'] is None or not hasattr(sys.modules['PIL'], 'Image'):
+        m = types.ModuleType('PIL')
+        m.Image = types.ModuleType('Image')
+        sys.modules['PIL'] = m
+        sys.modules['PIL.Image'] = m
+        sys.modules['_imaging'] = None
+        sys.modules['PIL._imaging'] = None
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import A4
+    return canvas, A4
+
+
 @login_required
 @user_passes_test(admin_required)
 def trial_balance_pdf(request):
-    from reportlab.pdfgen import canvas
-    from reportlab.lib.pagesizes import A4
+    canvas, A4 = _safe_reportlab_import()
 
     data = _get_trial_balance_data(request)
     rows = data["rows"]
@@ -1017,10 +1030,10 @@ def trial_balance_pdf(request):
     pdf = canvas.Canvas(response, pagesize=A4)
     width, height = A4
 
-    # Header branding & Title
-    y = height - 40
+    # Header branding & Title (Income Statement Theme style)
+    y = height - 45
     pdf.setFont("Helvetica-Bold", 16)
-    pdf.setFillColorRGB(0.05, 0.47, 0.34)  # Organic Green Theme #0d7a57
+    pdf.setFillColorRGB(0.18, 0.50, 0.71)  # Income statement blue #2f7fb5
     pdf.drawString(40, y, "AMADER UTHAAN KRISHI ERP")
 
     pdf.setFont("Helvetica-Bold", 12)
@@ -1045,17 +1058,17 @@ def trial_balance_pdf(request):
     pdf.drawString(40, y - 34, filter_str)
 
     # Line divider
-    pdf.setStrokeColorRGB(0.8, 0.85, 0.8)
+    pdf.setStrokeColorRGB(0.85, 0.85, 0.85)
     pdf.setLineWidth(1)
     pdf.line(40, y - 44, width - 40, y - 44)
 
-    # Table Header Box
+    # Table Header Box (Income statement table theme: Light slate background)
     y_table = y - 66
-    pdf.setFillColorRGB(0.05, 0.47, 0.34)
-    pdf.rect(40, y_table - 5, width - 80, 20, fill=1, stroke=0)
+    pdf.setFillColorRGB(0.93, 0.94, 0.96)  # Light gray-blue header #eeeff4
+    pdf.rect(40, y_table - 5, width - 80, 20, fill=1, stroke=1)
 
     pdf.setFont("Helvetica-Bold", 9)
-    pdf.setFillColorRGB(1, 1, 1)
+    pdf.setFillColorRGB(0.2, 0.2, 0.2)
     pdf.drawString(45, y_table, "Account Code")
     pdf.drawString(140, y_table, "Account Name")
     pdf.drawString(300, y_table, "Account Type")
@@ -1075,26 +1088,16 @@ def trial_balance_pdf(request):
 
         acc_type_name = str(acc.get_type1_display() if hasattr(acc, 'get_type1_display') else acc.type1).capitalize()
 
-        pdf.setFillColorRGB(0.1, 0.1, 0.1)
+        pdf.setFillColorRGB(0.15, 0.15, 0.15)
         pdf.drawString(45, y_curr, str(acc.account_code or ""))
         pdf.drawString(140, y_curr, str(acc.name)[:28])
         pdf.drawString(300, y_curr, acc_type_name)
 
-        # Color coding amounts
-        if dr > ZERO:
-            pdf.setFillColorRGB(0.1, 0.53, 0.33)  # Green for debit
-        else:
-            pdf.setFillColorRGB(0.4, 0.4, 0.4)
         pdf.drawRightString(440, y_curr, dr_str)
-
-        if cr > ZERO:
-            pdf.setFillColorRGB(0.86, 0.21, 0.27)  # Red for credit
-        else:
-            pdf.setFillColorRGB(0.4, 0.4, 0.4)
         pdf.drawRightString(550, y_curr, cr_str)
 
         # Light border below row
-        pdf.setStrokeColorRGB(0.92, 0.92, 0.92)
+        pdf.setStrokeColorRGB(0.9, 0.9, 0.9)
         pdf.setLineWidth(0.5)
         pdf.line(40, y_curr - 4, width - 40, y_curr - 4)
 
@@ -1106,14 +1109,14 @@ def trial_balance_pdf(request):
             pdf.setFont("Helvetica", 9)
 
     # Grand Total Line & Row
-    y_curr -= 5
-    pdf.setStrokeColorRGB(0.05, 0.47, 0.34)
+    y_curr -= 4
+    pdf.setStrokeColorRGB(0.18, 0.50, 0.71)
     pdf.setLineWidth(1.5)
     pdf.line(40, y_curr + 12, width - 40, y_curr + 12)
 
     pdf.setFont("Helvetica-Bold", 10)
-    pdf.setFillColorRGB(0.05, 0.47, 0.34)
-    pdf.drawString(45, y_curr, "TOTAL")
+    pdf.setFillColorRGB(0.18, 0.50, 0.71)
+    pdf.drawString(45, y_curr, "Total")
     pdf.drawRightString(440, y_curr, f"BDT {total_debit:,.2f}")
     pdf.drawRightString(550, y_curr, f"BDT {total_credit:,.2f}")
 
@@ -1122,7 +1125,7 @@ def trial_balance_pdf(request):
     # Balanced status footer
     pdf.setFont("Helvetica-Bold", 9)
     if data["balanced"]:
-        pdf.setFillColorRGB(0.1, 0.53, 0.33)
+        pdf.setFillColorRGB(0.18, 0.50, 0.71)
         pdf.drawString(45, y_curr - 22, "Status: Trial Balance Matched (Total Debit = Total Credit)")
     else:
         pdf.setFillColorRGB(0.86, 0.21, 0.27)
@@ -1690,8 +1693,7 @@ def voucher_print(request, voucher_no):
 
 @user_passes_test(admin_required)
 def voucher_pdf(request, voucher_no):
-    from reportlab.pdfgen import canvas
-    from reportlab.lib.pagesizes import A4
+    canvas, A4 = _safe_reportlab_import()
     voucher = get_object_or_404(Journal, Q(voucher_no=voucher_no) | Q(journal_id=voucher_no))
     response = HttpResponse(content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{voucher.voucher_no}.pdf"'
