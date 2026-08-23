@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 
 <!-- ================= HERO SECTION ================= -->
@@ -19,7 +20,7 @@
                         playsinline
                         class="hero-video">
 
-                        <source src="/static/videos/WhatsApp Video 2026-08-02 at 00.39.39.mp4" type="video/mp4">
+                        <source src="{% static 'videos/animationvideo.mp4' %}" type="video/mp4">
 
                     </video>
 

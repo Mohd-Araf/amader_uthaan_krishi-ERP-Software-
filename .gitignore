@@ -1,6 +1,4 @@
 # Large media files
-static/videos/
-*.mp4
 *.mov
 *.avi
 *.mkv
