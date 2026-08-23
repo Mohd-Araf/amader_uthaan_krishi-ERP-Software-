@@ -23,6 +23,11 @@
 
         <div>
 
+            <a href="{% url 'order_receipt_pdf' order.id %}"
+               class="btn btn-success font-weight-bold mr-2 shadow-sm">
+                <i class="fas fa-file-pdf mr-1"></i> Download Receipt
+            </a>
+
             <a href="{% url 'admin_panel' %}?tab=orders"
                class="btn btn-outline-secondary">
 

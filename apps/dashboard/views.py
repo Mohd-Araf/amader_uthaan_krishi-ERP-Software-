@@ -65,6 +65,161 @@ def user_order_detail(request, order_id):
     })
 
 
+@login_required
+def order_receipt_pdf(request, order_id):
+    """
+    Generates a professional Order Receipt PDF.
+    Accessible by the order owner (customer) and staff/superuser.
+    """
+    if request.user.is_staff or request.user.is_superuser:
+        order = get_object_or_404(Order.objects.prefetch_related('items', 'items__product'), id=order_id)
+    else:
+        order = get_object_or_404(Order.objects.prefetch_related('items', 'items__product'), id=order_id, user=request.user)
+
+    from django.http import HttpResponse
+
+    import sys, types
+    if 'PIL' not in sys.modules or sys.modules['PIL'] is None or not hasattr(sys.modules['PIL'], 'Image'):
+        m = types.ModuleType('PIL')
+        m.Image = types.ModuleType('Image')
+        sys.modules['PIL'] = m
+        sys.modules['PIL.Image'] = m
+        sys.modules['_imaging'] = None
+        sys.modules['PIL._imaging'] = None
+
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import A4
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = f'attachment; filename="Order_Receipt_#{order.order_code}.pdf"'
+
+    pdf = canvas.Canvas(response, pagesize=A4)
+    width, height = A4
+
+    # Top Yellow Header Banner
+    y = height - 40
+    pdf.setFillColorRGB(1.0, 0.90, 0.50)  # #ffe680
+    pdf.rect(30, y - 10, width - 60, 30, fill=1, stroke=1)
+
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.setFillColorRGB(0.1, 0.1, 0.1)
+    pdf.drawCentredString(width / 2.0, y, f"Amader Uthaan Krishi Bill — Order #{order.order_code}")
+
+    # Meta Customer & Order Info
+    y -= 35
+    pdf.setFont("Helvetica-Bold", 9)
+    pdf.setFillColorRGB(0.2, 0.2, 0.2)
+    pdf.drawString(35, y, f"Date: {order.created_at.strftime('%d.%m.%Y')}")
+    pdf.drawString(200, y, f"Customer: {order.user.username}")
+    pdf.drawRightString(width - 35, y, f"Status: {order.get_status_display()}")
+
+    # Table Header (Blue #0070c0)
+    y -= 25
+    pdf.setFillColorRGB(0.0, 0.44, 0.75)  # #0070c0
+    pdf.rect(35, y - 5, width - 70, 20, fill=1, stroke=0)
+
+    pdf.setFont("Helvetica-Bold", 9)
+    pdf.setFillColorRGB(1.0, 1.0, 1.0)
+    pdf.drawString(40, y, "SL")
+    pdf.drawString(75, y, "Product Name")
+    pdf.drawString(290, y, "Qty")
+    pdf.drawRightString(430, y, "Unit Price")
+    pdf.drawRightString(550, y, "Total")
+
+    y_curr = y - 20
+    pdf.setFont("Helvetica", 9)
+
+    counter = 1
+    items = order.items.all()
+    for item in items:
+        if item.is_admin_added and not item.is_visible_to_user and not (request.user.is_staff or request.user.is_superuser):
+            continue
+
+        prod_name = str(item.product.name)
+        if item.status == 'complimentary':
+            prod_name += " (Complimentary)"
+
+        qty_str = item.formatted_qty_unit
+        price_val = item.price_at_order_time if item.price_at_order_time is not None else item.product.price
+        total_val = item.updated_total if order.status == "accepted" else item.total_price()
+
+        pdf.setFillColorRGB(0.15, 0.15, 0.15)
+        pdf.drawString(40, y_curr, str(counter))
+        pdf.drawString(75, y_curr, prod_name[:36])
+        pdf.drawString(290, y_curr, str(qty_str))
+        pdf.drawRightString(430, y_curr, f"{price_val:.2f} BDT")
+        pdf.drawRightString(550, y_curr, f"{total_val:.2f} BDT")
+
+        # Row line
+        pdf.setStrokeColorRGB(0.85, 0.85, 0.85)
+        pdf.setLineWidth(0.5)
+        pdf.line(35, y_curr - 4, width - 35, y_curr - 4)
+
+        y_curr -= 18
+        counter += 1
+
+        if y_curr < 140:
+            pdf.showPage()
+            y_curr = height - 50
+
+    # Summary & Payment Details
+    y_curr -= 10
+    pdf.setStrokeColorRGB(0.8, 0.8, 0.8)
+    pdf.setLineWidth(1)
+    pdf.line(35, y_curr + 5, width - 35, y_curr + 5)
+
+    # bKash Card Box on Left
+    if order.status == "accepted":
+        pdf.setFillColorRGB(1.0, 0.96, 0.96)  # #fff5f5
+        pdf.setStrokeColorRGB(0.90, 0.22, 0.21)  # red dashed border
+        pdf.rect(35, y_curr - 65, 230, 60, fill=1, stroke=1)
+
+        pdf.setFont("Helvetica-Bold", 9)
+        pdf.setFillColorRGB(0.1, 0.1, 0.1)
+        pdf.drawString(42, y_curr - 18, "Payment Instructions")
+        pdf.setFont("Helvetica", 8)
+        pdf.setFillColorRGB(0.4, 0.4, 0.4)
+        pdf.drawString(42, y_curr - 32, "Please send bill amount via bKash:")
+        pdf.setFont("Helvetica-Bold", 10)
+        pdf.setFillColorRGB(0.75, 0.0, 0.0)  # #c00000
+        pdf.drawString(42, y_curr - 48, "bKash Number: 01403181484")
+
+        # Summary Values on Right
+        pdf.setFont("Helvetica", 9)
+        pdf.setFillColorRGB(0.3, 0.3, 0.3)
+
+        pdf.drawString(300, y_curr - 12, "Discount:")
+        pdf.drawRightString(550, y_curr - 12, f"- {order.discount or 0:.2f} BDT")
+
+        pdf.drawString(300, y_curr - 26, "Packaging & Delivery:")
+        pdf.drawRightString(550, y_curr - 26, f"{order.packaging_charge or 0:.2f} BDT")
+
+        pdf.setFont("Helvetica-Bold", 9.5)
+        pdf.setFillColorRGB(0.0, 0.44, 0.75)
+        pdf.drawString(300, y_curr - 40, "Final Total:")
+        pdf.drawRightString(550, y_curr - 40, f"{order.final_total:.2f} BDT")
+
+        pdf.setFillColorRGB(0.1, 0.53, 0.33)
+        pdf.drawString(300, y_curr - 55, "Total Bill (with bKash):")
+        pdf.drawRightString(550, y_curr - 55, f"{order.final_payment:.2f} BDT")
+
+        y_curr -= 80
+    else:
+        pdf.setFont("Helvetica-Bold", 10)
+        pdf.setFillColorRGB(0.0, 0.44, 0.75)
+        pdf.drawString(300, y_curr - 15, "Total Price:")
+        pdf.drawRightString(550, y_curr - 15, f"{order.total_price:.2f} BDT")
+        y_curr -= 35
+
+    # Footer Msg
+    pdf.setFont("Helvetica-Oblique", 9)
+    pdf.setFillColorRGB(0.44, 0.19, 0.63)  # #7030a0
+    pdf.drawCentredString(width / 2.0, y_curr, "We hope you enjoy our fresh harvests — thank you for supporting Amader Uthaan Krishi!")
+
+    pdf.save()
+    return response
+
+
 # =========================
 # STAFF / SUPPLIER LIST & DETAIL
 # =========================

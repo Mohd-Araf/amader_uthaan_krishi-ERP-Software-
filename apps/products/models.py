@@ -191,6 +191,37 @@ class OrderItem(models.Model):
             return (qty / 1000.0) * price
         return qty * price
 
+    @property
+    def formatted_qty_unit(self):
+        qty = self.updated_quantity if (self.order.status == 'accepted' and self.updated_quantity is not None) else self.quantity
+        return self.format_quantity(qty, self.product.unit)
+
+    @property
+    def formatted_qty_unit_initial(self):
+        return self.format_quantity(self.quantity, self.product.unit)
+
+    @staticmethod
+    def format_quantity(qty, unit):
+        if qty is None:
+            return ""
+        if unit == 'gm':
+            if qty >= 1000:
+                kg = qty / 1000.0
+                if kg.is_integer():
+                    return f"{int(kg)} kg"
+                return f"{round(kg, 2)} kg"
+            else:
+                if isinstance(qty, float) and qty.is_integer():
+                    return f"{int(qty)} gm"
+                return f"{qty} gm"
+        else:
+            unit_str = unit.lower() if unit else ""
+            if isinstance(qty, float) and qty.is_integer():
+                qty_val = str(int(qty))
+            else:
+                qty_val = str(round(qty, 2))
+            return f"{qty_val} {unit_str}"
+
     def __str__(self):
         return f"{self.product.name} x {self.quantity}"
 

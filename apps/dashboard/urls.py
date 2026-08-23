@@ -8,6 +8,7 @@ urlpatterns = [
     # User Orders (List & Detail)
     path('my-orders/', views.user_order_list, name='user_orders'),
     path('my-orders/<int:order_id>/', views.user_order_detail, name='user_order_detail'),
+    path('order/<int:order_id>/receipt-pdf/', views.order_receipt_pdf, name='order_receipt_pdf'),
     path('user_orders/', views.orders_view, name='user_orders_redirect'),
 
     # Staff / Supplier Orders (List & Detail)
