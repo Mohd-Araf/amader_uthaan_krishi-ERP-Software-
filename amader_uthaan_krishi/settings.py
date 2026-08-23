@@ -18,6 +18,7 @@ ALLOWED_HOSTS = [
 
 CSRF_TRUSTED_ORIGINS = [
     'https://amader-uthaan-krishi-erp-software.onrender.com',
+    'https://amader-uthaan-krishi.onrender.com',
     'https://*.onrender.com',
 ]
 
