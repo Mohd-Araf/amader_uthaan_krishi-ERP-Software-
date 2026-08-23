@@ -545,7 +545,7 @@
       cursor: pointer;
     }
 
-    /* Drawer Nav Links (Hover Bug Fix) */
+    /* Drawer Nav Links */
     .drawer-nav {
       padding: 14px 20px;
       display: flex;
@@ -678,12 +678,12 @@
       background: #fee2e2;
     }
 
-    /* ─── FOOTER ─── */
+    /* ─── SITE FOOTER ─── */
     .site-footer {
       background: #1b4332; /* Softened modern organic green */
       color: #e2e8f0;
-      padding: 60px 0 30px 0;
-      margin-top: 60px;
+      padding: 50px 0 25px 0;
+      margin-top: 50px;
     }
 
     .footer-brand {
@@ -697,6 +697,7 @@
       color: #b7e4c7;
       font-size: 14px;
       line-height: 1.6;
+      margin-bottom: 0;
     }
 
     .footer-heading {
@@ -745,6 +746,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      word-break: break-word;
     }
 
     .footer-contact i {
@@ -761,8 +763,9 @@
     }
 
     .footer-hr {
-      border-color: rgba(255, 255, 255, 0.12);
-      margin: 40px 0 20px 0;
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      margin: 35px 0 20px 0;
     }
 
     .footer-copy {
@@ -787,25 +790,87 @@
       }
     }
 
+    /* ─── MOBILE COMPACT & SLEEK FOOTER ─── */
     @media (max-width: 767px) {
       .site-footer {
-        padding: 40px 0 25px 0;
+        padding: 26px 0 16px 0;
+        margin-top: 30px;
+        text-align: center;
       }
 
       .footer-col-mobile {
-        margin-bottom: 26px;
-        padding-bottom: 18px;
-        border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
-      }
-
-      .footer-col-mobile:last-child {
-        margin-bottom: 0;
+        margin-bottom: 16px;
         padding-bottom: 0;
         border-bottom: none;
       }
 
+      .footer-brand {
+        font-size: 1.15rem;
+        margin-bottom: 4px;
+      }
+
+      .footer-tagline {
+        font-size: 12.5px;
+        line-height: 1.4;
+        max-width: 300px;
+        margin: 0 auto 6px auto;
+      }
+
+      .footer-heading {
+        font-size: 0.92rem;
+        margin-bottom: 8px;
+      }
+
+      .footer-heading::after {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: -3px;
+        width: 22px;
+      }
+
+      /* Compact Horizontal Pills for Quick Links on Phone */
+      .footer-links {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .footer-links a {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 4px 12px;
+        border-radius: var(--radius-pill);
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
       .footer-links a:hover {
-        transform: translateX(6px);
+        transform: none;
+        background: rgba(255, 255, 255, 0.18);
+        color: #ffffff;
+      }
+
+      /* Compact Contact details on Phone */
+      .footer-contact {
+        justify-content: center;
+        font-size: 12px;
+        margin-bottom: 5px;
+        gap: 8px;
+      }
+
+      .footer-contact i {
+        width: 24px;
+        height: 24px;
+        font-size: 10.5px;
+      }
+
+      .footer-hr {
+        margin: 14px 0 10px 0;
+      }
+
+      .footer-copy {
+        font-size: 11px;
       }
     }
   </style>
@@ -1069,7 +1134,7 @@
       </div>
     </div>
     <hr class="footer-hr">
-    <p class="footer-copy">&copy; 2026 Amader Uthaan Krishi. All Rights Reserved.</p>
+    <p class="footer-copy">&copy; 2026 Md. Mahbub Hassan Araf. All Rights Reserved.</p>
   </div>
 </footer>
 
