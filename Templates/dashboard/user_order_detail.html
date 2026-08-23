@@ -60,13 +60,6 @@
         overflow-wrap: break-word;
     }
 
-    /* ===== ACCEPTED TABLE COLUMN WIDTHS (5 cols) ===== */
-    .acc-col-sl    { width: 8%; }
-    .acc-col-name  { width: 34%; }
-    .acc-col-qty   { width: 20%; }
-    .acc-col-price { width: 20%; }
-    .acc-col-total { width: 18%; }
-
     /* ===== PENDING TABLE COLUMN WIDTHS (7 cols) ===== */
     .pen-col-sl     { width: 7%; }
     .pen-col-name   { width: 28%; }
@@ -130,8 +123,8 @@
         }
 
         .bill-header-banner {
-            font-size: 0.88rem;
-            padding: 0.45rem 0.6rem;
+            font-size: 0.82rem;
+            padding: 0.4rem 0.5rem;
             letter-spacing: 0;
         }
 
@@ -141,14 +134,14 @@
         }
 
         .table-memo thead th {
-            font-size: 0.68rem;
-            padding: 0.35rem 0.2rem !important;
+            font-size: 0.6rem;
+            padding: 0.3rem 0.15rem !important;
             letter-spacing: 0;
         }
 
         .table-memo td {
-            font-size: 0.72rem;
-            padding: 0.35rem 0.2rem !important;
+            font-size: 0.65rem;
+            padding: 0.3rem 0.15rem !important;
         }
 
         .summary-box-value {
@@ -157,8 +150,7 @@
             font-size: 0.8rem;
         }
 
-        .summary-box-row span,
-        .summary-box-row label {
+        .summary-box-row span {
             font-size: 0.78rem;
         }
 
@@ -173,13 +165,6 @@
         .bill-footer-msg {
             font-size: 0.8rem;
         }
-
-        /* Accepted 5-col tighter on small phones */
-        .acc-col-sl    { width: 9%; }
-        .acc-col-name  { width: 32%; }
-        .acc-col-qty   { width: 21%; }
-        .acc-col-price { width: 20%; }
-        .acc-col-total { width: 18%; }
 
         /* Pending 7-col tighter on small phones */
         .pen-col-sl     { width: 7%; }
@@ -279,15 +264,16 @@
 
         {% else %}
 
-            <!-- ========== ACCEPTED TABLE (6 columns — no Status, no Unit) ========== -->
+            <!-- ========== ACCEPTED TABLE (7 columns — no Status, no Unit col; unit shown in Qty) ========== -->
             <table class="table table-bordered table-memo text-center">
                 <colgroup>
-                    <col style="width:7%">
-                    <col style="width:28%">
+                    <col style="width:6%">
+                    <col style="width:22%">
+                    <col style="width:12%">
                     <col style="width:13%">
-                    <col style="width:14%">
-                    <col style="width:19%">
-                    <col style="width:19%">
+                    <col style="width:13%">
+                    <col style="width:17%">
+                    <col style="width:17%">
                 </colgroup>
                 <thead>
                     <tr>
@@ -295,6 +281,7 @@
                         <th class="text-left">Product Name</th>
                         <th>Qty</th>
                         <th>Upd. Qty</th>
+                        <th>Unit Price</th>
                         <th>Total</th>
                         <th>Upd. Total</th>
                     </tr>
@@ -309,6 +296,7 @@
                             </td>
                             <td>{{ item.formatted_qty_unit_initial }}</td>
                             <td class="font-weight-bold">{{ item.formatted_updated_qty_unit }}</td>
+                            <td>{{ item.price_at_order_time|default:item.product.price }} ৳</td>
                             <td>{{ item.total_price|floatformat:2 }} ৳</td>
                             <td class="font-weight-bold text-success">{{ item.updated_total|floatformat:2 }} ৳</td>
                         </tr>
@@ -322,19 +310,10 @@
         <!-- Bill Summary & Payment Info -->
         <div class="p-3 bg-light">
             {% if order.status == "accepted" %}
-                <div class="row align-items-center">
 
-                    <div class="col-md-6 col-12 mb-3 mb-md-0">
-                        <div class="bkash-info-card">
-                            <h6 class="font-weight-bold text-dark mb-1">💳 Payment Instructions</h6>
-                            <p class="small text-muted mb-2">Please send the final total bill amount via bKash to the number below:</p>
-                            <div class="bkash-text-red">
-                                Bkash Number: 01403181484
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-12">
+                <!-- Summary Numbers first (desktop: left col; mobile: full width top) -->
+                <div class="row">
+                    <div class="col-md-6 col-12 order-md-2 order-1 mb-3">
                         <div class="summary-box-row">
                             <span class="font-weight-bold text-muted">Discount:</span>
                             <div class="summary-box-value text-danger">- {{ order.discount|default:0 }} ৳</div>
@@ -353,7 +332,18 @@
                         </div>
                     </div>
 
+                    <!-- bKash card: desktop left, mobile below summary -->
+                    <div class="col-md-6 col-12 order-md-1 order-2">
+                        <div class="bkash-info-card">
+                            <h6 class="font-weight-bold text-dark mb-1">💳 Payment Instructions</h6>
+                            <p class="small text-muted mb-2">Please send the final total bill amount via bKash to the number below:</p>
+                            <div class="bkash-text-red">
+                                Bkash Number: 01403181484
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
             {% endif %}
 
             <div class="bill-footer-msg">
