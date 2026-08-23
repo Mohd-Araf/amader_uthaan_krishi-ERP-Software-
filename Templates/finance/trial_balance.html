@@ -426,11 +426,18 @@ body{
         </h5>
 
         <div>
-            <!-- EXCEL QUICK BUTTON IN TABLE HEADER -->
-            <a href="{% url 'export_all_ledgers_excel' %}?from_date={{ from_date }}&to_date={{ to_date }}&search={{ search }}"
+            <!-- EXCEL TRIAL BALANCE REPORT BUTTON -->
+            <a href="{% url 'trial_balance_excel' %}?search={{ search }}&type={{ selected_type }}&from_date={{ from_date }}&to_date={{ to_date }}"
                class="btn btn-sm btn-outline-success mr-2 font-weight-bold">
                 <i class="fas fa-file-excel mr-1"></i>
                 Export Excel
+            </a>
+
+            <!-- PDF TRIAL BALANCE REPORT BUTTON -->
+            <a href="{% url 'trial_balance_pdf' %}?search={{ search }}&type={{ selected_type }}&from_date={{ from_date }}&to_date={{ to_date }}"
+               class="btn btn-sm btn-outline-danger mr-2 font-weight-bold">
+                <i class="fas fa-file-pdf mr-1"></i>
+                Export PDF
             </a>
 
             <span class="badge badge-primary px-3 py-2">

@@ -263,6 +263,16 @@ urlpatterns = [
         views.trial_balance,
         name="trial_balance"
     ),
+    path(
+        "trial-balance/pdf/",
+        views.trial_balance_pdf,
+        name="trial_balance_pdf"
+    ),
+    path(
+        "trial-balance/excel/",
+        views.trial_balance_excel,
+        name="trial_balance_excel"
+    ),
     path("income-statement/", views.income_statement, name="income_statement"),
     path("balance-sheet/", views.balance_sheet, name="balance_sheet"),
 

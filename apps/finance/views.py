@@ -922,9 +922,11 @@ def other_ledger(request):
 # TRIAL BALANCE REPORT
 # ==========================================================
 
-@login_required
-@user_passes_test(admin_required)
-def trial_balance(request):
+def _get_trial_balance_data(request):
+    """
+    Helper function to calculate Trial Balance data with filters.
+    Shared by HTML view, PDF export, and Excel export.
+    """
     search = request.GET.get("search", "").strip()
     type1 = request.GET.get("type", "").strip()
     from_date = request.GET.get("from_date", "").strip()
@@ -979,20 +981,295 @@ def trial_balance(request):
         total_debit = _q(total_debit + display_debit)
         total_credit = _q(total_credit + display_credit)
 
-    return render(
-        request,
-        "finance/trial_balance.html",
-        {
-            "rows": rows,
-            "total_debit": total_debit,
-            "total_credit": total_credit,
-            "balanced": total_debit == total_credit,
-            "search": search,
-            "selected_type": type1,
-            "from_date": from_date,
-            "to_date": to_date,
-        },
+    return {
+        "rows": rows,
+        "total_debit": total_debit,
+        "total_credit": total_credit,
+        "balanced": total_debit == total_credit,
+        "search": search,
+        "selected_type": type1,
+        "from_date": from_date,
+        "to_date": to_date,
+    }
+
+
+@login_required
+@user_passes_test(admin_required)
+def trial_balance(request):
+    data = _get_trial_balance_data(request)
+    return render(request, "finance/trial_balance.html", data)
+
+
+@login_required
+@user_passes_test(admin_required)
+def trial_balance_pdf(request):
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import A4
+
+    data = _get_trial_balance_data(request)
+    rows = data["rows"]
+    total_debit = data["total_debit"]
+    total_credit = data["total_credit"]
+
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="Trial_Balance_Report.pdf"'
+
+    pdf = canvas.Canvas(response, pagesize=A4)
+    width, height = A4
+
+    # Header branding & Title
+    y = height - 40
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.setFillColorRGB(0.05, 0.47, 0.34)  # Organic Green Theme #0d7a57
+    pdf.drawString(40, y, "AMADER UTHAAN KRISHI ERP")
+
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.setFillColorRGB(0.2, 0.2, 0.2)
+    pdf.drawString(40, y - 18, "FINANCIAL TRIAL BALANCE REPORT")
+
+    pdf.setFont("Helvetica", 9)
+    pdf.setFillColorRGB(0.4, 0.4, 0.4)
+    gen_time = timezone.now().strftime("%d-%b-%Y %I:%M %p")
+    pdf.drawRightString(width - 40, y, f"Generated On: {gen_time}")
+
+    # Active Filters Summary
+    filter_items = []
+    if data["search"]:
+        filter_items.append(f"Search: '{data['search']}'")
+    if data["selected_type"]:
+        filter_items.append(f"Type: {data['selected_type'].capitalize()}")
+    if data["from_date"] or data["to_date"]:
+        filter_items.append(f"Period: {data['from_date'] or 'Start'} to {data['to_date'] or 'Present'}")
+
+    filter_str = " | ".join(filter_items) if filter_items else "Period: All Time (Real-Time Report)"
+    pdf.drawString(40, y - 34, filter_str)
+
+    # Line divider
+    pdf.setStrokeColorRGB(0.8, 0.85, 0.8)
+    pdf.setLineWidth(1)
+    pdf.line(40, y - 44, width - 40, y - 44)
+
+    # Table Header Box
+    y_table = y - 66
+    pdf.setFillColorRGB(0.05, 0.47, 0.34)
+    pdf.rect(40, y_table - 5, width - 80, 20, fill=1, stroke=0)
+
+    pdf.setFont("Helvetica-Bold", 9)
+    pdf.setFillColorRGB(1, 1, 1)
+    pdf.drawString(45, y_table, "Account Code")
+    pdf.drawString(140, y_table, "Account Name")
+    pdf.drawString(300, y_table, "Account Type")
+    pdf.drawRightString(440, y_table, "Debit")
+    pdf.drawRightString(550, y_table, "Credit")
+
+    y_curr = y_table - 20
+    pdf.setFont("Helvetica", 9)
+
+    for r in rows:
+        acc = r["account"]
+        dr = r["debit"]
+        cr = r["credit"]
+
+        dr_str = f"BDT {dr:,.2f}" if dr > ZERO else "-"
+        cr_str = f"BDT {cr:,.2f}" if cr > ZERO else "-"
+
+        acc_type_name = str(acc.get_type1_display() if hasattr(acc, 'get_type1_display') else acc.type1).capitalize()
+
+        pdf.setFillColorRGB(0.1, 0.1, 0.1)
+        pdf.drawString(45, y_curr, str(acc.account_code or ""))
+        pdf.drawString(140, y_curr, str(acc.name)[:28])
+        pdf.drawString(300, y_curr, acc_type_name)
+
+        # Color coding amounts
+        if dr > ZERO:
+            pdf.setFillColorRGB(0.1, 0.53, 0.33)  # Green for debit
+        else:
+            pdf.setFillColorRGB(0.4, 0.4, 0.4)
+        pdf.drawRightString(440, y_curr, dr_str)
+
+        if cr > ZERO:
+            pdf.setFillColorRGB(0.86, 0.21, 0.27)  # Red for credit
+        else:
+            pdf.setFillColorRGB(0.4, 0.4, 0.4)
+        pdf.drawRightString(550, y_curr, cr_str)
+
+        # Light border below row
+        pdf.setStrokeColorRGB(0.92, 0.92, 0.92)
+        pdf.setLineWidth(0.5)
+        pdf.line(40, y_curr - 4, width - 40, y_curr - 4)
+
+        y_curr -= 18
+
+        if y_curr < 60:
+            pdf.showPage()
+            y_curr = height - 50
+            pdf.setFont("Helvetica", 9)
+
+    # Grand Total Line & Row
+    y_curr -= 5
+    pdf.setStrokeColorRGB(0.05, 0.47, 0.34)
+    pdf.setLineWidth(1.5)
+    pdf.line(40, y_curr + 12, width - 40, y_curr + 12)
+
+    pdf.setFont("Helvetica-Bold", 10)
+    pdf.setFillColorRGB(0.05, 0.47, 0.34)
+    pdf.drawString(45, y_curr, "TOTAL")
+    pdf.drawRightString(440, y_curr, f"BDT {total_debit:,.2f}")
+    pdf.drawRightString(550, y_curr, f"BDT {total_credit:,.2f}")
+
+    pdf.line(40, y_curr - 6, width - 40, y_curr - 6)
+
+    # Balanced status footer
+    pdf.setFont("Helvetica-Bold", 9)
+    if data["balanced"]:
+        pdf.setFillColorRGB(0.1, 0.53, 0.33)
+        pdf.drawString(45, y_curr - 22, "Status: Trial Balance Matched (Total Debit = Total Credit)")
+    else:
+        pdf.setFillColorRGB(0.86, 0.21, 0.27)
+        pdf.drawString(45, y_curr - 22, "Status: Trial Balance Unmatched")
+
+    pdf.save()
+    return response
+
+
+@login_required
+@user_passes_test(admin_required)
+def trial_balance_excel(request):
+    data = _get_trial_balance_data(request)
+    rows = data["rows"]
+    total_debit = data["total_debit"]
+    total_credit = data["total_credit"]
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Trial Balance"
+
+    # Show grid lines
+    ws.views.sheetView[0].showGridLines = True
+
+    # Styles
+    title_font = Font(name="Calibri", size=16, bold=True, color="0D7A57")
+    sub_font = Font(name="Calibri", size=10, italic=True, color="595959")
+    header_fill = PatternFill(start_color="0D7A57", end_color="0D7A57", fill_type="solid")
+    header_font = Font(name="Calibri", size=11, bold=True, color="FFFFFF")
+    total_fill = PatternFill(start_color="F2F4F7", end_color="F2F4F7", fill_type="solid")
+    total_font = Font(name="Calibri", size=11, bold=True, color="000000")
+
+    thin_border = Border(
+        left=Side(style='thin', color='D3D3D3'),
+        right=Side(style='thin', color='D3D3D3'),
+        top=Side(style='thin', color='D3D3D3'),
+        bottom=Side(style='thin', color='D3D3D3')
     )
+
+    double_bottom_border = Border(
+        left=Side(style='thin', color='D3D3D3'),
+        right=Side(style='thin', color='D3D3D3'),
+        top=Side(style='thin', color='0D7A57'),
+        bottom=Side(style='double', color='0D7A57')
+    )
+
+    # Title & Information
+    ws.merge_cells("A1:E1")
+    ws["A1"] = "AMADER UTHAAN KRISHI ERP - TRIAL BALANCE REPORT"
+    ws["A1"].font = title_font
+    ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
+    ws.row_dimensions[1].height = 25
+
+    ws.merge_cells("A2:E2")
+    info_text = f"Generated On: {timezone.now().strftime('%d-%b-%Y %I:%M %p')}"
+    if data["from_date"] or data["to_date"]:
+        info_text += f" | Period: {data['from_date'] or 'Start'} to {data['to_date'] or 'Present'}"
+    if data["search"]:
+        info_text += f" | Search: '{data['search']}'"
+    if data["selected_type"]:
+        info_text += f" | Type: {data['selected_type'].capitalize()}"
+
+    ws["A2"] = info_text
+    ws["A2"].font = sub_font
+    ws["A2"].alignment = Alignment(horizontal="center", vertical="center")
+    ws.row_dimensions[2].height = 18
+
+    # Empty Row 3
+    ws.append([])
+
+    # Header Row (Row 4)
+    headers = ["Account Code", "Account Name", "Account Type", "Debit", "Credit"]
+    ws.append(headers)
+    ws.row_dimensions[4].height = 24
+
+    for col_idx, _ in enumerate(headers, 1):
+        cell = ws.cell(row=4, column=col_idx)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center" if col_idx != 2 else "left", vertical="center")
+        cell.border = thin_border
+
+    # Data Rows
+    current_row = 5
+    for r in rows:
+        acc = r["account"]
+        dr = r["debit"]
+        cr = r["credit"]
+
+        dr_str = f"BDT {dr:,.2f}" if dr > ZERO else "-"
+        cr_str = f"BDT {cr:,.2f}" if cr > ZERO else "-"
+
+        acc_type_name = str(acc.get_type1_display() if hasattr(acc, 'get_type1_display') else acc.type1).capitalize()
+
+        ws.append([
+            str(acc.account_code or ""),
+            str(acc.name),
+            acc_type_name,
+            dr_str,
+            cr_str,
+        ])
+
+        ws.cell(row=current_row, column=1).alignment = Alignment(horizontal="center")
+        ws.cell(row=current_row, column=2).alignment = Alignment(horizontal="left")
+        ws.cell(row=current_row, column=3).alignment = Alignment(horizontal="center")
+        ws.cell(row=current_row, column=4).alignment = Alignment(horizontal="right")
+        ws.cell(row=current_row, column=5).alignment = Alignment(horizontal="right")
+
+        for c in range(1, 6):
+            ws.cell(row=current_row, column=c).border = thin_border
+
+        current_row += 1
+
+    # Total Row
+    total_dr_str = f"BDT {total_debit:,.2f}"
+    total_cr_str = f"BDT {total_credit:,.2f}"
+
+    ws.append(["Total", "", "", total_dr_str, total_cr_str])
+    ws.row_dimensions[current_row].height = 22
+
+    for col_idx in range(1, 6):
+        cell = ws.cell(row=current_row, column=col_idx)
+        cell.fill = total_fill
+        cell.font = total_font
+        cell.border = double_bottom_border
+
+    ws.cell(row=current_row, column=1).alignment = Alignment(horizontal="left")
+    ws.cell(row=current_row, column=4).alignment = Alignment(horizontal="right")
+    ws.cell(row=current_row, column=5).alignment = Alignment(horizontal="right")
+
+    # Column Widths
+    col_widths = {
+        "A": 18,
+        "B": 35,
+        "C": 18,
+        "D": 22,
+        "E": 22,
+    }
+    for col_letter, width in col_widths.items():
+        ws.column_dimensions[col_letter].width = width
+
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = 'attachment; filename="Trial_Balance_Report.xlsx"'
+    wb.save(response)
+    return response
 
 
 # ==========================================================
