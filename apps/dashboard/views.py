@@ -574,12 +574,15 @@ def user_detail(request, user_id):
 @user_passes_test(is_admin)
 def add_product(request):
     if request.method == "POST":
+        is_active_val = request.POST.get("is_active", "on")
+        is_active = (is_active_val in ["on", "1", "true", True])
         Product.objects.create(
             name=request.POST.get("name"),
             price=request.POST.get("price"),
             unit=request.POST.get("unit"),
             description=request.POST.get("description"),
-            image=request.FILES.get("image")
+            image=request.FILES.get("image"),
+            is_active=is_active
         )
         return redirect('admin_panel')
 
@@ -603,10 +606,14 @@ def edit_product(request, product_id):
         product.unit = request.POST.get("unit", product.unit)
         product.description = request.POST.get("description", product.description)
 
+        is_active_val = request.POST.get("is_active")
+        product.is_active = (is_active_val in ["on", "1", "true", True])
+
         if request.FILES.get("image"):
             product.image = request.FILES.get("image")
 
         product.save()
+        messages.success(request, f"Product '{product.name}' updated successfully.")
         return redirect('product_detail', product_id=product.id)
 
     return render(request, 'dashboard/edit_product.html', {
@@ -624,11 +631,32 @@ def product_detail(request, product_id):
 
 @login_required
 @user_passes_test(is_admin)
-def delete_product(request, product_id):
+def toggle_product_status(request, product_id):
+    """
+    Toggles product between Active and Inactive without deleting data.
+    """
     product = get_object_or_404(Product, id=product_id)
-    if product.image:
-        product.image.delete()
-    product.delete()
+    product.is_active = not product.is_active
+    product.save()
+    status_txt = "Active (Visible in Shop)" if product.is_active else "Inactive (Hidden from Shop)"
+    messages.success(request, f"Product '{product.name}' is now marked as {status_txt}.")
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
+    return redirect('admin_panel')
+
+
+@login_required
+@user_passes_test(is_admin)
+def delete_product(request, product_id):
+    """
+    Soft-delete: Deactivates product so it's hidden from shop, but retains
+    all Chart of Accounts, Ledgers, Journals, and Order Items safely.
+    """
+    product = get_object_or_404(Product, id=product_id)
+    product.is_active = False
+    product.save()
+    messages.success(request, f"Product '{product.name}' has been deactivated and hidden from shop. Chart of Accounts, Ledgers, and historical orders are 100% preserved.")
     return redirect('admin_panel')
 
 

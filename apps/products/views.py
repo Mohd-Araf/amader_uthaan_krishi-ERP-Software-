@@ -33,7 +33,7 @@ def clean_quantity_by_unit(product, raw_qty):
 
 def shop(request):
     query = request.GET.get('q')
-    products = Product.objects.all()
+    products = Product.objects.filter(is_active=True)
 
     if query:
         products = products.filter(
@@ -49,7 +49,7 @@ def shop(request):
 
 @login_required
 def add_to_cart(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+    product = get_object_or_404(Product, id=product_id, is_active=True)
     cart = request.session.get('cart', {})
 
     raw_qty = request.POST.get('quantity', 1)
@@ -101,7 +101,7 @@ def cart(request):
     total = 0
 
     for pid, qty in list(cart.items()):
-        product = Product.objects.filter(id=pid).first()
+        product = Product.objects.filter(id=pid, is_active=True).first()
         if product:
             # মডেলে আপডেট করা calculate_price() মেথড দিয়ে গ্রামের সঠিক হিসাব
             item_total = product.calculate_price(qty)
@@ -113,6 +113,10 @@ def cart(request):
             })
 
             total += item_total
+        else:
+            # Inactive or deleted product removed from active cart
+            cart.pop(str(pid), None)
+            request.session['cart'] = cart
 
     return render(request, 'products/cart.html', {
         'items': items,
@@ -127,7 +131,7 @@ def order_confirm(request):
     total = 0
 
     for pid, qty in list(cart.items()):
-        product = Product.objects.filter(id=pid).first()
+        product = Product.objects.filter(id=pid, is_active=True).first()
         if product:
             item_total = product.calculate_price(qty)
 
@@ -139,6 +143,9 @@ def order_confirm(request):
             })
 
             total += item_total
+        else:
+            cart.pop(str(pid), None)
+            request.session['cart'] = cart
 
     return render(request, 'products/order_confirm.html', {
         'items': items,
@@ -158,8 +165,8 @@ def confirm_order(request):
             user=request.user
         )
 
-        for pid, qty in cart.items():
-            product = Product.objects.filter(id=pid).first()
+        for pid, qty in list(cart.items()):
+            product = Product.objects.filter(id=pid, is_active=True).first()
             if product:
                 OrderItem.objects.create(
                     order=order,
@@ -190,7 +197,8 @@ def send_to_supplier(request, order_id):
 def product_details(request, id):
     product = get_object_or_404(
         Product,
-        id=id
+        id=id,
+        is_active=True
     )
 
     context = {

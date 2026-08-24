@@ -18,6 +18,7 @@ class Product(models.Model):
     unit = models.CharField(max_length=10, choices=UNIT_CHOICES)
     description = models.TextField(blank=True, null=True)
     image = models.FileField(upload_to='products/', null=True, blank=True)
+    is_active = models.BooleanField(default=True, help_text="Designates whether this product is visible in shop & search.")
 
     @property
     def is_fractional_allowed(self):
@@ -233,6 +234,10 @@ class OrderItem(models.Model):
         return f"{self.product.name} x {self.quantity}"
 
     def save(self, *args, **kwargs):
+        # Automatically freeze unit price at the time of order creation
+        if self.price_at_order_time is None and self.product_id:
+            if hasattr(self, 'product') and self.product and self.product.price is not None:
+                self.price_at_order_time = self.product.price
 
         if self.pk:
             old = OrderItem.objects.filter(pk=self.pk).first()

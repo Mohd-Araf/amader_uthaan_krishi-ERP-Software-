@@ -10,7 +10,7 @@ from apps.products.models import Product
 
 def home(request):
 
-    products = Product.objects.all().order_by('?')[:8]
+    products = Product.objects.filter(is_active=True).order_by('?')[:8]
 
     return render(request, 'home.html', {
         'products': products

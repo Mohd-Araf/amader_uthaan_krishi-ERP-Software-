@@ -265,7 +265,10 @@ def create_sales_voucher(order: Order, created_by=None):
             rate = Decimal(str(
                 item.price_at_order_time if item.price_at_order_time is not None else item.product.price
             )).quantize(TWO_DECIMAL, rounding=ROUND_HALF_UP)
-            amount = (qty * rate).quantize(TWO_DECIMAL, rounding=ROUND_HALF_UP)
+            if item.product.unit == 'gm':
+                amount = ((qty / Decimal('1000')) * rate).quantize(TWO_DECIMAL, rounding=ROUND_HALF_UP)
+            else:
+                amount = (qty * rate).quantize(TWO_DECIMAL, rounding=ROUND_HALF_UP)
 
         product_account, _ = Account.objects.get_or_create(
             product=item.product,
