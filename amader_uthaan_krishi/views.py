@@ -25,7 +25,7 @@ def contact_view(request):
         subject = request.POST.get('subject', '').strip()
         message_text = request.POST.get('message', '').strip()
         if not name or not user_email or not subject or not message_text:
-            messages.error(request, 'Please fill in all required fields.')
+            messages.error(request, 'Please fill in all required fields.', extra_tags='contact')
             return render(request, 'contact.html')
         current_time = datetime.datetime.now().strftime('%d %b %Y, %I:%M %p')
         # formataddr স্বয়ংক্রিয়ভাবে "Md. Rakib" <email> সঠিকভাবে কোটেশন দিয়ে হ্যান্ডেল করে
@@ -129,10 +129,11 @@ def contact_view(request):
             email.content_subtype = "html"
             email.send(fail_silently=False)
             messages.success(request,
-                             'Thank you! Your message has been sent successfully. We will get back to you soon.')
+                             'Thank you! Your message has been sent successfully. We will get back to you soon.',
+                             extra_tags='contact')
             return redirect('contact')
         except Exception as e:
-            messages.error(request, f'Failed to send message: {str(e)}')
+            messages.error(request, f'Failed to send message: {str(e)}', extra_tags='contact')
     return render(request, 'contact.html')
 def about(request):
     return render(request, 'about.html')
