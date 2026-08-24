@@ -87,68 +87,83 @@
     }
 
     /* Quantity Area */
-    .quantity-area {
+    .quantity-wrapper {
         display: flex;
         align-items: center;
-        margin-top: 15px;
+        gap: 14px;
+        margin-top: 12px;
     }
 
-    .quantity-area button {
+    .quantity-group {
+        display: inline-flex;
+        align-items: stretch;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1.5px solid #198754;
+        background: white;
+        box-shadow: 0 2px 8px rgba(25, 135, 84, 0.08);
+    }
+
+    .qty-btn {
         width: 44px;
         height: 44px;
         border: none;
         background: #198754;
         color: white;
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 700;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         transition: background 0.2s ease;
+        user-select: none;
     }
 
-    .quantity-area button:first-child {
-        border-radius: 10px 0 0 10px;
-    }
-
-    .quantity-area button:last-child {
-        border-radius: 0 10px 10px 0;
-    }
-
-    .quantity-area button:hover {
+    .qty-btn:hover {
         background: #146c43;
     }
 
-    .quantity-area input {
+    .qty-input {
         width: 80px;
         height: 44px;
-        border: 1.5px solid #198754;
-        border-left: none;
-        border-right: none;
+        border: none;
         text-align: center;
         font-size: 18px;
         font-weight: 700;
         color: #0f172a;
+        background: transparent;
+        outline: none;
+        -moz-appearance: textfield;
     }
 
-    .unit-tag {
-        margin-left: 12px;
-        font-size: 14px;
+    .qty-input::-webkit-outer-spin-button,
+    .qty-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .unit-badge {
+        font-size: 14.5px;
         font-weight: 600;
-        color: #64748b;
-        background: #f1f5f9;
-        padding: 8px 14px;
+        color: #198754;
+        background: #e8f5e9;
+        padding: 0 16px;
         border-radius: 8px;
+        border: 1px solid #c8e6c9;
+        display: inline-flex;
+        align-items: center;
+        height: 44px;
     }
 
     /* Buttons */
     .action-buttons {
-        display: flex;
-        gap: 15px;
-        margin-top: 30px;
+        margin-top: 28px;
     }
 
     .cart-btn {
-        flex: 1;
-        height: 55px;
+        width: 100%;
+        height: 52px;
         background: #198754;
         color: white;
         font-size: 18px;
@@ -156,28 +171,18 @@
         border-radius: 12px;
         border: none;
         transition: all 0.25s ease;
-    }
-
-    .buy-btn {
-        flex: 1;
-        height: 55px;
-        background: #ff9800;
-        color: white;
-        font-size: 18px;
-        font-weight: 600;
-        border-radius: 12px;
-        border: none;
-        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 14px rgba(25, 135, 84, 0.25);
     }
 
     .cart-btn:hover {
-        background: #157347;
+        background: #146c43;
         color: white;
-    }
-
-    .buy-btn:hover {
-        background: #f57c00;
-        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(25, 135, 84, 0.35);
     }
 
     @media (max-width: 768px) {
@@ -187,10 +192,6 @@
 
         .product-title {
             font-size: 24px;
-        }
-
-        .action-buttons {
-            flex-direction: column;
         }
     }
 </style>
@@ -259,31 +260,34 @@
 
                     <h5 class="mt-4 font-weight-bold text-dark mb-2">Select Quantity</h5>
 
-                    <div class="quantity-area">
-                        <button type="button" onclick="decrease()">-</button>
+                    <div class="quantity-wrapper">
+                        <div class="quantity-group">
+                            <button type="button" class="qty-btn" onclick="decrease()">−</button>
 
-                        {% if product.unit == 'gm' %}
-                            <input type="number" id="qty" name="quantity" value="250" min="50" step="50">
-                            <span class="unit-tag">Grams (gm)</span>
-                        {% elif product.unit == 'pcs' or product.unit == 'ati' or product.unit == 'fana' %}
-                            <input type="number" id="qty" name="quantity" value="1" min="1" step="1">
-                            <span class="unit-tag">{{ product.get_unit_display }}</span>
-                        {% else %}
-                            <input type="number" id="qty" name="quantity" value="1" min="0.5" step="0.5">
-                            <span class="unit-tag">{{ product.get_unit_display }}</span>
-                        {% endif %}
+                            {% if product.unit == 'gm' %}
+                                <input type="number" id="qty" name="quantity" value="250" min="50" step="50" class="qty-input">
+                            {% elif product.unit == 'pcs' or product.unit == 'ati' or product.unit == 'fana' %}
+                                <input type="number" id="qty" name="quantity" value="1" min="1" step="1" class="qty-input">
+                            {% else %}
+                                <input type="number" id="qty" name="quantity" value="1" min="0.5" step="0.5" class="qty-input">
+                            {% endif %}
 
-                        <button type="button" onclick="increase()">+</button>
+                            <button type="button" class="qty-btn" onclick="increase()">+</button>
+                        </div>
+
+                        <span class="unit-badge">
+                            {% if product.unit == 'gm' %}
+                                Grams (gm)
+                            {% else %}
+                                {{ product.get_unit_display }}
+                            {% endif %}
+                        </span>
                     </div>
 
-                    <!-- Action Buttons -->
+                    <!-- Action Buttons (Add to Cart only) -->
                     <div class="action-buttons">
                         <button type="submit" class="btn cart-btn">
                             🛒 Add To Cart
-                        </button>
-
-                        <button type="submit" formaction="{% url 'add_to_cart' product.id %}" class="btn buy-btn">
-                            ⚡ Buy Now
                         </button>
                     </div>
 
