@@ -13,7 +13,14 @@
 
                 <div class="hero-video-box">
 
+                    <!-- Fallback Background Image (displayed on devices/browsers where video doesn't play or is loading) -->
+                    <img src="{% static 'images/Video_Alt.png' %}"
+                         alt="Fresh Organic Vegetables"
+                         class="hero-video-fallback"
+                         id="heroFallbackImg">
+
                     <video
+                        id="heroVideo"
                         autoplay
                         muted
                         loop
@@ -23,6 +30,7 @@
                         x5-video-player-type="h5"
                         x5-video-player-fullscreen="true"
                         preload="auto"
+                        poster="{% static 'images/Video_Alt.png' %}"
                         class="hero-video">
 
                         <source src="{% static 'videos/animation_video.mp4' %}" type="video/mp4">
@@ -243,6 +251,18 @@ body {
     overflow: hidden;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-soft);
+    background-color: #1a1f16;
+}
+
+.hero-video-fallback {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    z-index: 0;
 }
 
 .hero-video {
@@ -253,7 +273,8 @@ body {
     height: 100%;
     object-fit: cover;
     display: block;
-    z-index: 0;
+    z-index: 1;
+    background: transparent;
 }
 
 .hero-video-overlay {
@@ -807,8 +828,15 @@ body {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var v = document.querySelector('.hero-video');
+    var v = document.getElementById('heroVideo') || document.querySelector('.hero-video');
+    var fallback = document.getElementById('heroFallbackImg');
     if (!v) return;
+
+    // If video fails to load or cannot decode, hide it so the fallback image is cleanly shown
+    v.addEventListener('error', function() {
+        v.style.display = 'none';
+        if (fallback) fallback.style.display = 'block';
+    }, true);
 
     function startVideo() {
         v.muted = true;
