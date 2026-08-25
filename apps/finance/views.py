@@ -1811,14 +1811,14 @@ def export_all_ledgers_excel(request):
     )
 
     # ------------------ TITLE & INFO ------------------
-    ws.merge_cells("A1:J1")
+    ws.merge_cells("A1:K1")
     ws["A1"] = "MASTER GENERAL LEDGER STATEMENT"
     ws["A1"].font = Font(name="Calibri", size=16, bold=True, color="1F4E78")
     ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
     ws.row_dimensions[1].height = 25
 
     # Sub-header Date Info
-    ws.merge_cells("A2:J2")
+    ws.merge_cells("A2:K2")
     date_info = f"Generated On: {timezone.now().strftime('%d-%b-%Y %I:%M %p')}"
     if from_date_str or to_date_str:
         date_info += f" | Period: {from_date_str or 'Start'} to {to_date_str or 'Present'}"
@@ -1839,6 +1839,7 @@ def export_all_ledgers_excel(request):
         "Journal ID",
         "Voucher No",
         "Particulars",
+        "Opening Balance (৳)",
         "Debit (৳)",
         "Credit (৳)",
         "Balance (৳)"
@@ -1917,56 +1918,47 @@ def export_all_ledgers_excel(request):
         if acc_running_balance == ZERO and not entries.exists():
             continue
 
-        # --- ACCOUNT BANNER / SECTION HEADER ---
-        ws.merge_cells(start_row=current_row, start_column=1, end_row=current_row, end_column=10)
-        banner_cell = ws.cell(row=current_row, column=1)
-        banner_cell.value = f"▶ [{acc.account_code or 'N/A'}] {acc.name}  |  Type: {acc.get_type1_display()} ({acc.get_type2_display()})"
-        banner_cell.font = acc_banner_font
-        banner_cell.fill = acc_banner_fill
-        banner_cell.alignment = Alignment(horizontal="left", vertical="center")
-        ws.row_dimensions[current_row].height = 20
+        # --- OPENING BALANCE ROW (IF APPLICABLE) ---
+        if total_prev_dr > ZERO or total_prev_cr > ZERO or (acc_running_balance != ZERO and not entries.exists()):
+            ws.append([
+                sl_no,
+                acc.account_code or "",
+                acc.name,
+                from_date_str or (acc.created_at.strftime("%d-%m-%Y") if acc.created_at else "Opening"),
+                "-",
+                "-",
+                "Opening Balance",
+                ZERO,
+                total_prev_dr if total_prev_dr > ZERO else "",
+                total_prev_cr if total_prev_cr > ZERO else "",
+                acc_running_balance
+            ])
 
-        for c in range(1, 11):
-            ws.cell(row=current_row, column=c).border = thin_border
+            for col_i in range(1, 12):
+                c_cell = ws.cell(row=current_row, column=col_i)
+                c_cell.border = thin_border
+                c_cell.font = Font(name="Calibri", size=10, italic=True)
+                if col_i in [8, 9, 10, 11] and isinstance(c_cell.value, (int, float, Decimal)):
+                    c_cell.number_format = '#,##0.00'
+                    c_cell.alignment = Alignment(horizontal="right", vertical="center")
+                elif col_i in [1, 2, 4, 5, 6]:
+                    c_cell.alignment = Alignment(horizontal="center", vertical="center")
+                else:
+                    c_cell.alignment = Alignment(horizontal="left", vertical="center")
 
-        current_row += 1
-
-        # --- OPENING BALANCE ROW ---
-        ws.append([
-            sl_no,
-            acc.account_code or "",
-            acc.name,
-            from_date_str or (acc.created_at.strftime("%d-%m-%Y") if acc.created_at else "Opening"),
-            "-",
-            "-",
-            "Opening Balance",
-            total_prev_dr if total_prev_dr > ZERO else "",
-            total_prev_cr if total_prev_cr > ZERO else "",
-            acc_running_balance
-        ])
-
-        for col_i in range(1, 11):
-            c_cell = ws.cell(row=current_row, column=col_i)
-            c_cell.border = thin_border
-            c_cell.font = Font(name="Calibri", size=10, italic=True)
-            if col_i in [8, 9, 10] and isinstance(c_cell.value, (int, float, Decimal)):
-                c_cell.number_format = '#,##0.00'
-                c_cell.alignment = Alignment(horizontal="right")
-            elif col_i in [1, 2, 4, 5, 6]:
-                c_cell.alignment = Alignment(horizontal="center")
-
-        current_row += 1
-        sl_no += 1
+            current_row += 1
+            sl_no += 1
 
         # --- TRANSACTION ROWS ---
         for entry in entries:
             dr = _q(entry.debit)
             cr = _q(entry.credit)
+            op_bal = acc_running_balance
 
             if acc.type1 in ["asset", "expense"]:
-                acc_running_balance = _q(acc_running_balance + dr - cr)
+                acc_running_balance = _q(op_bal + dr - cr)
             else:
-                acc_running_balance = _q(acc_running_balance + cr - dr)
+                acc_running_balance = _q(op_bal + cr - dr)
 
             grand_total_debit = _q(grand_total_debit + dr)
             grand_total_credit = _q(grand_total_credit + cr)
@@ -1984,51 +1976,50 @@ def export_all_ledgers_excel(request):
                 journal_id_val,
                 voucher_no_val,
                 narration_val,
+                op_bal,
                 dr if dr > ZERO else "",
                 cr if cr > ZERO else "",
                 acc_running_balance
             ])
 
-            for col_i in range(1, 11):
+            for col_i in range(1, 12):
                 c_cell = ws.cell(row=current_row, column=col_i)
                 c_cell.border = thin_border
                 c_cell.font = Font(name="Calibri", size=10)
-                if col_i in [8, 9, 10] and isinstance(c_cell.value, (int, float, Decimal)):
+                if col_i in [8, 9, 10, 11] and isinstance(c_cell.value, (int, float, Decimal)):
                     c_cell.number_format = '#,##0.00'
-                    c_cell.alignment = Alignment(horizontal="right")
+                    c_cell.alignment = Alignment(horizontal="right", vertical="center")
                 elif col_i in [1, 2, 4, 5, 6]:
-                    c_cell.alignment = Alignment(horizontal="center")
+                    c_cell.alignment = Alignment(horizontal="center", vertical="center")
+                else:
+                    c_cell.alignment = Alignment(horizontal="left", vertical="center")
 
             current_row += 1
             sl_no += 1
 
-        # Small spacing after each account
-        current_row += 1
-        ws.row_dimensions[current_row - 1].height = 8
-
     # ------------------ GRAND TOTAL ROW ------------------
-    ws.merge_cells(start_row=current_row, start_column=1, end_row=current_row, end_column=7)
+    ws.merge_cells(start_row=current_row, start_column=1, end_row=current_row, end_column=8)
     tot_label = ws.cell(row=current_row, column=1)
     tot_label.value = "GRAND TOTAL (ALL TRANSACTIONS)"
     tot_label.font = total_font
     tot_label.alignment = Alignment(horizontal="right", vertical="center")
 
-    dr_cell = ws.cell(row=current_row, column=8, value=grand_total_debit)
+    dr_cell = ws.cell(row=current_row, column=9, value=grand_total_debit)
     dr_cell.font = total_font
     dr_cell.number_format = '#,##0.00'
-    dr_cell.alignment = Alignment(horizontal="right")
+    dr_cell.alignment = Alignment(horizontal="right", vertical="center")
 
-    cr_cell = ws.cell(row=current_row, column=9, value=grand_total_credit)
+    cr_cell = ws.cell(row=current_row, column=10, value=grand_total_credit)
     cr_cell.font = total_font
     cr_cell.number_format = '#,##0.00'
-    cr_cell.alignment = Alignment(horizontal="right")
+    cr_cell.alignment = Alignment(horizontal="right", vertical="center")
 
-    bal_cell = ws.cell(row=current_row, column=10, value=_q(grand_total_debit - grand_total_credit))
+    bal_cell = ws.cell(row=current_row, column=11, value=_q(grand_total_debit - grand_total_credit))
     bal_cell.font = total_font
     bal_cell.number_format = '#,##0.00'
-    bal_cell.alignment = Alignment(horizontal="right")
+    bal_cell.alignment = Alignment(horizontal="right", vertical="center")
 
-    for col_i in range(1, 11):
+    for col_i in range(1, 12):
         cell = ws.cell(row=current_row, column=col_i)
         cell.fill = total_fill
         cell.border = double_bottom_border
@@ -2037,16 +2028,17 @@ def export_all_ledgers_excel(request):
 
     # ------------------ AUTO COLUMN WIDTHS ------------------
     col_widths = {
-        "A": 8,  # SL No
+        "A": 8,   # SL No
         "B": 15,  # Account Code
         "C": 30,  # Account / Product Name
         "D": 14,  # Date
         "E": 15,  # Journal ID
         "F": 18,  # Voucher No
         "G": 38,  # Particulars
-        "H": 16,  # Debit
-        "I": 16,  # Credit
-        "J": 18,  # Balance
+        "H": 20,  # Opening Balance (৳)
+        "I": 16,  # Debit (৳)
+        "J": 16,  # Credit (৳)
+        "K": 18,  # Balance (৳)
     }
     for col_letter, width in col_widths.items():
         ws.column_dimensions[col_letter].width = width
