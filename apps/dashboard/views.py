@@ -484,7 +484,7 @@ def delete_user(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
     if user != request.user:
         user.delete()
-    return redirect('admin_panel')
+    return redirect('/dashboard/admin_panel/?tab=users')
 
 
 @login_required
@@ -495,7 +495,7 @@ def send_to_supplier_admin(request, order_id):
     order.assigned_to = supplier
     order.status = 'sent_to_uthaan_krishi'
     order.save()
-    return redirect('admin_panel')
+    return redirect('/dashboard/admin_panel/?tab=orders')
 
 
 @login_required
@@ -504,7 +504,7 @@ def accept_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order.status = 'accepted'
     order.save()
-    return redirect('admin_panel')
+    return redirect('/dashboard/admin_panel/?tab=orders')
 
 
 @login_required
@@ -513,7 +513,7 @@ def reject_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order.status = 'rejected'
     order.save()
-    return redirect('admin_panel')
+    return redirect('/dashboard/admin_panel/?tab=orders')
 
 
 @login_required
@@ -523,7 +523,7 @@ def payment_done(request, order_id):
     order.status = "payment_done"
     order.save()
     receive_payment(order)
-    return redirect("admin_panel")
+    return redirect('/dashboard/admin_panel/?tab=orders')
 
 
 @login_required
@@ -532,7 +532,7 @@ def delivery_done(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order.status = 'delivery_done'
     order.save()
-    return redirect('admin_panel')
+    return redirect('/dashboard/admin_panel/?tab=orders')
 
 
 @login_required
@@ -584,7 +584,7 @@ def add_product(request):
             image=request.FILES.get("image"),
             is_active=is_active
         )
-        return redirect('admin_panel')
+        return redirect('/dashboard/admin_panel/?tab=products')
 
     return render(request, 'dashboard/add_product.html', {
         'unit_choices': Product.UNIT_CHOICES
@@ -640,10 +640,7 @@ def toggle_product_status(request, product_id):
     product.save()
     status_txt = "Active (Visible in Shop)" if product.is_active else "Inactive (Hidden from Shop)"
     messages.success(request, f"Product '{product.name}' is now marked as {status_txt}.")
-    referer = request.META.get('HTTP_REFERER')
-    if referer:
-        return redirect(referer)
-    return redirect('admin_panel')
+    return redirect('/dashboard/admin_panel/?tab=products')
 
 
 @login_required
@@ -657,7 +654,7 @@ def delete_product(request, product_id):
     product.is_active = False
     product.save()
     messages.success(request, f"Product '{product.name}' has been deactivated and hidden from shop. Chart of Accounts, Ledgers, and historical orders are 100% preserved.")
-    return redirect('admin_panel')
+    return redirect('/dashboard/admin_panel/?tab=products')
 
 
 @login_required
@@ -668,7 +665,7 @@ def update_order_status(request, order_id, status):
     if status in valid_statuses:
         order.status = status
         order.save()
-    return redirect('admin_panel')
+    return redirect('/dashboard/admin_panel/?tab=orders')
 
 
 @login_required
@@ -682,7 +679,7 @@ def assign_order_user(request, order_id):
             order.assigned_to = user
             order.status = "sent_to_uthaan_krishi"
             order.save()
-    return redirect('admin_panel')
+    return redirect('/dashboard/admin_panel/?tab=orders')
 
 
 @login_required

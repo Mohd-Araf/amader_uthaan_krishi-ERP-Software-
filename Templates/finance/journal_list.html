@@ -55,10 +55,15 @@ View all accounting journals and vouchers.
 
 
 
-<div class="col-lg-6">
+<div class="col-lg-6 d-flex align-items-center justify-content-lg-end">
 
 
-<form method="GET">
+<a href="{% url 'financial_dashboard' %}" class="btn btn-outline-primary mr-2 text-nowrap">
+    <i class="fas fa-arrow-left"></i> Dashboard
+</a>
+
+
+<form method="GET" class="flex-grow-1">
 
 
 <div class="input-group">

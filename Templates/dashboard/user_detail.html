@@ -3,7 +3,12 @@
 
 <div class="container mt-4">
 
-    <h3>User Detail</h3>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">User Detail</h3>
+        <a href="{% url 'admin_panel' %}?tab=users" class="btn btn-outline-secondary font-weight-bold">
+            <i class="fas fa-arrow-left mr-1"></i> Back to Users
+        </a>
+    </div>
 
     <div class="card p-3">
 
