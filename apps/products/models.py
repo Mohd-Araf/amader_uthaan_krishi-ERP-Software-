@@ -125,7 +125,7 @@ class Order(models.Model):
 
             with transaction.atomic():
 
-                now = timezone.now()
+                now = timezone.localtime(timezone.now())
                 month = now.strftime("%m")
                 year = now.strftime("%y")
 

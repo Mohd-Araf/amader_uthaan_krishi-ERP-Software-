@@ -534,7 +534,7 @@ def outstanding_vouchers_api(request, account_id):
                 item["journal"].voucher_no if item.get("journal") else "OPENING-BALANCE"),
             "voucher_type": item.get("voucher_type") or (
                 item["journal"].get_voucher_type_display() if item.get("journal") else "Opening Balance"),
-            "date": item["journal"].created_at.strftime("%d-%m-%Y") if item.get("journal") else "Opening Balance",
+            "date": timezone.localtime(item["journal"].created_at).strftime("%d-%m-%Y") if item.get("journal") else "Opening Balance",
             "original_amount": str(item["original_amount"]),
             "paid_amount": str(item["paid_amount"]),
             "outstanding_amount": str(item["outstanding_amount"]),
@@ -1042,7 +1042,7 @@ def trial_balance_pdf(request):
 
     pdf.setFont("Helvetica", 9)
     pdf.setFillColorRGB(0.4, 0.4, 0.4)
-    gen_time = timezone.now().strftime("%d-%b-%Y %I:%M %p")
+    gen_time = timezone.localtime(timezone.now()).strftime("%d-%b-%Y %I:%M %p")
     pdf.drawRightString(width - 40, y, f"Generated On: {gen_time}")
 
     # Active Filters Summary
@@ -1180,7 +1180,7 @@ def trial_balance_excel(request):
     ws.row_dimensions[1].height = 25
 
     ws.merge_cells("A2:E2")
-    info_text = f"Generated On: {timezone.now().strftime('%d-%b-%Y %I:%M %p')}"
+    info_text = f"Generated On: {timezone.localtime(timezone.now()).strftime('%d-%b-%Y %I:%M %p')}"
     if data["from_date"] or data["to_date"]:
         info_text += f" | Period: {data['from_date'] or 'Start'} to {data['to_date'] or 'Present'}"
     if data["search"]:
@@ -1713,7 +1713,7 @@ def voucher_pdf(request, voucher_no):
     y -= 20
     pdf.drawString(50, y, f"Status: {voucher.status.upper()}")
     y -= 20
-    pdf.drawString(50, y, f"Date: {voucher.created_at.strftime('%d-%m-%Y')}")
+    pdf.drawString(50, y, f"Date: {timezone.localtime(voucher.created_at).strftime('%d-%m-%Y') if voucher.created_at else '-'}")
 
     y -= 40
     pdf.setFont("Helvetica-Bold", 11)
@@ -1753,7 +1753,7 @@ def get_account_journals(request, account_id):
             "journal_id": j.journal_id,
             "voucher_no": j.voucher_no,
             "reference_no": j.reference_no,
-            "date": j.created_at.strftime("%d-%m-%Y"),
+            "date": timezone.localtime(j.created_at).strftime("%d-%m-%Y") if j.created_at else "-",
         }
         for j in journals
     ]
@@ -1819,7 +1819,7 @@ def export_all_ledgers_excel(request):
 
     # Sub-header Date Info
     ws.merge_cells("A2:K2")
-    date_info = f"Generated On: {timezone.now().strftime('%d-%b-%Y %I:%M %p')}"
+    date_info = f"Generated On: {timezone.localtime(timezone.now()).strftime('%d-%b-%Y %I:%M %p')}"
     if from_date_str or to_date_str:
         date_info += f" | Period: {from_date_str or 'Start'} to {to_date_str or 'Present'}"
     else:
@@ -1924,7 +1924,7 @@ def export_all_ledgers_excel(request):
                 sl_no,
                 acc.account_code or "",
                 acc.name,
-                from_date_str or (acc.created_at.strftime("%d-%m-%Y") if acc.created_at else "Opening"),
+                from_date_str or (timezone.localtime(acc.created_at).strftime("%d-%m-%Y") if acc.created_at else "Opening"),
                 "-",
                 "-",
                 "Opening Balance",
@@ -1963,7 +1963,7 @@ def export_all_ledgers_excel(request):
             grand_total_debit = _q(grand_total_debit + dr)
             grand_total_credit = _q(grand_total_credit + cr)
 
-            date_val = entry.entry_date.strftime("%d-%m-%Y") if entry.entry_date else ""
+            date_val = timezone.localtime(entry.entry_date).strftime("%d-%m-%Y") if entry.entry_date else ""
             journal_id_val = entry.journal.journal_id if entry.journal else ""
             voucher_no_val = entry.voucher_no or (entry.journal.voucher_no if entry.journal else "") or "-"
             narration_val = entry.narration or (entry.journal.notes if entry.journal else "") or "-"
@@ -2047,7 +2047,7 @@ def export_all_ledgers_excel(request):
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    timestamp = timezone.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = timezone.localtime(timezone.now()).strftime("%Y%m%d_%H%M%S")
     response["Content-Disposition"] = f'attachment; filename="All_Ledgers_Report_{timestamp}.xlsx"'
     wb.save(response)
     return response

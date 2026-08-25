@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
+from django.utils import timezone
 from apps.accounts.models import CustomUser
 from apps.products.models import Product, Order, OrderItem
 from apps.finance.models import Journal, Account
@@ -109,7 +110,7 @@ def order_receipt_pdf(request, order_id):
     y -= 35
     pdf.setFont("Helvetica-Bold", 9)
     pdf.setFillColorRGB(0.2, 0.2, 0.2)
-    pdf.drawString(35, y, f"Date: {order.created_at.strftime('%d.%m.%Y')}")
+    pdf.drawString(35, y, f"Date: {timezone.localtime(order.created_at).strftime('%d.%m.%Y') if order.created_at else '-'}")
     pdf.drawString(200, y, f"Customer: {order.user.username}")
     pdf.drawRightString(width - 35, y, f"Status: {order.get_status_display()}")
 

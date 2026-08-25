@@ -459,7 +459,7 @@ class Journal(models.Model):
                 self.journal_id = f"JR{serial}"
 
             if not self.voucher_no:
-                year = timezone.now().strftime("%y")
+                year = timezone.localtime(timezone.now()).strftime("%y")
                 prefix_map = {
                     "sales": "SV",
                     "purchase": "PUV",

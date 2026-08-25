@@ -4,6 +4,7 @@ from email.utils import formataddr
 from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
+from django.utils import timezone
 
 from amader_uthaan_krishi import settings
 from apps.products.models import Product
@@ -15,7 +16,6 @@ def home(request):
     return render(request, 'home.html', {
         'products': products
     })
-from django.shortcuts import render
 
 
 def contact_view(request):
@@ -27,7 +27,7 @@ def contact_view(request):
         if not name or not user_email or not subject or not message_text:
             messages.error(request, 'Please fill in all required fields.', extra_tags='contact')
             return render(request, 'contact.html')
-        current_time = datetime.datetime.now().strftime('%d %b %Y, %I:%M %p')
+        current_time = timezone.localtime(timezone.now()).strftime('%d %b %Y, %I:%M %p')
         # formataddr স্বয়ংক্রিয়ভাবে "Md. Rakib" <email> সঠিকভাবে কোটেশন দিয়ে হ্যান্ডেল করে
         dynamic_from_email = formataddr((name, user_email))
         # HTML Email Template
