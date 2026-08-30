@@ -341,7 +341,10 @@ def receive_payment(request, account_id=None, journal_id=None):
         selected_customer = Account.objects.filter(id=query_customer_id, type2="customer").first()
 
     customer_accounts = Account.objects.filter(type2="customer", status="active").order_by("name")
-    cash_bank_accounts = Account.objects.filter(type2__in=["cash", "bank"], status="active").order_by("name")
+    cash_bank_accounts = Account.objects.filter(
+        Q(type2__in=["cash", "bank", "bad_debt"]) | Q(name__icontains="Bad Debt"),
+        status="active"
+    ).order_by("type1", "name")
 
     outstanding_vouchers = []
     if selected_customer:

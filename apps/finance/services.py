@@ -442,12 +442,19 @@ def receive_customer_payment_voucher_wise(customer_account: Account, payment_acc
         posted_at=timezone.now()
     )
 
+    if payment_account.type2 in ["cash", "bank"]:
+        pay_narration = f"Cash/Bank Received from {customer_account.name}"
+    elif payment_account.type2 == "bad_debt" or "bad debt" in payment_account.name.lower():
+        pay_narration = f"Bad Debt (Expected Credit Loss) Settlement for {customer_account.name}"
+    else:
+        pay_narration = f"Settlement Received from {customer_account.name} into {payment_account.name}"
+
     JournalEntry.objects.create(
         journal=journal_obj,
         account=payment_account,
         debit=total_received,
         credit=ZERO,
-        narration=f"Cash/Bank Received from {customer_account.name}",
+        narration=pay_narration,
         created_by=received_by
     )
 

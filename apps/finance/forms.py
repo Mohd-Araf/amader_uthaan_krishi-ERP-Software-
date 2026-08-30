@@ -103,7 +103,7 @@ class ReceivePaymentForm(forms.Form):
     payment_account = forms.ModelChoiceField(
         queryset=Account.objects.none(),
         widget=forms.Select(attrs={"class": "form-select"}),
-        label="Deposit To (Cash/Bank)",
+        label="Deposit To (Cash / Bank / Bad Debt)",
         required=True
     )
 
@@ -138,9 +138,12 @@ class ReceivePaymentForm(forms.Form):
         self.fields["customer_account"].empty_label = "-- Choose Customer Account --"
         self.fields["customer_account"].label_from_instance = lambda obj: f"{obj.name} (Current Receivable: ৳ {obj.current_balance:,.2f})"
 
-        payment_qs = Account.objects.filter(status="active", type2__in=["cash", "bank"]).order_by("name")
+        payment_qs = Account.objects.filter(
+            Q(type2__in=["cash", "bank", "bad_debt"]) | Q(name__icontains="Bad Debt"),
+            status="active"
+        ).order_by("type1", "name")
         self.fields["payment_account"].queryset = payment_qs
-        self.fields["payment_account"].empty_label = "-- Choose Deposit Account --"
+        self.fields["payment_account"].empty_label = "-- Choose Deposit Account (Cash / Bank / Bad Debt) --"
         self.fields["payment_account"].label_from_instance = lambda obj: f"{obj.name} (Balance: ৳ {obj.current_balance:,.2f})"
 
 

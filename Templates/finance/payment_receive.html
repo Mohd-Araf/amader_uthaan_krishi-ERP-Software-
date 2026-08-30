@@ -60,11 +60,11 @@ Receive Customer Payment
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-bold">Deposit To (Cash/Bank) <span class="text-danger">*</span></label>
+                        <label class="form-label fw-bold">Deposit To (Cash / Bank / Bad Debt) <span class="text-danger">*</span></label>
                         <select name="payment_account" class="form-select form-control" required>
-                            <option value="">-- Choose Cash/Bank Account --</option>
+                            <option value="">-- Choose Account (Cash / Bank / Bad Debt) --</option>
                             {% for acc in cash_bank_accounts %}
-                                <option value="{{ acc.id }}" {% if acc.is_default %}selected{% endif %}>
+                                <option value="{{ acc.id }}" {% if acc.is_default and acc.type2 == 'cash' %}selected{% endif %}>
                                     {{ acc.name }} (Balance: ৳{{ acc.get_current_balance|floatformat:2|intcomma }})
                                 </option>
                             {% endfor %}

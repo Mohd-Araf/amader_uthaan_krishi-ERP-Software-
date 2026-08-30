@@ -63,6 +63,7 @@ class Account(models.Model):
         ("discount", "Discount"),
         ("packaging", "Packaging Charge"),
         ("bkash_charge", "bKash Charge"),
+        ("bad_debt", "Bad Debt / Expected Credit Loss"),
         ("other", "Other"),
     )
 

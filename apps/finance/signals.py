@@ -231,6 +231,14 @@ def create_default_system_accounts(sender, **kwargs):
             "is_default": True,
             "status": "active",
         },
+        # Bad Debt (Expected Credit Loss) Account
+        {
+            "name": "Bad Debt (Expected Credit Loss)",
+            "type1": "expense",
+            "type2": "bad_debt",
+            "is_default": True,
+            "status": "active",
+        },
     ]
 
     for account_data in default_accounts:
